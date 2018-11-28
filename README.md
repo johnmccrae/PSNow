@@ -1,4 +1,4 @@
-# MyNewPSModule
+# New-MyPSModule
 A PowerShell module that uses Plaster to create a new module for you! In essence, a module-building module that builds modules!
 
 This module is based on some really fine work by Mike Robbins,Markus Kraus and Kevin Marquette.
