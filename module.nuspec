@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id><%= $PLASTER_PARAM_ModuleName %></id>
+    <version><%= $PLASTER_PARAM_ModuleVersion %></version>
+    <authors><%= $PLASTER_PARAM_ModuleAuthor %></authors>
+    <owners><%= $PLASTER_PARAM_CompanyName %></owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description><%= $PLASTER_PARAM_Description %></description>
+    <releaseNotes>2nd release</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>PSModule Plaster</tags>
+    <dependencies></dependencies>
+  </metadata>
+  <files>
+    <file src="<%= $PLASTER_PARAM_ModuleName %>.psd1" target="<%= $PLASTER_PARAM_ModuleName %>.psd1"/>
+    <file src="<%= $PLASTER_PARAM_ModuleName %>.psm1" target="<%= $PLASTER_PARAM_ModuleName %>.psm1"/>
+    <file src="Docs\*.*" target="Docs"/>
+    <file src="en-US\*.*" target="en-US"/>
+    <file src="Public\*.*" target="Public"/>
+  </files>
+</package>

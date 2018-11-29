@@ -23,6 +23,7 @@ Pester
     # reference - Auf Deutsch! https://mycloudrevolution.com/2017/06/01/my-custom-plaster-template/
     # reference - https://kevinmarquette.github.io/2017-01-21-powershell-module-continious-delivery-pipeline/?utm_source=blog&utm_medium=blog&utm_content=titlelink
     # reference - https://github.com/PowerShell/platyPS
+    # reference - https://overpoweredshell.com/Working-with-Plaster/#using-token-replacement
 
     General notes
 
@@ -66,9 +67,11 @@ function New-MyPSModule {
         
         if ($PSVersionTable.PSEdition -eq "Desktop") {
             
+            if (!$moduleroot){
+                $moduleroot = "c:\modules"
+            }
             if (-not (Test-Path -path $moduleroot) ) {
             
-                $moduleroot = "c:\modules"
                 New-Item -Path "$moduleroot" -ItemType Directory
             }
 
@@ -79,8 +82,11 @@ function New-MyPSModule {
 
             if (($isMACOS) -or ($isLinux)) {
 
-                if (-not (Test-Path -path $moduleroot) ) {
+                if (!$moduleroot) {
                     $moduleroot = "~/modules"
+                }
+                if (-not (Test-Path -path $moduleroot) ) {
+
                     New-Item -Path "$moduleroot" -ItemType Directory
                 }           
             
@@ -89,8 +95,11 @@ function New-MyPSModule {
             }
             else {
                 
-                if (-not (Test-Path -path $moduleroot) ) {
+                if (!$moduleroot) {
                     $moduleroot = "c:\modules"
+                }
+                if (-not (Test-Path -path $moduleroot) ) {
+            
                     New-Item -Path "$moduleroot" -ItemType Directory
                 }
 
@@ -109,7 +118,8 @@ function New-MyPSModule {
             #CompanyName       = 'mikefrobbins.com'
             #FunctionFolders   = 'public', 'private'
             #Git               = 'Yes'
-            #GitRepoName       = 'ModuleBuildTools'
+            GitHubUserName	   = 'johnmccrae'
+            #GitHubRepo        = 'ModuleBuildTools'
             #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
             PowerShellVersion  = '3.0' #minimum PS version
             # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest. 

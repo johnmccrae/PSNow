@@ -11,10 +11,13 @@
   </metadata>
   <parameters>
     <parameter name="ModuleAuthor" type="user-fullname" prompt="Author" />
-    <parameter name="ModuleName" type="text" prompt="Name of your module" default="ChefITPS" />
+    <parameter name="ModuleName" type="text" prompt="Name of your module" default="MyNewModule" />
     <parameter name="ModuleVersion" type="text" prompt="Version Number" default="0.0.0.1" />
     <parameter name="CompanyName" type="text" prompt="Name of your Organization" default="Chef Software Inc." />
     <parameter name="Description" type="text" prompt="Brief Description of your module" />
+    <parameter name="GitHubUserName" type="text" prompt="Enter your Github username" />
+    <parameter name="GitHubRepo" type="text" prompt="Enter your Github repository name for this project" />
+    <parameter name="PowerShellVersion" type="text" prompt="Enter the minimum PS version needed to run this module" />
     <parameter name="FunctionFolders" type="multichoice" prompt="Please select folders to include" default="0,1,2">
       <choice label="&amp;Public" value="Public" help="Adds a public folder to module root" />
       <choice label="&amp;Internal" value="Internal" help="Adds a internal folder to module root" />
@@ -27,9 +30,9 @@
       <choice label="&amp;Yes" value="Yes" help="Adds a tests folder" />
       <choice label="&amp;No" value="No" help="Does not add a tests folder" />
     </parameter>
-    <parameter name="Git" type="choice" prompt="Include GIt Support?" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Includes Git files" />
-      <choice label="&amp;No" value="No" help="Does not include git files" />
+    <parameter name="Git" type="choice" prompt="Include Git Support?" default="0">
+      <choice label="&amp;Yes" value="Yes" help="Includes Github files" />
+      <choice label="&amp;No" value="No" help="Does not include github files" />
     </parameter>
     <parameter name="InvokeBuild" type="choice" prompt="Include InvokeBuild Script" default="0">
       <choice label="&amp;Yes" value="Yes" help="Adds an invoke build script at the root of module" />
@@ -42,6 +45,10 @@
     <parameter name="PlatyPS" type="choice" prompt="Include PlatyPS" default="0">
       <choice label="&amp;Yes" value="Yes" help="Adds a PlatyPS for help" />
       <choice label="&amp;No" value="No" help="Does not add PlatyPS support" />
+    </parameter>
+    <parameter name="NuSpec" type="choice" prompt="Include Nuspec file" default="0">
+      <choice label="&amp;Yes" value="Yes" help="Adds a Nuspec file" />
+      <choice label="&amp;No" value="No" help="Does not add Nuspec support" />
     </parameter>
   </parameters>
   <content>
@@ -56,12 +63,13 @@
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
     <message>Deploying common files</message>
+    <templateFile source="readme.md" destination="${PLASTER_PARAM_ModuleName}\readme.md" />
+    <templateFile source="LICENSE" destination="${PLASTER_PARAM_ModuleName}\LICENSE" />
+    <templateFile source="LICENSE.yml" destination="${PLASTER_PARAM_ModuleName}\LICENSE.yml" />
+    <templateFile source="mkdocs.yml" destination="${PLASTER_PARAM_ModuleName}\mkdocs.yml" />
     <file source="appveyor.yml" destination="${PLASTER_PARAM_ModuleName}\appveyor.yml" />
     <file source="build.ps1" destination="${PLASTER_PARAM_ModuleName}\build.ps1" />
     <file source="build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\build.depend.psd1" />
-    <file source="mkdocs.yml" destination="${PLASTER_PARAM_ModuleName}\mkdocs.yml" />
-    <file source="LICENSE" destination="${PLASTER_PARAM_ModuleName}\LICENSE" />
-    <file source="PITCHME.md" destination="${PLASTER_PARAM_ModuleName}\PITCHME.md" />
     <file source="psake.ps1" destination="${PLASTER_PARAM_ModuleName}\psake.ps1" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Docs\" />
     <file source="docs\about.md" destination="${PLASTER_PARAM_ModuleName}\docs\about.md" />
@@ -82,9 +90,9 @@
     <file source="tests\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <file source="tests\unload-SUT.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <file source="tests\Export-PSGraph.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <message condition="$PlASTER_PARAM_Git -eq &quot;Yes&quot;">Setting up support for Git</message>
-    <templateFile source="README.md" destination="${PLASTER_PARAM_ModuleName}\README.md" condition="$PLASTER_PARAM_Git -eq &quot;Yes&quot;" />
-    <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PlASTER_PARAM_Git -eq &quot;Yes&quot;" />
+    <message condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;">Setting up support for Github</message>
+    <templateFile source="README.md" destination="${PLASTER_PARAM_ModuleName}\README.md" condition="$PLASTER_PARAM_Github -eq &quot;Yes&quot;" />
+    <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;">Setting up support for Invoke-Build</message>
     <requireModule name="InvokeBuild" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
     <templateFile source="default.build.ps1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
@@ -95,5 +103,7 @@
     <message condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;">Setting up support for PlatyPS</message>
     <requireModule name="PlatyPS" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
+    <message condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;">Setting up support for Nuspec</message>
+    <templateFile source="module.nuspec" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;" />
   </content>
 </plasterManifest>

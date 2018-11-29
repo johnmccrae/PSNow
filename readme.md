@@ -2,9 +2,9 @@
 
 <%= $PLASTER_PARAM_ModuleDesc %>
 
-## GitPitch PitchMe presentation
+## GitHub ReadMe
 
-* [gitpitch.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>](https://gitpitch.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>)
+* [github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>](https://github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>)
 
 ## Getting Started
 
