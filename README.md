@@ -12,8 +12,10 @@ This module is designed to run under PowerShell Core or PowerShell Desktop so it
 Pull the files down and install them where you wish.
 
 ## Usage
+```powershell
 import-module new-mypsmodule
 New-MyPSModule
+```
 
 ## Where to start
 Read about the dependencies in the header of the new-mypsmodule file and install them as need be
