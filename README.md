@@ -12,9 +12,9 @@ This module is designed to run under PowerShell Core or PowerShell Desktop so it
 Pull the files down and install them where you wish.
 
 ## Usage
-```powershell
+```PowerShell
 import-module new-mypsmodule
-New-MyPSModule
+New-MyPSModule -MyNewModuleName mynewmodule -BaseManifest PlasterManifest-extended2.xml -Modulepath "C:\modules"
 ```
 
 ## Where to start
