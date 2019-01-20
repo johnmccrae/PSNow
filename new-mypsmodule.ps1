@@ -54,6 +54,9 @@ function New-MyPSModule {
     process {
 
         $templateroot = $PSScriptRoot
+        
+        Set-Location $PSScriptRoot
+
         #$templateroot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath('./')
 
         # check for old plastermanifest and delete it.
