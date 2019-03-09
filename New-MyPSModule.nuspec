@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>chefitps</id>
-    <version>0.0.0.4</version>
+    <id>New-MyPSModule</id>
+    <version>0.0.0.21</version>
     <authors>John McCrae</authors>
     <owners>Chef Software Inc.</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -13,11 +13,12 @@
     <dependencies></dependencies>
   </metadata>
   <files>
+    <file src="Public\*.*" target="Public"/>
+    <file src="Private\*.*" target="Private"/>
     <file src="Docs\*.*" target="Docs"/>
     <file src="PlasterTemplate\*.*" target="PlasterTemplate"/>
     <file src="spec\*.*" target="spec"/>
     <file src="tests\*.*" target="tests"/>
-    <file src="appveyor.yml" target="appveyor.yml"/>
     <file src="build.depend.ps1" target="build.depend.ps1"/>
     <file src="build.depend.psd1" target="build.depend.psd1"/>
     <file src="build.ps1" target="build.ps1"/>
@@ -27,8 +28,7 @@
     <file src="LICENSE" target="LICENSE"/>
     <file src="LICENSE.yml" target="LICENSE.yml"/>
     <file src="mkdocs.yml" target="mkdocs.yml"/>
-    <file src="module.nuspec" target="module.nuspec"/>
-    <file src="New-MyPSModule.ps1" target="New-MyPSModule.ps1"/>
+    <file src="nuspec.txt" target="nuspec.txt"/>
     <file src="New-MyPSModule.psd1" target="New-MyPSModule.psd1"/>
     <file src="New-MyPSModule.psm1" target="New-MyPSModule.psm1"/>
     <file src="psake.ps1" target="psake.ps1"/>

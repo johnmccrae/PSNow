@@ -67,7 +67,6 @@
     <templateFile source="LICENSE" destination="${PLASTER_PARAM_ModuleName}\LICENSE" />
     <templateFile source="LICENSE.yml" destination="${PLASTER_PARAM_ModuleName}\LICENSE.yml" />
     <templateFile source="mkdocs.yml" destination="${PLASTER_PARAM_ModuleName}\mkdocs.yml" />
-    <file source="appveyor.yml" destination="${PLASTER_PARAM_ModuleName}\appveyor.yml" />
     <file source="build.ps1" destination="${PLASTER_PARAM_ModuleName}\build.ps1" />
     <file source="build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\build.depend.psd1" />
     <file source="psake.ps1" destination="${PLASTER_PARAM_ModuleName}\psake.ps1" />
@@ -104,6 +103,6 @@
     <requireModule name="PlatyPS" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;">Setting up support for Nuspec</message>
-    <templateFile source="module.nuspec" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;" />
+    <templateFile source="nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;" />
   </content>
 </plasterManifest>

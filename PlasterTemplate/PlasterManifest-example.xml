@@ -35,7 +35,6 @@
     <message>
     Deploying common files
     </message>
-    <file source='\root\appveyor.yml' destination='\'/>
     <file source='\root\build.ps1'    destination='\'/>
     <file source='\root\mkdocs.yml'   destination='\'/>
     <file source='\root\LICENSE.yml'  destination='\'/>
