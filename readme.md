@@ -1,26 +1,26 @@
-# <%= $PLASTER_PARAM_ModuleName %>
+# New-MyPSModule 
 
-<%= $PLASTER_PARAM_ModuleDesc %>
+A module used as scaffolding to create an entire PowerShell module framework. Test modules are included. 
 
 ## GitHub ReadMe
 
-* [github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>](https://github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>)
+* [github.com/johnmccrae/New-MyPSModule](https://github.com/johnmccrae/New-MyPSModule)
 
 ## Getting Started
 
 Install from the PSGallery and Import the module
 
-    Install-Module <%= $PLASTER_PARAM_ModuleName %>
-    Import-Module <%= $PLASTER_PARAM_ModuleName %>
+    Install-Module New-MyPSModule 
+    Import-Module New-MyPSModule 
 
 
 ## More Information
 
 For more information
 
-* [<%= $PLASTER_PARAM_ModuleName %>.readthedocs.io](http://<%= $PLASTER_PARAM_ModuleName %>.readthedocs.io)
-* [github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>](https://github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>)
-* [<%= $PLASTER_PARAM_GitHubUserName %>.github.io](https://<%= $PLASTER_PARAM_GitHubUserName %>.github.io)
+* [New-MyPSModule.readthedocs.io](http://New-MyPSModule.readthedocs.io)
+* [github.com/johnmccrae/New-MyPSModule](https://github.com/johnmccrae/New-MyPSModule)
+* [johnmccrae.github.io](https://johnmccrae.github.io)
 
 
 This project was generated using [Kevin Marquette](http://kevinmarquette.github.io)'s [Full Module Plaster Template](https://github.com/KevinMarquette/PlasterTemplates/tree/master/FullModuleTemplate).
