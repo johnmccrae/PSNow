@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>New-MyPSModule</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>MyPSModule</command:noun>
+      <maml:description>
+        <maml:para>A module used to create new PS Modules with.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This module uses Plaster to create all the essential parts of a PowerShell Module</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-MyPSModule</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+          <maml:name>MyNewModuleName</maml:name>
+          <maml:Description>
+            <maml:para>Any string you want to use to describe the name for your new module</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>BaseManifest</maml:name>
+          <maml:Description>
+            <maml:para>We use a Plaster manifest to create your module from. We include 4 examples for you to play with. 3 of them are directly available when you invoke the module.</maml:para>
+          </maml:Description>
+          <command:parameterValueGroup>
+            <command:parameterValue required="false" command:variableLength="false">PlasterManifest-basic.xml</command:parameterValue>
+            <command:parameterValue required="false" command:variableLength="false">PlasterManifest-extended.xml</command:parameterValue>
+            <command:parameterValue required="false" command:variableLength="false">PlasterManifest-extended2.xml</command:parameterValue>
+          </command:parameterValueGroup>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>moduleroot</maml:name>
+          <maml:Description>
+            <maml:para>The path on the local drive where you want to place the module. This module supports installation on PS Core so you can install it on Linux or Mac OS as well as on Windows.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+        <maml:name>MyNewModuleName</maml:name>
+        <maml:Description>
+          <maml:para>Any string you want to use to describe the name for your new module</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>BaseManifest</maml:name>
+        <maml:Description>
+          <maml:para>We use a Plaster manifest to create your module from. We include 4 examples for you to play with. 3 of them are directly available when you invoke the module.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>moduleroot</maml:name>
+        <maml:Description>
+          <maml:para>The path on the local drive where you want to place the module. This module supports installation on PS Core so you can install it on Linux or Mac OS as well as on Windows.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Object</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:&gt; New-MyPSModule -MyNewModuleName ContosoExporting -Basemanifest PlasterManifest-extended2.xml -ModuleRoot c:\</dev:code>
+        <dev:remarks>
+          <maml:para>In the above example you are creating a Module with the name ContosoExporting that is going to be based on a Plaster manifest named PlasterManifest-extended2.xml and it will be created at c:\ContosoExporting\</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+</helpItems>

@@ -1,6 +1,6 @@
-﻿<#
+<#
 .SYNOPSIS
-A module used to create new PS Modules with. 
+A module used to create new PS Modules with.
 
 .DESCRIPTION
 This module uses Plaster to create all the essential parts of a PowerShell Module
@@ -15,6 +15,8 @@ InvokeBuild
 PSGraph
 PlatyPS
 Pester
+PSDepend
+
 
 .NOTES
 
@@ -27,9 +29,6 @@ Pester
 
     General notes
 
-
-
-
 #>
 
 function New-MyPSModule {
@@ -40,7 +39,7 @@ function New-MyPSModule {
         [string]$MyNewModuleName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("PlasterManifest-basic.xml", "PlasterManifest-extended.xml", "PlasterManifest-extended2.xml")]
+        [ValidateSet("Basic.xml", "Extended.xml", "Advanced.xml")]
         [string]$BaseManifest,
 
         [Parameter(Mandatory = $false)]
@@ -54,7 +53,7 @@ function New-MyPSModule {
     process {
 
         $templateroot = $MyInvocation.MyCommand.Module.ModuleBase
-        
+
         Set-Location $templateroot
 
         #$templateroot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath('./')
@@ -65,21 +64,21 @@ function New-MyPSModule {
                 Remove-Item -Path PlasterManifest.xml
             }
 
-        $plasterdoc = Get-ChildItem $templateroot -Filter $basemanifest -Recurse | % { $_.FullName }
+        $plasterdoc = Get-ChildItem $templateroot -Filter $basemanifest -Recurse | ForEach-Object { $_.FullName }
 
         Copy-Item -Path $plasterdoc "$templateroot\PlasterManifest.xml"
-        
+
         if ($PSVersionTable.PSEdition -eq "Desktop") {
-            
+
             if (!$moduleroot){
                 $moduleroot = "c:\modules"
             }
             if (-not (Test-Path -path $moduleroot) ) {
-            
+
                 New-Item -Path "$moduleroot" -ItemType Directory
             }
 
-            Set-Location $moduleroot 
+            Set-Location $moduleroot
 
         }
         elseif ($PSVersionTable.PSEdition -eq "Core") {
@@ -92,29 +91,29 @@ function New-MyPSModule {
                 if (-not (Test-Path -path $moduleroot) ) {
 
                     New-Item -Path "$moduleroot" -ItemType Directory
-                }           
-            
-                Set-Location $moduleroot 
+                }
+
+                Set-Location $moduleroot
 
             }
             else {
-                
+
                 if (!$moduleroot) {
                     $moduleroot = "c:\modules"
                 }
                 if (-not (Test-Path -path $moduleroot) ) {
-            
+
                     New-Item -Path "$moduleroot" -ItemType Directory
                 }
 
-                Set-Location $moduleroot 
-                
+                Set-Location $moduleroot
+
             }
         }
 
         $PlasterParams = @{
             TemplatePath       = $templateroot #where the plaster manifest xml file lives
-            Destination        = $moduleroot
+            Destination        = $moduleroot #where my new module is going to live
             ModuleName         = $MyNewModuleName
             #Description       = 'PowerShell Script Module Building Toolkit'
             #Version           = '1.0.0'
@@ -126,7 +125,7 @@ function New-MyPSModule {
             #GitHubRepo        = 'ModuleBuildTools'
             #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
             PowerShellVersion  = '3.0' #minimum PS version
-            # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest. 
+            # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest.
         }
 
         Invoke-Plaster @PlasterParams -Force -Verbose
@@ -137,6 +136,7 @@ function New-MyPSModule {
         #keep this formatted as is. the format is output to the file as is, including indentation
         $scriptCode = "function $MyNewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
 
+        <#
         $testCode = '$here = Split-Path -Parent $MyInvocation.MyCommand.Path
         $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace ''\.Tests\.'', ''.''
         . "$here\$sut"
@@ -146,7 +146,7 @@ function New-MyPSModule {
                 $true | Should -Be $false
             }
         }' -replace "#name#", $MyNewModuleName
-
+        #>
         #endregion
 
         $Path = "$moduleroot\$MyNewModuleName"

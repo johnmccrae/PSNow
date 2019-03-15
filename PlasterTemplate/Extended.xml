@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plasterManifest
+  schemaVersion="1.1"
+  templateType="Project" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+  <metadata>
+    <name>ScriptModuleTemplate</name>
+    <id>7b92c62e-2fc3-40da-84b6-b5cb0f489ce5</id>
+    <version>1.0.0</version>
+    <title>ScriptModuleTemplate</title>
+    <description>Scaffolds the files required for a PowerShell script module</description>
+    <author>John McCrae</author>
+    <tags>PowerShell, Module, ModuleManifest</tags>
+  </metadata>
+      <parameters>
+        <parameter name='ModuleName' type='text' prompt='Name of the module' />
+        <parameter name='Description' type='text' prompt='Brief description of module (required for publishing to the PowerShell Gallery)' />
+        <parameter name='Version' type='text' default='0.1.0' prompt='Enter the version number of the module' />
+        <parameter name='ModuleAuthor' type='user-fullname' prompt="Module author's name" store='text' />
+        <parameter name='CompanyName' type='text' prompt='Name of your Company' default='Chef Software Inc.' />
+        <parameter name='PowerShellVersion' default='3.0' type='text' prompt='Minimum PowerShell version' />
+      </parameters>
+<content>
+    <message>
+     Creating you folders for module: $PLASTER_PARAM_Name
+    </message>
+    <file source='' destination='docs\images'/>
+    <file source='' destination='tests'/>
+    <file source='' destination='spec'/>
+    <file source='' destination='${PLASTER_PARAM_ModuleName}\Public\'/>
+    <file source='' destination='${PLASTER_PARAM_ModuleName}\private'/>
+    <file source='' destination='${PLASTER_PARAM_ModuleName}\classes'/>
+    <file source='' destination='${PLASTER_PARAM_ModuleName}\data'/>
+
+    <message>
+    Deploying common files
+    </message>
+    <file source='appveyor.yml' destination='${PLASTER_PARAM_ModuleName}\appveyor.yml'/>
+    <file source='build.ps1'    destination=''/>
+    <file source='mkdocs.yml'   destination=''/>
+    <file source='LICENSE.yml'  destination=''/>
+    <file source='PITCHME.md'   destination=''/>
+    <file source='psake.ps1'    destination=''/>
+    <file source='readme.ps1'   destination=''/>
+
+    <file source='docs\about.md' destination=''/>
+    <file source='docs\acknowledgements.md' destination=''/>
+    <file source='docs\index.md' destination='\docs'/>
+    <file source='docs\Quick-Start-Installation-and-Example.md' destination=''/>
+
+    <file source='tests\Project.Tests.ps1' destination=''/>
+    <file source='tests\Help.Tests.ps1' destination=''/>
+    <file source='tests\Feature.Tests.ps1' destination=''/>
+    <file source='tests\Regression.Tests.ps1' destination=''/>
+    <file source='tests\Unit.Tests.ps1' destination=''/>
+
+    <file source='spec\module.feature' destination=''/>
+    <file source='spec\module.Steps.ps1' destination=''/>
+
+    <file source='template.psm1' destination='\${PLASTER_PARAM_Name}\${PLASTER_PARAM_Name}.psm1'/>
+
+    <newModuleManifest 
+        destination='\${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1'
+        moduleVersion='$PLASTER_PARAM_Version'
+        rootModule='${PLASTER_PARAM_ModuleName}.psm1'
+        author='$PLASTER_PARAM_FullName'
+        description='$PLASTER_PARAM_ModuleDesc'
+        encoding='UTF8-NoBOM'/>
+
+</content>
+</plasterManifest>

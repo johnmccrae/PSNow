@@ -1,13 +1,14 @@
-@{ 
-    PSDependOptions  = @{ 
+@{
+    PSDependOptions  = @{
         Target    = '$DependencyPath/_build-cache/'
         AddToPath = $true
     }
-    InvokeBuild      = '4.1.0'
-    PSDeploy         = '0.2.2'
-    BuildHelpers     = '1.0.0'
-    PSScriptAnalyzer = '1.16.1'
+    InvokeBuild      = '5.4.2'
+    PSDeploy         = '1.0.1'
+    PlatyPS          = '0.13.0'
+    BuildHelpers     = '2.0.7'
+    PSScriptAnalyzer = '1.17.1'
     Pester           = @{
-        Version = '4.1.0'
+        Version = '4.7.2'
     }
 }

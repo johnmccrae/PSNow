@@ -1,9 +1,9 @@
-Import-Module Get-HelpAsMarkDown -Force
+Import-Module UncommonSense.PowerShell.Documentation -Force
 
-Get-Command -Module Get-HelpAsMarkDown |
+Get-Command -Module New-MyPSModule |
     Sort-Object Noun, Verb |
-    Get-HelpAsMarkDown `
-    -Title 'Get-HelpAsMarkDown' `
-    -Description 'PowerShell module for converting PowerShell help information to MarkDown' `
-    -PrefacePath ./PREFACE.md | 
+    Convert-HelpToMarkDown `
+    -Title 'New-MyPSModule' `
+    -Description 'PowerShell module for creating PowerShell Modules' `
+    -PrefacePath .\PREFACE.md | 
     Out-File .\README.md -Encoding utf8

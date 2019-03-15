@@ -26,17 +26,17 @@ graph CommandFlow {
     $moduleRoot = Split-Path -Path $PSScriptRoot -Parent
     $scripts = @{}
     $folders = @()
-    
+
     if (Test-Path -Path "$moduleRoot\Public")
     {
         $folders += "$moduleRoot\Public\*ps1"
     }
-    
+
     if (Test-Path -Path "$moduleRoot\Internal")
     {
         $folders += "$moduleRoot\Internal\*ps1"
     }
-    
+
     Get-ChildItem -Path $folders |
         ForEach-Object -Process {
             $scripts[$PSItem.BaseName] = $PSItem.FullName

@@ -1,14 +1,14 @@
-$projectRoot = Resolve-Path "$PSScriptRoot\.."
-$moduleRoot = Split-Path (Resolve-Path "$projectRoot\*\*.psm1")
+# $projectRoot = Resolve-Path "$PSScriptRoot\.."
+# $moduleRoot = Split-Path (Resolve-Path "$projectRoot\*.psm1")
+$moduleRoot = Resolve-Path "$PSScriptRoot\.."
 $moduleName = Split-Path $moduleRoot -Leaf
-
 
 Describe "PSScriptAnalyzer rule-sets" -Tag Build {
 
     $Rules   = Get-ScriptAnalyzerRule
-    $scripts = Get-ChildItem $moduleRoot -Include *.ps1,*.psm1,*.psd1 -Recurse | where fullname -notmatch 'classes'
+    $scripts = Get-ChildItem $moduleRoot -Include *.ps1, *.psm1, *.psd1 -Recurse | Where-Object fullname -notmatch 'classes'
 
-    foreach ( $Script in $scripts ) 
+    foreach ( $Script in $scripts )
     {
         Context "Script '$($script.FullName)'" {
 
@@ -23,32 +23,29 @@ Describe "PSScriptAnalyzer rule-sets" -Tag Build {
     }
 }
 
-
-Describe "General project validation: $moduleName" -Tags Build {
-
-    It "Module '$moduleName' can import cleanly" {
-        {Import-Module (Join-Path $moduleRoot "$moduleName.psm1") -force } | Should Not Throw
-    }
-}
-
 Describe "General project validation: $moduleName" {
 
-    $scripts = Get-ChildItem $projectRoot -Include *.ps1, *.psm1, *.psd1 -Recurse
+    Context "Verifying all the files are proper PowerShell files"{
 
-    # TestCases are splatted to the script so we need hashtables
-    $testCase = $scripts | Foreach-Object {@{file = $_}}         
-    It "Script <file> should be valid powershell" -TestCases $testCase {
-        param($file)
+        $scripts = Get-ChildItem $projectRoot -Include *.ps1, *.psm1, *.psd1 -Recurse
 
-        $file.fullname | Should Exist
+        # TestCases are splatted to the script so we need hashtables
+        $testCase = $scripts | Foreach-Object {@{file = $_}}
+        It "Script <file> should be valid powershell" -TestCases $testCase {
+            param($file)
 
-        $contents = Get-Content -Path $file.fullname -ErrorAction Stop
-        $errors = $null
-        $null = [System.Management.Automation.PSParser]::Tokenize($contents, [ref]$errors)
-        $errors.Count | Should Be 0
+            $file.fullname | Should Exist
+
+            $contents = Get-Content -Path $file.fullname -ErrorAction Stop
+            $errors = $null
+            $null = [System.Management.Automation.PSParser]::Tokenize($contents, [ref]$errors)
+            $errors.Count | Should Be 0
+        }
     }
 
-    It "Module '$moduleName' can import cleanly" {
-        {Import-Module (Join-Path $moduleRoot "$moduleName.psm1") -force } | Should Not Throw
+    Context "Does the module load cleanly" {
+        It "Module '$moduleName' can import cleanly" {
+            {Import-Module (Join-Path $moduleRoot "$moduleName.psm1") -force } | Should Not Throw
+        }
     }
 }

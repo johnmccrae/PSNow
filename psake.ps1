@@ -1,4 +1,4 @@
-﻿# PSake makes variables declared here available in other scriptblocks
+# PSake makes variables declared here available in other scriptblocks
 # Init some things
 Properties {
     # Find the build folder based on build system
@@ -8,15 +8,15 @@ Properties {
             $ProjectRoot = $PSScriptRoot
         }
 
-    $Timestamp = Get-date -uformat "%Y%m%d-%H%M%S"
-    $PSVersion = $PSVersionTable.PSVersion.Major
-    $TestFile = "TestResults_PS$PSVersion`_$TimeStamp.xml"
-    $lines = '----------------------------------------------------------------------'
+    #$Timestamp = Get-date -uformat "%Y%m%d-%H%M%S"
+    #$PSVersion = $PSVersionTable.PSVersion.Major
+    #$TestFile = "TestResults_PS$PSVersion`_$TimeStamp.xml"
+    #$lines = '----------------------------------------------------------------------'
 
-    $Verbose = @{}
+    #$Verbose = @{}
     if($ENV:BHCommitMessage -match "!verbose")
     {
-        $Verbose = @{Verbose = $True}
+        #$Verbose = @{Verbose = $True}
     }
 }
 
@@ -33,8 +33,8 @@ Task Init {
 Task UnitTests -Depends Init {
     $lines
     'Running quick unit tests to fail early if there is an error'
-    $TestResults = Invoke-Pester -Path $ProjectRoot\Tests\*unit* -PassThru -Tag Build 
-    
+    $TestResults = Invoke-Pester -Path $ProjectRoot\Tests\*unit* -PassThru -Tag Build
+
     if($TestResults.FailedCount -gt 0)
     {
         Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"
@@ -71,9 +71,9 @@ Task Test -Depends UnitTests  {
 Task Build -Depends Test {
     $lines
 
-    $functions = Get-ChildItem "$PSScriptRoot\$env:BHProjectName\Public\*.ps1" | 
+    $functions = Get-ChildItem "$PSScriptRoot\$env:BHProjectName\Public\*.ps1" |
             Where-Object{ $_.name -notmatch 'Tests'} |
-            Select-Object -ExpandProperty basename      
+            Select-Object -ExpandProperty basename
 
     # Load the module, read the exported functions, update the psd1 FunctionsToExport
     Set-ModuleFunctions -Name $env:BHPSModuleManifest -FunctionsToExport $functions
@@ -86,8 +86,8 @@ Task Build -Depends Test {
         $version = $galleryVersion
     }
     $version = [version]::New($version.Major,$version.Minor,$version.Build,$env:BHBuildNumber)
-    Write-Host "Using version: $version"
-    
+    Write-Output "Using version: $version"
+
     Update-Metadata -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -Value $version
 }
 
