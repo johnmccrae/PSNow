@@ -75,3 +75,5 @@ task PushRelease Version, {
     exec { git tag -a "v$script:Version" -m "v$script:Version" }
     exec { git push origin "v$script:Version" }
 }
+
+task . Pushrelease, Version, Clean
