@@ -6,7 +6,7 @@ $moduleName = Split-Path $moduleRoot -Leaf
 
 Describe "Help tests for $moduleName" -Tags Build {
 
-    
+
     if(Get-Module -Name $moduleName){
         Remove-module $moduleName -force
     }

@@ -1,0 +1,13 @@
+The spec folder is here to give you an example of how to use Behavior Driven Development
+using Gherkin. Gherkin is a DSL used to describe outcomes you want from your modules. You call Gherkin and it 
+in turn calls Pester which in turn calls PSScriptAnalyzer so you get the whole cascading effect of verifying
+your code
+
+To get started:
+
+Install-Module Gherkin
+Import-Module Gherkin
+
+Invoke-Gherkin .\spec
+
+Reading - https://powershellexplained.com/2017-04-30-Powershell-Gherkin-advanced-features/?utm_source=reddit&utm_medium=post

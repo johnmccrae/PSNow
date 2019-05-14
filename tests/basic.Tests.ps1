@@ -2,7 +2,7 @@ $moduleRoot = Resolve-Path "$PSScriptRoot\.."
 $moduleName = Split-Path $moduleRoot -Leaf
 
 Describe "General project validation: $moduleName" {
-    Context "Are these valid PowerShell Scripts"{
+    Context "Are these valid PowerShell Scripts?"{
 
         $scripts = Get-ChildItem $moduleRoot -Include *.ps1, *.psm1, *.psd1 -Recurse
 

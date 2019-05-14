@@ -1,5 +1,5 @@
 
-# <%= $PLASTER_PARAM_ModuleName %>
+# New-MyPSModule
 
 <%= $PLASTER_PARAM_ModuleDesc %>
 

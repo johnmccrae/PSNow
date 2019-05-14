@@ -21,7 +21,7 @@ An example
 General notes
 #>
 
-function Create-File {
+function Write-MyPSModuleFile {
 
     [CmdletBinding()]
     param (

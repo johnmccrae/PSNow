@@ -18,7 +18,7 @@
     <parameter name="GitHubUserName" type="text" prompt="Enter your Github username" />
     <parameter name="GitHubRepo" type="text" prompt="Enter your Github repository name for this project" />
     <parameter name="PowerShellVersion" type="text" prompt="Enter the minimum PS version needed to run this module" />
-    <parameter name="FunctionFolders" type="multichoice" prompt="Please select folders to include" default="0,1,2">
+    <parameter name="FunctionFolders" type="multichoice" prompt="Please select folders to include" default="0,3">
       <choice label="&amp;Public" value="Public" help="Adds a public folder to module root" />
       <choice label="&amp;Internal" value="Internal" help="Adds a internal folder to module root" />
       <choice label="&amp;Classes" value="Classes" help="Adds a classes folder to module root" />
@@ -38,10 +38,6 @@
       <choice label="&amp;Yes" value="Yes" help="Adds an invoke build script at the root of module" />
       <choice label="&amp;No" value="No" help="Does not include any invoke build scripts" />
     </parameter>
-    <parameter name="PSGraph" type="choice" prompt="Include PSGraph" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Adds a PSGraph diagram" />
-      <choice label="&amp;No" value="No" help="Does not add PSGraph support" />
-    </parameter>
     <parameter name="PlatyPS" type="choice" prompt="Include PlatyPS" default="0">
       <choice label="&amp;Yes" value="Yes" help="Adds a PlatyPS for help" />
       <choice label="&amp;No" value="No" help="Does not add PlatyPS support" />
@@ -54,7 +50,7 @@
   <content>
     <message>Setting up your project</message>
     <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="$PLASTER_PARAM_ModuleVersion" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="$PLASTER_PARAM_ModuleAuthor" companyName="$PLASTER_PARAM_ModuleCompanyName" description="$PLASTER_PARAM_ModuleDesc" />
-    <templateFile source="template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
+    <templateFile source="Scaffold\template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
     <message>Creating you folders for module: $PLASTER_PARAM_ModuleName</message>
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Internal&quot;" />
@@ -63,18 +59,14 @@
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
     <message>Deploying common files</message>
-    <templateFile source="readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\readme.md" />
-    <templateFile source="LICENSE" destination="${PLASTER_PARAM_ModuleName}\LICENSE" />
-    <templateFile source="LICENSE.yml" destination="${PLASTER_PARAM_ModuleName}\LICENSE.yml" />
+    <templateFile source="PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\PSScriptAnalyzerSettings.psd1" />
+    <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\preface.md" />
+    <templateFile source="Scaffold\initialize-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\initialize-readme.ps1" />
+    <templateFile source="LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
     <templateFile source="mkdocs.yml" destination="${PLASTER_PARAM_ModuleName}\mkdocs.yml" />
-    <file source="build.ps1" destination="${PLASTER_PARAM_ModuleName}\build.ps1" />
-    <file source="build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\build.depend.psd1" />
-    <file source="psake.ps1" destination="${PLASTER_PARAM_ModuleName}\psake.ps1" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Sample Docs\" />
-    <file source="Sample Docs\about.md" destination="${PLASTER_PARAM_ModuleName}\docs\about.md" />
-    <file source="Sample Docs\acknowledgements.md" destination="${PLASTER_PARAM_ModuleName}\docs\acknowledgements.md" />
-    <file source="Sample Docs\index.md" destination="${PLASTER_PARAM_ModuleName}\docs\index.md" />
-    <file source="Sample Docs\Quick-Start-Installation-and-Example.md" destination="${PLASTER_PARAM_ModuleName}\docs\Quick-Start-Installation-and-Example.md" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Scaffold\" />
+    <file source="Scaffold\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Scaffold\build.depend.psd1" />
+    <file source="Scaffold\psake.ps1" destination="${PLASTER_PARAM_ModuleName}\Scaffold\psake.ps1" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
     <file source="spec\module.feature" destination="${PLASTER_PARAM_ModuleName}\Spec\module.feature" />
     <file source="spec\module.Steps.ps1" destination="${PLASTER_PARAM_ModuleName}\Spec\module.Steps.ps1" />
@@ -87,22 +79,17 @@
     <file source="tests\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <file source="tests\Regression.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <file source="tests\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\unload-SUT.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Export-PSGraph.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
+    <file source="tests\Remove-SUT.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <message condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;">Setting up support for Github</message>
-    <templateFile source="README.md" destination="${PLASTER_PARAM_ModuleName}\README.md" condition="$PLASTER_PARAM_Github -eq &quot;Yes&quot;" />
+    <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Scaffold\README.md" condition="$PLASTER_PARAM_Github -eq &quot;Yes&quot;" />
     <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;">Setting up support for Invoke-Build</message>
     <requireModule name="InvokeBuild" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
-    <templateFile source="default.build.ps1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
-    <message condition="$PLASTER_PARAM_PSGraph -eq &quot;Yes&quot;">Setting up support for PSGraph</message>
-    <requireModule name="PSGraph" condition="$PLASTER_PARAM_PSGraph -eq &quot;Yes&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Graphs" condition="$PLASTER_PARAM_PSGraph -eq &quot;Yes&quot;" />
-    <file source="CommandFlow.ps1" destination="${PLASTER_PARAM_ModuleName}\Graphs\CommandFlow.ps1" condition="$PLASTER_PARAM_PSGraph -eq &quot;Yes&quot;" />
+    <templateFile source="Scaffold\default.build.ps1" destination="${PLASTER_PARAM_ModuleName}\Scaffold\default.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;">Setting up support for PlatyPS</message>
     <requireModule name="PlatyPS" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;">Setting up support for Nuspec</message>
-    <templateFile source="nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;" />
+    <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;" />
   </content>
 </plasterManifest>

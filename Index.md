@@ -14,15 +14,24 @@ A module used as scaffolding to create an entire PowerShell module framework. Th
     Import-Module New-MyPSModule 
 
 ### Create your scripts - New-MyPSModule
+```powershell
+    New-MyPSModule -MyNewModuleName ReallyGreatModule -BaseManifest Advanced.xml -ModuleRoot c:\
+```
+
 - use readme.ps1 to create a readme.md for your module
 
-### Test your scripts
+## Write out your test cases for your scripts
+This module supports the Gherkin DSL for specification creation and Test Driven Development. When following that pattern, you write your tests first to clarify your thinking around what you expect your module and scripts to do. 
 
-### Build your scripts
+### Spec out features using the Gherkin DSL
 
-### Deploy your scripts
+### Test your scripts by calling Gherkin which in turn calls feature tests using Pester
 
-### Publish your scripts
+### Build your scripts into nuspec module
+
+### Deploy your module to your nodes using Azure CI CD Pipelines
+
+### Publish your module to PSGallery
 
 ## More Information
 
