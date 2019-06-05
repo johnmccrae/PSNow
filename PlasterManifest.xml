@@ -34,12 +34,12 @@
       <choice label="&amp;Yes" value="Yes" help="Includes Github files" />
       <choice label="&amp;No" value="No" help="Does not include github files" />
     </parameter>
-    <parameter name="InvokeBuild" type="choice" prompt="Include InvokeBuild Script" default="0">
+    <parameter name="InvokeBuild" type="choice" prompt="Include Invoke-Build build Script" default="0">
       <choice label="&amp;Yes" value="Yes" help="Adds an invoke build script at the root of module" />
       <choice label="&amp;No" value="No" help="Does not include any invoke build scripts" />
     </parameter>
-    <parameter name="PlatyPS" type="choice" prompt="Include PlatyPS Support" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Adds files for PlatyPS-based help" />
+    <parameter name="PlatyPS" type="choice" prompt="Include PlatyPS Support for Help" default="0">
+      <choice label="&amp;Yes" value="Yes" help="Adds a PlatyPS for help" />
       <choice label="&amp;No" value="No" help="Does not add PlatyPS support" />
     </parameter>
     <parameter name="NuSpec" type="choice" prompt="Include Nuspec file" default="0">
@@ -51,7 +51,7 @@
     <message>Setting up your project</message>
     <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="$PLASTER_PARAM_ModuleVersion" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="$PLASTER_PARAM_ModuleAuthor" companyName="$PLASTER_PARAM_ModuleCompanyName" description="$PLASTER_PARAM_ModuleDesc" />
     <templateFile source="Scaffold\template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
-    <message>Creating you folders for module: $PLASTER_PARAM_ModuleName</message>
+    <message>Creating your folders for module: $PLASTER_PARAM_ModuleName</message>
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Internal&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Classes&quot;" />
@@ -59,14 +59,11 @@
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
     <message>Deploying common files</message>
-    <templateFile source="PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\PSScriptAnalyzerSettings.psd1" />
+    <templateFile source="Scaffold\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\PSScriptAnalyzerSettings.psd1" />
     <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\preface.md" />
-    <templateFile source="Scaffold\build-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\build-readme.ps1" />
+    <templateFile source="Scaffold\initialize-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\initialize-readme.ps1" />
     <templateFile source="LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
-    <templateFile source="mkdocs.yml" destination="${PLASTER_PARAM_ModuleName}\mkdocs.yml" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Scaffold\" />
-    <file source="Scaffold\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Scaffold\build.depend.psd1" />
-    <file source="Scaffold\psake.ps1" destination="${PLASTER_PARAM_ModuleName}\Scaffold\psake.ps1" />
+    <file source="Scaffold\*z" destination="${PLASTER_PARAM_ModuleName}\Scaffold\" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
     <file source="spec\module.feature" destination="${PLASTER_PARAM_ModuleName}\Spec\module.feature" />
     <file source="spec\module.Steps.ps1" destination="${PLASTER_PARAM_ModuleName}\Spec\module.Steps.ps1" />
@@ -79,13 +76,12 @@
     <file source="tests\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <file source="tests\Regression.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <file source="tests\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Remove-SUT.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <message condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;">Setting up support for Github</message>
     <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Scaffold\README.md" condition="$PLASTER_PARAM_Github -eq &quot;Yes&quot;" />
     <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;">Setting up support for Invoke-Build</message>
     <requireModule name="InvokeBuild" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
-    <templateFile source="Scaffold\default.build.ps1" destination="${PLASTER_PARAM_ModuleName}\Scaffold\default.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
+    <templateFile source="Scaffold\MyPSModule.build.template.ps1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;">Setting up support for PlatyPS</message>
     <requireModule name="PlatyPS" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />

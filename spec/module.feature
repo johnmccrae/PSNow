@@ -4,7 +4,7 @@ Feature: A proper community module
     I want to make sure everything works and the quality is high
 
 Background: we have a module
-    Given the module was named <%= $PLASTER_PARAM_ModuleName %>
+    Given the module was named mypsmodule
 
 
 Scenario: Should have correct project structure and files
@@ -15,8 +15,7 @@ Scenario: Should have correct project structure and files
     And it will have a spec\*.feature file for Gherkin
     And it will have a spec\*.Steps.ps1 file for Gherkin
     And it will have a build.ps1 file for builds
-    And it will have a psake.ps1 file for builds
-    And it will have a appveyor.yml file for build automation
+
 
 
 Scenario: Should have correct module structure

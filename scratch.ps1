@@ -30,3 +30,38 @@ Get-Command -Module New-MyPSModule |
     -PrefacePath .\PREFACE.md |
     Out-File .\README.md -Encoding utf8
 
+trap {
+"in Trap"
+((get-date).ToString() + " ------- Error Information: -------") |
+ Out-File -FilePath "c:\cmds\error.log" -Append
+
+((get-date).ToString() + " - Script Name: " + $error[0].invocationinfo.ScriptName) |
+ Out-File -FilePath "c:\cmds\error.log" -Append
+
+((get-date).ToString() + " - Error occurred at line: " + $error[0].invocationinfo.ScriptLineNumber + "  at offset: " + $error[0].invocationinfo.OffSetInLine ) |
+ Out-File -FilePath "c:\cmds\error.log" -Append
+
+((get-date).ToString() + " - Line of code: " + $error[0].invocationinfo.Line) |
+ Out-File -FilePath "c:\cmds\error.log" -Append
+
+((get-date).ToString() + " - Error that was trapped: " + $error[0]) |
+ Out-File -FilePath "c:\cmds\error.log" -Append
+
+# 'n gives you a forced new line, for example 'n(what you want to print)
+((get-date).ToString() + " - Script Error Message Line Indicator:" + $error[0].invocationinfo.positionmessage) |
+ Out-File -FilePath "c:\cmds\error.log" -Append
+
+ 
+
+ "stop here"   
+}
+
+$error.clear()
+"Start Test"
+ ((get-date).ToString() + " - Initiating Script ") |
+ Out-File -FilePath "c:\cmds\error.log"
+
+ $x = 1/$null
+ "After bad statement 1"  
+ 
+ "End of script"

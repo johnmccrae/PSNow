@@ -15,6 +15,43 @@ param(
 # Ensure IB works in the strict mode.
 Set-StrictMode -Version Latest
 
+# Synopsis: We have a number of modules which must be installed, do that here.
+task InstallDependencies {
+
+    if (Get-Module -ListAvailable -Name Pester) {
+        # Write-Host "Module exists"
+        Update-Module -Name Pester
+    } 
+    else {
+        Install-Module Pester -Force
+    }
+
+    if (Get-Module -ListAvailable -Name PSScriptAnalyzer) {
+        # Write-Host "Module exists"
+        Update-Module -Name PSScriptAnalyzer
+    } 
+    else {
+        Install-Module PSScriptAnalyzer -Force
+    }
+
+    if (Get-Module -ListAvailable -Name Gherkin) {
+        # Write-Host "Module exists"
+        Update-Module -Name Gherkin
+    } 
+    else {
+        Install-Module Gherkin -Force
+    }
+
+    if (Get-Module -ListAvailable -Name PlatyPS) {
+        # Write-Host "Module exists"
+        Update-Module -Name PlatyPS
+    } 
+    else {
+        Install-Module PlatyPS -Force
+    }
+}
+
+
 task UpdateHelp{
     $projectRoot = Resolve-Path "$PSScriptRoot"
     # $projectRoot = (Get-Location -PSProvider FileSystem).ProviderPath
@@ -50,7 +87,7 @@ task GetVersion {
     assert $script:Version
 }
 
-$Tests = 'Analyzer.build.ps1', 'MoreTests.build.ps1'
+$Tests = 'SmokeTests.build.ps1', 'MoreTests.build.ps1'
 
 task Test {
     foreach ($_ in $Tests) {

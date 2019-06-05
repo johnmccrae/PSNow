@@ -1,4 +1,3 @@
-
 <#
 .SYNOPSIS
 A module used to create new PS Modules with.
@@ -34,6 +33,7 @@ PSCI
 
 #>
 
+#Requires -Modules UncommonSense.PowerShell.Documentation
 function New-MyPSModule {
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
@@ -58,8 +58,6 @@ function New-MyPSModule {
         $templateroot = $MyInvocation.MyCommand.Module.ModuleBase
 
         Set-Location $templateroot
-
-        #$templateroot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath('./')
 
         # check for old plastermanifest and delete it.
         if (Test-Path $templateroot\PlasterManifest.xml -PathType Leaf)
@@ -139,28 +137,15 @@ function New-MyPSModule {
         #keep this formatted as is. the format is output to the file as is, including indentation
         $scriptCode = "function $MyNewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
 
-        <#
-        $testCode = '$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-        $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace ''\.Tests\.'', ''.''
-        . "$here\$sut"
-
-        Describe "#name#" {
-            It "does something useful" {
-                $true | Should -Be $false
-            }
-        }' -replace "#name#", $MyNewModuleName
-        #>
-        #endregion
-
         $Path = "$moduleroot\$MyNewModuleName"
 
         Write-Output "Your module was built at: $Path"
 
         if (Test-Path "$Path\public"){
-            Write-File -Path "$Path\Public" -Name "$MyNewModuleName.ps1" -Content $scriptCode | Out-Null
+            New-Item -Path "$Path\Public" -ItemType File -Name "$MyNewModuleName.ps1" -Value $scriptCode Out-Null
         }
         else {
-            Write-File -Path $Path -Name "$MyNewModuleName.ps1" -Content $scriptCode | Out-Null
+            New-Item -Path $Path -Name "$MyNewModuleName.ps1" -Content $scriptCode | Out-Null
         }
 
         if (-not (& Test-Path -Path $Path)) {
@@ -169,16 +154,9 @@ function New-MyPSModule {
         else{
             add-content -path "$templateroot\currentmodules.txt" -value "$Path" | Out-Null
         }
-        <#
-        if(Test-Path "$moduleroot\tests"){
-            Create-File -Path "$moduleroot\tests" -Name "$MyNewModuleName.Tests.ps1" -Content $testCode
-        }
-        else{
-            Create-File -Path $moduleroot -Name "$MyNewModuleName.Tests.ps1" -Content $testCode
-        }
-        #>
+
 
     }
     end{}
 }
-#Export-ModuleMember -Function new-myposmodule
+

@@ -1,11 +1,11 @@
-# Install-Module Gherkin
+param()
 
 Given 'the module was named (\S*)' {
     Param($Name)
     $Script:ModuleName = $Name
 
     $path = "$PSScriptRoot\.."
-    $ModuleName | should be '<%= $PLASTER_PARAM_ModuleName %>'
+    $ModuleName | should be 'MyPSModule'
     $module = Get-ChildItem -Path $path -Recurse -Filter "$ModuleName.psm1" -verbose
     $module | should not benullorempty
     $module.fullname | Should Exist
