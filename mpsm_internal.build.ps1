@@ -70,6 +70,9 @@ task SetVersion {
         Revision {[version]$NewVersion = "{0}.{1}.{2}.{3}" -f $Version.Major, $Version.Minor, $Version.Build, ($version.Revision + 1) }
     }
     Update-ModuleManifest -Path MyPSModule.psd1 -ModuleVersion $NewVersion
+
+    exec { git add .}
+    exec { git commit -m "Updating the module version"}
 }
 
 # Synopsis: Make the module folder.
