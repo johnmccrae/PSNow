@@ -20,4 +20,5 @@
     psake            = '4.8.0'
     PSDeploy         = '1.0.2'
     PSScriptAnalyzer = '1.18.1'
+    "POSH-GIT"       = '0.7.3'
 }

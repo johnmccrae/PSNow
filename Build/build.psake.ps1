@@ -273,11 +273,22 @@ Task 'UpdateRepo' -Depends 'Init' {
     }
     Assert -conditionToCheck $results -failureMessage 'Please pass in a commit message. Build cannot continue!'
 
-    Exec {git add -u }
-    Exec {git commit -m $env:BHCommitMessage}
-    Exec { git push }
-    Exec { git tag -a "v$env:BHBuildNumber" -m "v$env:BHBuildNumber"}
-    Exec {git push origin $env:BHBranchName}
+    #does my current build number match what I already pushed to git? If yes, don't tag
+    $gittagversion = git tag --merged
+    if ($gittagversion.Contains("v" + "$env:BHBuildNumber") ) {
+        Exec { git add -u }
+        Exec { git commit -m $env:BHCommitMessage }
+        Exec { git push }
+        Exec { git push origin $env:BHBranchName }
+    }
+    else {
+        Exec { git add -u }
+        Exec { git commit -m $env:BHCommitMessage }
+        Exec { git push }
+        Exec { git tag -a "v$env:BHBuildNumber" -m "v$env:BHBuildNumber" }
+        Exec { git push origin $env:BHBranchName }
+    }
+
 
 }
 
