@@ -152,11 +152,10 @@ function Publish-MyPSModule {
     }
 
 
-    $patUser = 'itautomation@chef.io'
-    $patToken = 'kozxlixxi3mc4jzm4sg4ljbmmtjj53h3cvbvaqy34fsbtmz7bv3q'
+    $patUser = (Get-ChildItem Env:\BHChefITAzureBuildUser).Value
+    $patToken = (Get-ChildItem Env:\BHChefITAzureBuildPassword).Value
     $securePat = ConvertTo-SecureString -String $patToken -AsPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential($patUser, $securePat)
-
 
     publish-module -Path $newtempdir -Repository $Gallery -Credential $credential -NuGetApiKey $NuGetAPIKey -Verbose
 

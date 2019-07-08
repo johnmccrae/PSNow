@@ -1,24 +1,28 @@
 <#
-.SYNOPSIS
-Publishes the module to your preferred gallery
+    .SYNOPSIS
+    Publishes the module to your preferred gallery
 
-.DESCRIPTION
-Long description
+    .DESCRIPTION
+    Long description
 
-.PARAMETER IncrementVersion
-Are you updating this as a Major, Minor or Build release
+    .PARAMETER IncrementVersion
+    Are you updating this as a Major, Minor or Build release
 
-.Parameter Gallery
-What PS Gallery will you be posting your module to?
+    .Parameter Gallery
+    What PS Gallery will you be posting your module to?
 
-.Parameter NuGetAPIKey
-You'll need one from your Gallery to post things with
+    .Parameter NuGetAPIKey
+    You'll need one from your Gallery to post things with
 
-.EXAMPLE
-Publish-MyPSModule -IncrementVersion Build -Gallery PSGallery -NuGetApiKEY SomeGuidGoeshere
+    .EXAMPLE
+    Publish-MyPSModule -IncrementVersion Build -Gallery PSGallery -NuGetApiKEY SomeGuidGoeshere
 
-.NOTES
-At the bottom of the script you'll need to explicitly modify the Publish command line where you need to provide credentials
+    You call the module and pass in Major, Minor, Build or Revision, your Gallery, and finally your API Key
+
+
+    .NOTES
+    At the bottom of the script you'll need to explicitly modify the Publish command line where you need to provide credentials
+
 #>
 
 function Publish-MyPSModule {
@@ -152,8 +156,8 @@ function Publish-MyPSModule {
     }
 
 
-    $patUser = 'itautomation@chef.io'
-    $patToken = 'kozxlixxi3mc4jzm4sg4ljbmmtjj53h3cvbvaqy34fsbtmz7bv3q'
+    $patUser = (Get-ChildItem Env:\BHChefITAzureBuildUser).Value
+    $patToken = (Get-ChildItem Env:\BHChefITAzureBuildPassword).Value
     $securePat = ConvertTo-SecureString -String $patToken -AsPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential($patUser, $securePat)
 

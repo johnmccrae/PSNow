@@ -156,17 +156,17 @@ function New-MyPSModule {
         Write-Output "Your module was built at: $Path"
 
         if (Test-Path "$Path\public") {
-            New-Item -Path "$Path\Public" -ItemType File -Name "$MyNewModuleName.ps1" -Value $scriptCode Out-Null
+            New-Item -Path "$Path\Public" -ItemType File -Name "$MyNewModuleName.ps1" -Value $scriptCode
         }
         else {
-            New-Item -Path $Path -Name "$MyNewModuleName.ps1" -Content $scriptCode | Out-Null
+            New-Item -Path $Path -Name "$MyNewModuleName.ps1" -Content $scriptCode
         }
 
         if (-not (& Test-Path -Path $Path)) {
-            New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | & Out-Null
+            New-Item -ItemType "File" -Path $templateroot -Name "currentmodules.txt" -Value $Path
         }
         else{
-            add-content -path "$templateroot\currentmodules.txt" -value "$Path" | Out-Null
+            add-content -path "$templateroot\currentmodules.txt" -value "$Path"
         }
 
     }

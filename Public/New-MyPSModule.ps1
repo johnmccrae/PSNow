@@ -135,21 +135,34 @@ function New-MyPSModule {
 
         #region File contents
         #keep this formatted as is. the format is output to the file as is, including indentation
-        $scriptCode = "function $MyNewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
+        #$scriptCode = "function $MyNewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
+
+        $scriptCode =
+        @"
+@{
+    function <%= $PLASTER_PARAM_ModuleName %> {
+        [cmdletbinding()]
+        param()
+        begin{}
+        process {}
+        end {}
+    }
+}
+"@
 
         $Path = "$moduleroot\$MyNewModuleName"
 
         Write-Output "Your module was built at: $Path"
 
         if (Test-Path "$Path\public"){
-            New-Item -Path "$Path\Public" -ItemType File -Name "$MyNewModuleName.ps1" -Value $scriptCode Out-Null
+            New-Item -Path "$Path\Public" -ItemType File -Name "$MyNewModuleName.ps1" -Value $scriptCode | Out-Null
         }
         else {
             New-Item -Path $Path -Name "$MyNewModuleName.ps1" -Content $scriptCode | Out-Null
         }
 
         if (-not (& Test-Path -Path $Path)) {
-            New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | & Out-Null
+            New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | Out-Null
         }
         else{
             add-content -path "$templateroot\currentmodules.txt" -value "$Path" | Out-Null

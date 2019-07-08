@@ -65,3 +65,8 @@ $error.clear()
  "After bad statement 1"  
  
  "End of script"
+
+$MonolithFile = "$env:BHProjectPath/$env:BHProjectName.nuspec"
+$MyFile = Get-Content $MonolithFile
+$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+[System.IO.File]::WriteAllLines($MonolithFile, $MyFile, $Utf8NoBomEncoding)
