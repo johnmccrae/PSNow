@@ -4,7 +4,7 @@ $ScriptAnalyzerSettingsPath = Join-Path -Path $env:BHProjectPath -ChildPath 'Bui
 
 Describe 'Testing against PSSA rules' {
     Context 'PSSA Standard Rules' {
-        $analysis = Invoke-ScriptAnalyzer -Path $env:BHModulePath -Recurse -Settings $ScriptAnalyzerSettingsPath
+        $analysis = Invoke-ScriptAnalyzer -Path $env:BHPSModulePath -Recurse -Settings $ScriptAnalyzerSettingsPath
         $scriptAnalyzerRules = Get-ScriptAnalyzerRule
 
         forEach ($rule in $scriptAnalyzerRules) {

@@ -25,3 +25,5 @@ For more information
 * [<%= $PLASTER_PARAM_GitHubUserName %>.github.io](https://<%= $PLASTER_PARAM_GitHubUserName %>.github.io)
 
 This project was generated using [Kevin Marquette](http://kevinmarquette.github.io)'s [Full Module Plaster Template](https://github.com/KevinMarquette/PlasterTemplates/tree/master/FullModuleTemplate).
+Special Thanks to [Adam Rush](https://adamrushuk.github.io/example-azure-devops-build-pipeline-for-powershell-modules/#test-1) for this blog entry. 
+

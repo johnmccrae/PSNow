@@ -66,7 +66,12 @@ $error.clear()
  
  "End of script"
 
-$MonolithFile = "$env:BHProjectPath/$env:BHProjectName.nuspec"
-$MyFile = Get-Content $MonolithFile
-$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-[System.IO.File]::WriteAllLines($MonolithFile, $MyFile, $Utf8NoBomEncoding)
+$pat = 'kozxlixxi3mc4jzm4sg4ljbmmtjj53h3cvbvaqy34fsbtmz7bv3q'
+$username = 'itautomation@chef.io'
+$nuget_repo_name = 'ChefITPS'
+$nuget_repo_feed = 'https://pkgs.dev.azure.com/chefcorp-chefIT/_packaging/chefitps/nuget/v2/'
+
+$password = ConvertTo-SecureString $pat -AsPlainText -Force
+$credsVSTS = New-Object System.Management.Automation.PSCredential $username, $password
+
+Register-PSRepository -Name $nuget_repo_name -SourceLocation $nuget_repo_feed -PublishLocation $nuget_repo_feed -InstallationPolicy Trusted

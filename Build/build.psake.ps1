@@ -1,3 +1,9 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingCmdletAliases", "")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "")]
+[cmdletbinding()]
+param()
 # PSake makes variables declared here available in other scriptblocks
 Properties {
     $ProjectRoot = $ENV:BHProjectPath
@@ -115,17 +121,20 @@ Task 'CreateModuleAndStage' -Depends 'Clean' {
     New-Item -Path $StagingModulePath -ItemType 'Directory' -Force | Out-String | Write-Verbose
 
     "`n"
-    Write-Output "Staging Module Path is: $StagingModulePath " 
+    Write-Output "Staging Module Path is: $StagingModulePath "
     Write-Output "Staging Folder Path is: $StagingFolder"
 
     # Copy required folders and files
     $pathsToCopy = @(
-        Join-Path -Path $ProjectRoot -ChildPath 'Public'
-        Join-Path -Path $ProjectRoot -ChildPath 'Private'
         Join-Path -Path $ProjectRoot -ChildPath 'en-US'
         Join-Path -Path $ProjectRoot -ChildPath 'Docs'
         Join-Path -Path $ProjectRoot -ChildPath 'Build'
+        Join-Path -Path $ProjectRoot -ChildPath 'PlasterTemplate'
+        Join-Path -Path $ProjectRoot -ChildPath 'Scaffold'
+        Join-Path -Path $ProjectRoot -ChildPath 'Spec'
         Join-Path -Path $ProjectRoot -ChildPath 'Preface.md'
+        Join-Path -Path $ProjectRoot -ChildPath 'Public'
+        Join-Path -Path $ProjectRoot -ChildPath 'Private'
         Join-Path -Path $ProjectRoot -ChildPath 'MyPSModule.nuspec'
         Join-Path -Path $ProjectRoot -ChildPath 'MyPSModule.psm1'
         Join-Path -Path $ProjectRoot -ChildPath 'MyPSModule.psd1'
@@ -163,7 +172,7 @@ Task 'Analyze' -Depends 'ImportStagingModule' {
             [console]::ForegroundColor = 'Yellow'; $_;
         }
         else {
-            $_    
+            $_
         }
     } | Format-List
     [console]::ForegroundColor = 'White'
@@ -197,14 +206,37 @@ Task 'Test' -Depends 'ImportStagingModule' {
     $lines
     Write-Output "Running Tests against the module`n"
 
+    # PSScriptAnalyzer doesn't ignore files, only rules. Temporarily renaming files here which can safely skip Linting
+    $directoriestoexclude = @('Spec' <#,'Scaffold'#>)
+    foreach($directory in $directoriestoexclude){
+        $insidepath = $env:BHProjectPath + "/" + $directory
+        $filestorename = @( Get-ChildItem -Path "$insidepath/*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
+        foreach($file in $filestorename){
+            $newname = $file.Name + ".hold"
+            Rename-Item -path $file.PSPath -NewName $newname
+        }
+    }
+
     # Gather test results. Store them in a variable and file
-    $TestFilePath = Join-Path -Path $ArtifactFolder -ChildPath $TestFile
+    $TestFilePath = Join-Path -Path $StagingFolder -ChildPath $TestFile
     $TestResults = Invoke-Pester -Script $TestScripts -PassThru -OutputFormat 'NUnitXml' -OutputFile $TestFilePath -PesterOption @{IncludeVSCodeMarker = $true }
 
     # Fail build if any tests fail
     if ($TestResults.FailedCount -gt 0) {
         Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"
     }
+
+    # PSScriptAnalyzer doesn't ignore files, only rules. Renaming the files back again
+    foreach ($directory in $directoriestoexclude) {
+        $insidepath = $env:BHProjectPath + "/" + $directory
+        $filestorename = @( Get-ChildItem -Path "$insidepath/*.hold" -Recurse -ErrorAction 'SilentlyContinue' )
+        foreach ($file in $filestorename) {
+            $newname = (Get-Item $file).Basename
+            Rename-Item -path $file.PSPath -NewName $newname
+        }
+    }
+
+
 }
 
 
@@ -245,25 +277,25 @@ Task 'UpdateBuildVersion' -Depends 'UpdateDocumentation' {
         Build { [version]$NewVersion = "{0}.{1}.{2}.{3}" -f $Version.Major, $Version.Minor, ($Version.Build + 1), $version.Revision }
         Revision { [version]$NewVersion = "{0}.{1}.{2}.{3}" -f $Version.Major, $Version.Minor, $Version.Build, ($version.Revision + 1) }
     }
-    Update-ModuleManifest -Path (Get-Item env:\BHPSModuleManifest).Value -ModuleVersion $NewVersion    
+    Update-ModuleManifest -Path (Get-Item env:\BHPSModuleManifest).Value -ModuleVersion $NewVersion
     Set-Item -Path Env:BHBuildNumber -Value $NewVersion
 
     $MonolithFile = "$env:BHProjectPath/$env:BHProjectName.nuspec"
     #Import the New PSD file
     $newString = Import-PowerShellDataFile $env:BHPSModuleManifest
-    #Create a new file and Update each time. 
+    #Create a new file and Update each time.
     $xmlFile = New-Object xml
     $xmlFile.Load($MonolithFile)
     #Set the version to the one that is in the manifest.
     $xmlFile.package.metadata.version = $newString.ModuleVersion
-    $xmlFile.Save($MonolithFile) 
+    $xmlFile.Save($MonolithFile)
 
     #exec { git commit $manifest -m "Updated the module version" }
 
 }
 
 Task 'UpdateRepo' -Depends 'Init' {
-    $lines 
+    $lines
 
     if ( ($env:BHCommitFlag -eq 0) -or (  (Test-Path -Path Env:BHCommitFlag) -eq $false   ) ) {
         $results = $false
@@ -288,8 +320,6 @@ Task 'UpdateRepo' -Depends 'Init' {
         Exec { git tag -a "v$env:BHBuildNumber" -m "v$env:BHBuildNumber" }
         Exec { git push origin $env:BHBranchName }
     }
-
-
 }
 
 Task 'CreateNuGetPacakge' -Depends 'UpdateBuildVersion' {
@@ -335,6 +365,18 @@ Task 'CreateBuildArtifact' -Depends 'Init' {
     Write-Output "`nFINISHED: Release artifact creation."
 }
 
+Task 'DeployToAzureRepo' -Depends 'Init' {
+    $lines
+    Write-Output "Deploying to Azure Repo"
+
+    $patUser = $env:BHChefITAzureBuildUser
+    $patToken = $env:BHChefITAzureBuildPassword
+    $securePat = ConvertTo-SecureString -String $patToken -AsPlainText -Force
+    $credential = New-Object System.Management.Automation.PSCredential($patUser, $securePat)
+
+    Publish-Module  -Path $env:BHModulePath -Repository $env:BHPublishRepo -Credential $credential -Verbose
+    #Do I need a NuGetAPIKey parameter here?
+}
 
 #region NOT USED FOR THIS DEMO
 # Task 'Release' -Depends 'Clean', 'Test', 'UpdateDocumentation', 'CombineFunctionsAndStage', 'CreateBuildArtifact' #'UpdateManifest', 'UpdateTag'
@@ -355,7 +397,7 @@ Task 'Build' -Depends 'Init' {
 }
 
 
-Task 'Deploy' -Depends 'Init' {
+Task 'DeployToPSGallery' -Depends 'Init' {
     $lines
 
     $Params = @{

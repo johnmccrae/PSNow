@@ -1,5 +1,5 @@
 # Vars
-$changelogPath = Join-Path -Path $env:BHProjectPath -Child 'CHANGELOG.md'
+$changelogPath = Join-Path -Path $env:BHPSModulePath -Child 'CHANGELOG.md'
 
 Describe 'Module manifest' {
     Context 'Validation' {

@@ -1,7 +1,6 @@
 <#
-
     .SYNOPSIS
-    Builds your PowerShell module. 
+    Builds your PowerShell module.
 
     .DESCRIPTION
     A tool to Build your module with. It can take several variables to flesh out your build environment and do
@@ -18,7 +17,7 @@
     'Test' - Run Pester tests against the code. Tests are coming from /Tests
     'UpdateDocumentation' - Create/Update markdown helpfiles using PlatyPS
     'UpdateBuildVersion' - based on a parameter you pass (see below) the build number is updated
-    'UpdateRepo' - does a git push back to your repo to sync your current files
+    'UpdateRepo' - does a git push back to your repo to sync your current files. Also tags files with the current build
     'CreateNuGetPackage' - builds a .nupkg file in the /Artifacts directory
     'CreateBuildArtifact' - creates a .zip file of your creation in the /Artifacts folder
 
@@ -47,7 +46,7 @@
 
     .NOTES
     Author: Adam Rush
-    
+
     .REFERENCES
     thanks to Adam Rush UK - https://adamrushuk.github.io/example-azure-devops-build-pipeline-for-powershell-modules/#test-1
 
@@ -104,26 +103,31 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
         Install = $true
         # Verbose = $true
     }
-    Invoke-PSDepend @invokePSDependParams 
+    Invoke-PSDepend @invokePSDependParams
 
     # Remove ResolveDependency PSBoundParameter ready for passthru to PSake
     $PSBoundParameters.Remove('ResolveDependency')
 }
 else {
-    Write-Host "Skipping dependency check...`n" -ForegroundColor 'Yellow'
+    Write-Output "Skipping dependency check...`n" -ForegroundColor 'Yellow'
 }
 
 # Init BuildHelpers
 Set-BuildEnvironment -Force
+
+#region - BHBUILDVARS
 Set-Item -Path Env:BHBuildSystem -Value "Azure Pipelines"
 $manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
 [version]$script:Version = $manifest.ModuleVersion
 Set-Item -Path Env:BHBuildNumber -Value $script:Version
 $stagingfolder = (Get-item env:\BHPSModulePath).Value + "/Staging"
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
+$publishfolder = $ENV:BHModulePath + "/Staging/" + $ENV:BHProjectName
+Set-Item -Path env:\BHModulePath -Value $publishfolder
+#endregion
 
 # Capture the build version type - Major, Minor, Build, Revision. Used later to bump that version number
-# The revision is passed in via the BuildRev parameter. 
+# The revision is passed in via the BuildRev parameter.
 if ($PSBoundParameters.Keys -contains 'Parameters') {
     foreach ($key in $Parameters.Keys) {
         if ($key -eq 'BuildRev') {

@@ -59,11 +59,10 @@
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
     <message>Deploying common files</message>
-    <templateFile source="Scaffold\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\PSScriptAnalyzerSettings.psd1" />
     <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\preface.md" />
     <templateFile source="Scaffold\initialize-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\initialize-readme.ps1" />
     <templateFile source="LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
-    <file source="Scaffold\*z" destination="${PLASTER_PARAM_ModuleName}\Scaffold\" />
+    <file source="Scaffold\" destination="${PLASTER_PARAM_ModuleName}\Scaffold\" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
     <file source="spec\module.feature" destination="${PLASTER_PARAM_ModuleName}\Spec\module.feature" />
     <file source="spec\module.Steps.ps1" destination="${PLASTER_PARAM_ModuleName}\Spec\module.Steps.ps1" />
@@ -78,7 +77,6 @@
     <file source="tests\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
     <message condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;">Setting up support for Github</message>
     <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Scaffold\README.md" condition="$PLASTER_PARAM_Github -eq &quot;Yes&quot;" />
-    <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;" />
     <message condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;">Setting up support for Invoke-Build</message>
     <requireModule name="InvokeBuild" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
     <templateFile source="Scaffold\MyPSModule.build.template.ps1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />

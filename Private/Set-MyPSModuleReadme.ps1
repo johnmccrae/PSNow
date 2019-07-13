@@ -1,5 +1,7 @@
 Function Set-MyPSModuleReadme{
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
     [cmdletbinding()]
+    param()
 
     $projectRoot = Resolve-Path "$PSScriptRoot\.."
     $moduleName = Split-Path $projectRoot -Leaf
