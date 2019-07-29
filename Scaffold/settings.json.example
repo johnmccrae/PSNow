@@ -1,0 +1,4 @@
+{
+    "files.trimTrailingWhitespace": true,
+    "files.defaultLanguage": "powershell"
+}

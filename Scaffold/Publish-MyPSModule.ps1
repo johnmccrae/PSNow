@@ -15,13 +15,13 @@ What PS Gallery will you be posting your module to?
 You'll need one from your Gallery to post things with
 
 .EXAMPLE
-Publish-MyPSModule -IncrementVersion Build -Gallery PSGallery -NuGetApiKEY SomeGuidGoeshere
+Publish-PSNow -IncrementVersion Build -Gallery PSGallery -NuGetApiKEY SomeGuidGoeshere
 
 .NOTES
 At the bottom of the script you'll need to explicitly modify the Publish command line where you need to provide credentials
 #>
 
-function Publish-MyPSModule {
+function Publish-PSNow {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
@@ -70,9 +70,9 @@ function Publish-MyPSModule {
         "LICENSE",
         "License.yml",
         "mkdocs.yml",
-        "New-MyPSModule.nuspec",
-        "New-MyPSModule.psm1",
-        "New-MyPSModule.psd1",
+        "New-PSNow.nuspec",
+        "New-PSNow.psm1",
+        "New-PSNow.psd1",
         "nuspec.txt",
         "psake.ps1",
         "PSScriptAnalyzerSettings.psd1",

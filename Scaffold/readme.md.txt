@@ -18,6 +18,16 @@ Install from the PSGallery and Import the module
 
 ## More Information
 
+
+
+## Documentation
+
+You can learn how to use Plaster and write your own templates by reading our documentation:
+
+- [About Plaster](docs/en-US/about_Plaster.help.md)
+- [Creating a Plaster Manifest](docs/en-US/about_Plaster_CreatingAManifest.help.md)
+- [Cmdlet Documentation](docs/en-US/Plaster.md)
+
 For more information
 
 * [<%= $PLASTER_PARAM_ModuleName %>.readthedocs.io](http://<%= $PLASTER_PARAM_ModuleName %>.readthedocs.io)

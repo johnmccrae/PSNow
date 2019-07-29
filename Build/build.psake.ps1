@@ -44,7 +44,7 @@ Task 'Default' -Depends 'Test'
 # Show build variables
 Task 'Init' {
     $lines
-    Write-Output "Settng up Staging and Artifacts folders`n"
+    Write-Output "Settng up Staging and Artifacts folders in .gitignore`n"
     Set-Location $ProjectRoot
 
     #Add Folders to gitignore. You don't need this in your repo
@@ -112,7 +112,7 @@ Task 'CombineFunctionsAndStage' -Depends 'Clean' {
 
 # Create a folder structure containing Public, Private and whatever else folders
 # Copy new module and other supporting files (Documentation / Examples) to Staging folder
-Task 'CreateModuleAndStage' -Depends 'Clean' {
+Task 'Stage' -Depends 'Clean' {
     $lines
     Write-Output "Building a Module folder at: [$StagingModulePath]`n"
 
@@ -129,15 +129,19 @@ Task 'CreateModuleAndStage' -Depends 'Clean' {
         Join-Path -Path $ProjectRoot -ChildPath 'en-US'
         Join-Path -Path $ProjectRoot -ChildPath 'Docs'
         Join-Path -Path $ProjectRoot -ChildPath 'Build'
+        Join-Path -Path $ProjectRoot -ChildPath 'Certs'
         Join-Path -Path $ProjectRoot -ChildPath 'PlasterTemplate'
         Join-Path -Path $ProjectRoot -ChildPath 'Scaffold'
         Join-Path -Path $ProjectRoot -ChildPath 'Spec'
-        Join-Path -Path $ProjectRoot -ChildPath 'Preface.md'
         Join-Path -Path $ProjectRoot -ChildPath 'Public'
         Join-Path -Path $ProjectRoot -ChildPath 'Private'
-        Join-Path -Path $ProjectRoot -ChildPath 'MyPSModule.nuspec'
-        Join-Path -Path $ProjectRoot -ChildPath 'MyPSModule.psm1'
-        Join-Path -Path $ProjectRoot -ChildPath 'MyPSModule.psd1'
+        Join-Path -Path $ProjectRoot -ChildPath 'Tests'
+        Join-Path -Path $ProjectRoot -ChildPath 'PSNow.nuspec'
+        Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psm1'
+        Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psd1'
+        Join-Path -Path $ProjectRoot -ChildPath 'readme.md'
+        Join-Path -Path $ProjectRoot -ChildPath 'LICENSE.md'
+        Join-Path -Path $ProjectRoot -ChildPath '.gitignore'
     )
     Copy-Item -Path $pathsToCopy -Destination $StagingModulePath -Recurse
 
@@ -209,7 +213,7 @@ Task 'Test' -Depends 'ImportStagingModule' {
     # PSScriptAnalyzer doesn't ignore files, only rules. Temporarily renaming files here which can safely skip Linting
     $directoriestoexclude = @('Spec' <#,'Scaffold'#>)
     foreach($directory in $directoriestoexclude){
-        $insidepath = $env:BHProjectPath + "/" + $directory
+        $insidepath = $env:BHModulePath + "/" + $directory
         $filestorename = @( Get-ChildItem -Path "$insidepath/*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
         foreach($file in $filestorename){
             $newname = $file.Name + ".hold"
@@ -296,6 +300,7 @@ Task 'UpdateBuildVersion' -Depends 'UpdateDocumentation' {
 
 Task 'UpdateRepo' -Depends 'Init' {
     $lines
+    Write-Output "Updating the repository`n"
 
     if ( ($env:BHCommitFlag -eq 0) -or (  (Test-Path -Path Env:BHCommitFlag) -eq $false   ) ) {
         $results = $false
@@ -322,19 +327,19 @@ Task 'UpdateRepo' -Depends 'Init' {
     }
 }
 
-Task 'CreateNuGetPacakge' -Depends 'UpdateBuildVersion' {
+Task 'BuildNuget' -Depends 'UpdateBuildVersion' {
     $lines
     Write-Output "Creating a Nuget Package in Aritfacts folder: [$ArtifactFolder]`n"
 
-    Set-Location -Path $StagingModulePath
     exec { nuget pack "$env:BHProjectName.nuspec" -Version $env:BHBuildNumber }
-    Move-Item -Path "$env:BHProjectName.nupkg" -Destination $ArtifactFolder\"$env:BHProjectName.nupkg"
+    $newpackagename = $env:BHProjectName + "." + $env:BHBuildNumber + ".nupkg"
+    Move-Item -Path $newpackagename -Destination $ArtifactFolder
     Set-Location -Path $Env:BHModulePath
 }
 
 # Create a versioned zip file of all staged files
 # NOTE: Admin Rights are needed if you run this locally
-Task 'CreateBuildArtifact' -Depends 'Init' {
+Task 'BuildZip' -Depends 'Init' {
     $lines
     Write-Output "`nCreating a Build Artifact"
 
@@ -365,7 +370,7 @@ Task 'CreateBuildArtifact' -Depends 'Init' {
     Write-Output "`nFINISHED: Release artifact creation."
 }
 
-Task 'DeployToAzureRepo' -Depends 'Init' {
+Task 'DeployAzure' -Depends 'Init' {
     $lines
     Write-Output "Deploying to Azure Repo"
 
@@ -377,6 +382,83 @@ Task 'DeployToAzureRepo' -Depends 'Init' {
     Publish-Module  -Path $env:BHModulePath -Repository $env:BHPublishRepo -Credential $credential -Verbose
     #Do I need a NuGetAPIKey parameter here?
 }
+
+Task 'Sign' {
+    $Lines
+    Write-Output "Checking for Self-Signed Certs and Signing Your Code`n"
+
+    if ($PSVersionTable.PSEdition -eq "Desktop") {
+
+        $OSVer = Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object Version
+        if ($OSVer.Version.StartsWith(10)){
+
+            $ExistingCerts = Get-ChildItem -Path cert:\LocalMachine\My -Recurse -CodeSigningCert
+            if (-not ($ExistingCerts)){
+            # specific to Win 10 and Server 2019 and later
+                New-SelfSignedCertificate -Type CodeSigningCert -Subject $env:BHProjectName | Out-Null
+                $ExistingCerts = Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert
+            }
+
+            $publicFunctions = @( Get-ChildItem -Path "$env:BHModulePath\Public\*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
+            foreach($function in $publicFunctions){
+                Set-AuthenticodeSignature -FilePath $function -Certificate $ExistingCerts[0]
+            }
+
+        }
+
+    }
+    elseif ($PSVersionTable.PSEdition -eq "Core") {
+
+        if (($isMACOS) -or ($isLinux)) {
+
+            Write-Output "You are going to need to enter a password for your pfx file"
+
+            # using this article as a reference - http://thecuriousgeek.org/2014/02/creating-openssl-code-signing-certs-on-windows/
+            Exec {openssl genrsa -out $env:BHModulePath/Certs/ca.key 2048}
+            Exec {openssl req -config $env:BHModulePath/Certs/openssl.cfg -new -x509 -days 1826 -key $env:BHModulePath/Certs/ca.key -out $env:BHModulePath/Certs/ca.crt}
+            Exec {openssl genrsa -out $env:BHModulePath/Certs/codesign.key 2048} ## Can I delete this line?
+            Exec {openssl req -config $env:BHModulePath/Certs/openssl.cfg -new -key $env:BHModulePath/Certs/codesign.key -reqexts v3_req -out $env:BHModulePath/Certs/codesign.csr}
+            Exec {openssl x509 -req -days 1826 -in $env:BHModulePath/Certs/codesign.csr -CA $env:BHModulePath/Certs/ca.crt -CAkey $env:BHModulePath/Certs/ca.key -extfile $env:BHModulePath/Certs/openssl.cfg -set_serial 01 -out $env:BHModulePath/Certs/codesign.crt}
+            Exec {openssl pkcs12 -export -out $env:BHModulePath/Certs/codesign.pfx -inkey $env:BHModulePath/Certs/codesign.key -in $env:BHModulePath/Certs/codesign.crt}
+            $MyCertFromPfx = Get-PfxCertificate -FilePath $env:BHModulePath/Certs/codesign.pfx
+
+            $publicFunctions = @( Get-ChildItem -Path "$env:BHModulePath\Public\*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
+            foreach($function in $publicFunctions){
+                Set-AuthenticodeSignature -FilePath $function -Certificate $MyCertFromPfx
+            }
+
+        }
+        else {
+
+            # If this is PS Core Running on Windows, what version is it? If Win10, great, here's something to try.
+            if ($OSVer.Version.StartsWith(10)) {
+
+                $ExistingCerts = Get-ChildItem -Path cert:\LocalMachine\My -Recurse -CodeSigningCert
+                if (-not ($ExistingCerts)) {
+                    # specific to Win 10 and Server 2019 and later
+                    New-SelfSignedCertificate -Type CodeSigningCert -Subject $env:BHProjectName | Out-Null
+                    $ExistingCerts = Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert
+                }
+
+                $publicFunctions = @( Get-ChildItem -Path "$env:BHModulePath\Public\*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
+                foreach ($function in $publicFunctions) {
+                    Set-AuthenticodeSignature -FilePath $function -Certificate $ExistingCerts[0]
+                }
+
+            }
+            # If not win10, soorrrryyyyy
+            else {
+                Write-Output "Sorry, no soup for you - no cert options configured"
+            }
+
+
+
+
+        }
+    }
+
+}
+
 
 #region NOT USED FOR THIS DEMO
 # Task 'Release' -Depends 'Clean', 'Test', 'UpdateDocumentation', 'CombineFunctionsAndStage', 'CreateBuildArtifact' #'UpdateManifest', 'UpdateTag'

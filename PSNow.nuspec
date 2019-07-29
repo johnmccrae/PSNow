@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PSNow</id>
+    <version>0.0.1.20</version>
+    <authors>John McCrae</authors>
+    <owners>John McCrae</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Powershell Module Authoring Module</description>
+    <releaseNotes>1st official release as a Module</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>PSModule Plaster Pester PSDepend PSScriptAnalyzer</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Public\*.*" target="Public" />
+    <file src="Private\*.*" target="Private" />
+    <file src="en-US\*.*" target="en-US" />
+    <file src="PlasterTemplate\*.*" target="PlasterTemplate" />
+    <file src="Spec\*.*" target="Spec" />
+    <file src="Tests\*.*" target="Tests" />
+    <file src="Build\*.*" target="Build" />
+    <file src="Certs\*.*" target="Certs" />
+    <file src="Scaffold\*.*" target="Scaffold" />
+    <file src="PSNow.psd1" target="PSNow.psd1" />
+    <file src="PSNow.psm1" target="PSNow.psm1" />
+    <file src="readme.md" target="readme.md" />
+  </files>
+</package>

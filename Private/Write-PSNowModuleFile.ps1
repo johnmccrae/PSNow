@@ -21,7 +21,7 @@ An example
 General notes
 #>
 
-function Write-MyPSModuleFile {
+function Write-PSNowFile {
 
     [CmdletBinding()]
     param (
@@ -41,7 +41,7 @@ function Write-MyPSModuleFile {
 
     $FullPath = & Join-Path -Path $Path -ChildPath $Name
     if (-not (& Test-Path -Path $FullPath)) {
-        & Set-Content -Path  $FullPath -Value $Content -Encoding UTF8
+        & Set-Content -Path  $FullPath -Value $Content -Encoding UTF8NoBOM
         & Get-Item -Path $FullPath
     }
     else {

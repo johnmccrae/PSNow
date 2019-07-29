@@ -1,11 +1,11 @@
 ---
-external help file: New-MyPSModule-help.xml
-Module Name: New-MyPSModule
+external help file: New-PSNow-help.xml
+Module Name: New-PSNow
 online version:
 schema: 2.0.0
 ---
 
-# New-MyPSModule
+# New-PSNow
 
 ## SYNOPSIS
 A module used to create new PS Modules with.
@@ -13,7 +13,7 @@ A module used to create new PS Modules with.
 ## SYNTAX
 
 ```
-New-MyPSModule [-MyNewModuleName] <String> [-BaseManifest] <String> [[-moduleroot] <String>] [-WhatIf]
+New-PSNow [-MyNewModuleName] <String> [-BaseManifest] <String> [[-moduleroot] <String>] [-WhatIf]
  [-Confirm] [<CommonParameters>]
 ```
 
@@ -24,7 +24,7 @@ This module uses Plaster to create all the essential parts of a PowerShell Modul
 
 ### Example 1
 ```powershell
-PS C:> New-MyPSModule -MyNewModuleName ContosoExporting -Basemanifest PlasterManifest-extended2.xml -ModuleRoot c:\
+PS C:> New-PSNow -MyNewModuleName ContosoExporting -Basemanifest PlasterManifest-extended2.xml -ModuleRoot c:\
 ```
 
 In the above example you are creating a Module with the name ContosoExporting that is going to be based on a Plaster manifest named PlasterManifest-extended2.xml and it will be created at c:\ContosoExporting\
@@ -48,7 +48,7 @@ Accept wildcard characters: False
 
 
 ### -BaseManifest
-We use a Plaster manifest to create your module from. We include 4 examples for you to play with. 3 of them are directly available when you invoke the module. 
+We use a Plaster manifest to create your module from. We include 4 examples for you to play with. 3 of them are directly available when you invoke the module.
 
 ```yaml
 Type: String
@@ -64,7 +64,7 @@ Accept wildcard characters: False
 ```
 
 ### -moduleroot
-The path on the local drive where you want to place the module. This module supports installation on PS Core so you can install it on Linux or Mac OS as well as on Windows. 
+The path on the local drive where you want to place the module. This module supports installation on PS Core so you can install it on Linux or Mac OS as well as on Windows.
 
 ```yaml
 Type: String

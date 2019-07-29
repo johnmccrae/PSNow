@@ -1,4 +1,3 @@
-
 <#
 .SYNOPSIS
 A module used to create new PS Modules with.
@@ -7,7 +6,7 @@ A module used to create new PS Modules with.
 This module uses Plaster to create all the essential parts of a PowerShell Module
 
 .EXAMPLE
-New-MyPSModule -MyNewModuleName "MyFabModule" -
+New-PSNow -NewModuleName "MyFabModule" -
 
 .DEPENDENCIES
 The following modules must be installed or this won't work at all
@@ -18,6 +17,7 @@ PlatyPS
 Pester
 PSDepend
 PSCI
+
 
 .NOTES
 
@@ -33,15 +33,16 @@ PSCI
 
 #>
 
-function New-MyPSModule {
+
+function New-PSNowModule {
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$MyNewModuleName,
+        [string]$NewModuleName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Basic.xml", "Extended.xml", "Advanced.xml")]
+        [ValidateSet("Basic", "Extended", "Advanced")]
         [string]$BaseManifest,
 
         [Parameter(Mandatory = $false)]
@@ -64,7 +65,7 @@ function New-MyPSModule {
                 Remove-Item -Path PlasterManifest.xml
             }
 
-        $plasterdoc = Get-ChildItem $templateroot -Filter $basemanifest -Recurse | ForEach-Object { $_.FullName }
+        $plasterdoc = Get-ChildItem "$templateroot\PlasterTemplate" -Filter "$basemanifest.xml" | ForEach-Object { $_.FullName }
 
         Copy-Item -Path $plasterdoc "$templateroot\PlasterManifest.xml"
 
@@ -79,6 +80,7 @@ function New-MyPSModule {
             }
 
             Set-Location $moduleroot
+            $PathDivider = "\"
 
         }
         elseif ($PSVersionTable.PSEdition -eq "Core") {
@@ -93,7 +95,8 @@ function New-MyPSModule {
                     New-Item -Path "$moduleroot" -ItemType Directory
                 }
 
-                Set-Location $moduleroot
+                Set-Location $ModuleRoot
+                $PathDivider = "/"
 
             }
             else {
@@ -107,6 +110,7 @@ function New-MyPSModule {
                 }
 
                 Set-Location $moduleroot
+                $PathDivider = "\"
 
             }
         }
@@ -114,14 +118,14 @@ function New-MyPSModule {
         $PlasterParams = @{
             TemplatePath       = $templateroot #where the plaster manifest xml file lives
             Destination        = $moduleroot #where my new module is going to live
-            ModuleName         = $MyNewModuleName
+            ModuleName         = $NewModuleName
             #Description       = 'PowerShell Script Module Building Toolkit'
             #Version           = '1.0.0'
-            ModuleAuthor       = 'John McCrae'
+            ModuleAuthor       = '<Your Full Name Goes Here>'
             #CompanyName       = 'Chef Software Inc'
             #FunctionFolders   = 'public', 'private'
             #Git               = 'Yes'
-            GitHubUserName	   = 'johnmccrae'
+            GitHubUserName	   = '<Your GitHub Name Goes Here>'
             #GitHubRepo        = 'ModuleBuildTools'
             #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
             PowerShellVersion  = '3.0' #minimum PS version
@@ -130,15 +134,15 @@ function New-MyPSModule {
 
         Invoke-Plaster @PlasterParams -Force -Verbose
 
-        $MyNewModuleName = $MyNewModuleName -replace '.ps1', ''
+        $NewModuleName = $NewModuleName -replace '.ps1', ''
 
         #region File contents
         #keep this formatted as is. the format is output to the file as is, including indentation
-        #$scriptCode = "function $MyNewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
+        #$scriptCode = "function $NewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
 
         $scriptCode =
-@"
-@{
+        @"
+{
     function <%= $PLASTER_PARAM_ModuleName %> {
         [cmdletbinding()]
         param()
@@ -149,27 +153,26 @@ function New-MyPSModule {
 }
 "@
 
-        #endregion
+        $Path = "$moduleroot$PathDivider$NewModuleName"
 
-        $Path = "$moduleroot\$MyNewModuleName"
+        Write-Output "`nYour module was built at: $Path`n"
 
-        Write-Output "Your module was built at: $Path"
-
-        if (Test-Path "$Path\public") {
-            New-Item -Path "$Path\Public" -ItemType File -Name "$MyNewModuleName.ps1" -Value $scriptCode
+        if (Test-Path "$Path\public"){
+            New-Item -Path "$Path\Public" -ItemType File -Name "$NewModuleName.ps1" -Value $scriptCode | Out-Null
         }
         else {
-            New-Item -Path $Path -Name "$MyNewModuleName.ps1" -Content $scriptCode
+            New-Item -Path $Path -Name "$NewModuleName.ps1" -Content $scriptCode | Out-Null
         }
 
         if (-not (& Test-Path -Path $Path)) {
-            New-Item -ItemType "File" -Path $templateroot -Name "currentmodules.txt" -Value $Path
+            New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | Out-Null
         }
         else{
-            add-content -path "$templateroot\currentmodules.txt" -value "$Path"
+            add-content -path "$templateroot\currentmodules.txt" -value "$Path" | Out-Null
         }
+
 
     }
     end{}
 }
-#Export-ModuleMember -Function new-myposmodule
+

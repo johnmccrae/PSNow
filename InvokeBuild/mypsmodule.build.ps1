@@ -32,7 +32,7 @@ task Clean {
 
 # Synopsis: Set $script:Version from Release-Notes.
 task Version {
-    $manifest = Import-PowerShellDataFile ..\new-mypsmodule.psd1
+    $manifest = Import-PowerShellDataFile ..\new-PSNow.psd1
     [version]$script:Version = $manifest.ModuleVersion
     assert $script:Version
 }

@@ -1,2 +1,0 @@
-c:\\june42019.5
-~/modules\chefitpsdashboard

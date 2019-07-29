@@ -2,9 +2,9 @@
 <helpItems schema="maml" xmlns="http://msh">
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
-      <command:name>New-MyPSModule</command:name>
+      <command:name>New-PSNow</command:name>
       <command:verb>New</command:verb>
-      <command:noun>MyPSModule</command:noun>
+      <command:noun>PSNow</command:noun>
       <maml:description>
         <maml:para>A module used to create new PS Modules with.</maml:para>
       </maml:description>
@@ -14,7 +14,7 @@
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
-        <maml:name>New-MyPSModule</maml:name>
+        <maml:name>New-PSNow</maml:name>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
           <maml:name>MyNewModuleName</maml:name>
           <maml:Description>
@@ -124,7 +124,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:&gt; New-MyPSModule -MyNewModuleName ContosoExporting -Basemanifest PlasterManifest-extended2.xml -ModuleRoot c:\</dev:code>
+        <dev:code>PS C:&gt; New-PSNow -MyNewModuleName ContosoExporting -Basemanifest PlasterManifest-extended2.xml -ModuleRoot c:\</dev:code>
         <dev:remarks>
           <maml:para>In the above example you are creating a Module with the name ContosoExporting that is going to be based on a Plaster manifest named PlasterManifest-extended2.xml and it will be created at c:\ContosoExporting\</maml:para>
         </dev:remarks>

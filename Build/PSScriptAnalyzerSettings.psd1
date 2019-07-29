@@ -17,7 +17,7 @@
     # For instance, the PSAvoidUsingCmdletAliases rule takes a whitelist for aliases you
     # want to allow.
     ExcludeRules = @(
-        'PSAvoidGlobalVars' 
+        'PSAvoidGlobalVars'
     )
     # Use Severity when you want to limit the generated diagnostic records to a
     # subset of: Error, Warning and Information.
@@ -28,7 +28,7 @@
         "Error"
     )
 
-    Rules        = @{ 
+    Rules        = @{
         # Do not flag 'cd' alias.
         'PSAvoidUsingCmdletAliases' = @{'Whitelist' = @('Given', 'Then', 'When') }
 

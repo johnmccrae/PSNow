@@ -12,7 +12,7 @@ Write-ChefScriptNoWhitespace
 General notes
 #>
 
-function Write-MyPSModuleScriptNoWhitespace {
+function Write-PSNowScriptNoWhitespace {
     [cmdletBinding()]
     Param
     (

@@ -4,86 +4,221 @@
     <name>ModuleTemplate</name>
     <id>c8e32c92-c461-4200-89a0-79ac904e7520</id>
     <version>1.0.0</version>
-    <title>Chef IT Custom Module Template</title>
+    <title>Custom Module Template</title>
     <description>Plaster template to create a module</description>
     <author>John McCrae</author>
     <tags>Plaster, PSake, PlatyPS</tags>
   </metadata>
   <parameters>
-    <parameter name="ModuleAuthor" type="user-fullname" prompt="Author" />
-    <parameter name="ModuleName" type="text" prompt="Name of your module" default="MyNewModule" />
-    <parameter name="ModuleVersion" type="text" prompt="Version Number" default="0.0.0.1" />
-    <parameter name="CompanyName" type="text" prompt="Name of your Organization" default="" />
-    <parameter name="Description" type="text" prompt="Brief Description of your module" />
-    <parameter name="GitHubUserName" type="text" prompt="Enter your Github username" />
-    <parameter name="GitHubRepo" type="text" prompt="Enter your Github repository name for this project" />
-    <parameter name="PowerShellVersion" type="text" prompt="Enter the minimum PS version needed to run this module" />
-    <parameter name="FunctionFolders" type="multichoice" prompt="Please select folders to include" default="0,3">
-      <choice label="&amp;Public" value="Public" help="Adds a public folder to module root" />
-      <choice label="&amp;Internal" value="Internal" help="Adds a internal folder to module root" />
-      <choice label="&amp;Classes" value="Classes" help="Adds a classes folder to module root" />
-      <choice label="&amp;Private" value="Private" help="Adds a private folder to module root" />
-      <choice label="&amp;Binaries" value="Binaries" help="Adds a binaries folder to module root" />
-      <choice label="&amp;DSCResources" value="DSCResources" help="Adds a DSCResource folder to module root" />
+
+    <parameter name="ModuleAuthor"
+               type="user-fullname"
+               prompt="Author" />
+
+    <parameter name="ModuleName"
+               type="text"
+               prompt="Name of your module"
+               default="MyNewModule" />
+
+    <parameter name="ModuleVersion"
+               type="text"
+               prompt="Version Number"
+               default="0.0.0.1" />
+
+    <parameter name="CompanyName"
+               type="text" prompt="Name of your Organization"
+               default="" />
+
+    <parameter name="Description"
+               type="text"
+               prompt="Brief Description of your module" />
+
+    <parameter name="GitHubUserName"
+               type="text"
+               prompt="Enter your Github username" />
+
+    <parameter name="GitHubRepo"
+               type="text"
+               prompt="Enter your Github repository name for this project" />
+
+    <parameter name="PowerShellVersion"
+               type="text"
+               prompt="Enter the minimum PS version needed to run this module" />
+
+    <parameter name="FunctionFolders"
+               type="multichoice"
+               prompt="Please select folders to include"
+               default="0,3">
+
+      <choice label="&amp;Public"
+              value="Public"
+              help="Adds a public folder to module root" />
+
+      <choice label="&amp;Internal"
+              value="Internal"
+              help="Adds a internal folder to module root" />
+
+      <choice label="&amp;Classes"
+              value="Classes"
+              help="Adds a classes folder to module root" />
+
+      <choice label="P&amp;rivate"
+              value="Private"
+              help="Adds a private folder to module root" />
+
+      <choice label="&amp;Binaries"
+              value="Binaries"
+              help="Adds a binaries folder to module root" />
+
+      <choice label="&amp;DSCResources"
+              value="DSCResources"
+              help="Adds a DSCResource folder to module root" />
     </parameter>
-    <parameter name="Pester" type="choice" prompt="Include Pester Tests?" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Adds a tests folder" />
-      <choice label="&amp;No" value="No" help="Does not add a tests folder" />
+
+    <parameter name='Options' type='multichoice' prompt='Select one or more of the following tooling options:' default='1,2,3,4,5' store='text' >
+      <choice label='&amp;None' help="No tooling options specified." value="None"/>
+      <choice label='Add &amp;Git .gitignore file' help="Adds a .gitignore file." value="Git"/>
+      <choice label='Add p&amp;sake build script' help="Adds psake build script that generates the module directory for publishing to the PowerShell Gallery." value="psake"/>
+      <choice label='Add &amp;Pester test support' help="Adds test directory and Pester test for the module manifest file." value="Pester"/>
+      <choice label='Add PSScript&amp;Analyzer support' help="Adds script analysis support using PSScriptAnalyzer." value="PSScriptAnalyzer"/>
+      <choice label='Add plat&amp;yPS help generation support' help="Adds help build support using platyPS." value="platyPS"/>
     </parameter>
-    <parameter name="Git" type="choice" prompt="Include Git Support?" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Includes Github files" />
-      <choice label="&amp;No" value="No" help="Does not include github files" />
-    </parameter>
-    <parameter name="InvokeBuild" type="choice" prompt="Include Invoke-Build build Script" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Adds an invoke build script at the root of module" />
-      <choice label="&amp;No" value="No" help="Does not include any invoke build scripts" />
-    </parameter>
-    <parameter name="PlatyPS" type="choice" prompt="Include PlatyPS Support for Help" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Adds a PlatyPS for help" />
-      <choice label="&amp;No" value="No" help="Does not add PlatyPS support" />
-    </parameter>
-    <parameter name="NuSpec" type="choice" prompt="Include Nuspec file" default="0">
-      <choice label="&amp;Yes" value="Yes" help="Adds a Nuspec file" />
-      <choice label="&amp;No" value="No" help="Does not add Nuspec support" />
-    </parameter>
+
   </parameters>
+
   <content>
-    <message>Setting up your project</message>
-    <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="$PLASTER_PARAM_ModuleVersion" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="$PLASTER_PARAM_ModuleAuthor" companyName="$PLASTER_PARAM_ModuleCompanyName" description="$PLASTER_PARAM_ModuleDesc" />
-    <templateFile source="Scaffold\template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
-    <message>Creating your folders for module: $PLASTER_PARAM_ModuleName</message>
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Internal&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Classes&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Private&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
-    <message>Deploying common files</message>
-    <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\preface.md" />
-    <templateFile source="Scaffold\initialize-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\initialize-readme.ps1" />
-    <templateFile source="LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
-    <file source="Scaffold\" destination="${PLASTER_PARAM_ModuleName}\Scaffold\" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
-    <file source="spec\module.feature" destination="${PLASTER_PARAM_ModuleName}\Spec\module.feature" />
-    <file source="spec\module.Steps.ps1" destination="${PLASTER_PARAM_ModuleName}\Spec\module.Steps.ps1" />
-    <message condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;">Setting up support for Pester</message>
-    <requireModule name="Pester" minimumVersion="3.4.0" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\basic.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\${PLASTER_PARAM_ModuleName}.tests.ps1" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Regression.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <file source="tests\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Pester -eq &quot;Yes&quot;" />
-    <message condition="$PlASTER_PARAM_Github -eq &quot;Yes&quot;">Setting up support for Github</message>
-    <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Scaffold\README.md" condition="$PLASTER_PARAM_Github -eq &quot;Yes&quot;" />
-    <message condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;">Setting up support for Invoke-Build</message>
-    <requireModule name="InvokeBuild" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
-    <templateFile source="Scaffold\MyPSModule.build.template.ps1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.build.ps1" condition="$PLASTER_PARAM_InvokeBuild -eq &quot;Yes&quot;" />
-    <message condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;">Setting up support for PlatyPS</message>
-    <requireModule name="PlatyPS" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_PlatyPS -eq &quot;Yes&quot;" />
-    <message condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;">Setting up support for Nuspec</message>
-    <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" condition="$PLASTER_PARAM_NuSpec -eq &quot;Yes&quot;" />
+        <message>
+
+Setting up Your Project
+-----------------------
+
+
+        </message>
+        <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="$PLASTER_PARAM_ModuleVersion" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="$PLASTER_PARAM_ModuleAuthor" companyName="$PLASTER_PARAM_ModuleCompanyName" description="$PLASTER_PARAM_ModuleDesc" encoding='UTF8-NoBOM'/>
+        <templateFile source="Scaffold\template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
+        <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" />
+
+        <message>Creating Base Folders for module: $PLASTER_PARAM_ModuleName</message>
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Internal&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Classes&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Private&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
+
+        <message>
+
+Deploying Common Files
+----------------------
+
+        </message>
+        <templateFile source="Scaffold\initialize-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\initialize-readme.ps1" />
+        <templateFile source="LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
+
+        <message>
+
+Staging Support Folders
+-----------------------
+
+        </message>
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
+        <file source="Scaffold\PSNow.feature" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.feature" />
+        <file source="Scaffold\PSNow.Steps.ps1" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.Steps.ps1" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\.vscode">
+        <file source="Scaffold\settings.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\settings.json">
+        <file source="Scaffold\task.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\task.json">
+
+
+        <message condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;">
+
+Setting up Support for Git
+--------------------------
+
+        </message>
+        <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;" />
+        <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Readme.md" condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;" />
+
+        <message condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;">
+
+Setting up Support for Psake Build Environment
+----------------------------------------------
+
+        </message>
+        <requireModule name="psake" minimumVersion="4.8.0" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Build\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="\Build\build.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="\Build\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="\Build\build.psake.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="\Build\deploy.psdeploy.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Certs\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <templateFile source="\Scaffold\openssl.cfg" destination="${PLASTER_PARAM_ModuleName}\Certs\openssl.cfg" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+
+        <message condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;">
+
+Setting up Support for Pester
+-----------------------------
+
+        </message>
+        <requireModule name="Pester" minimumVersion="3.4.0" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Features\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\Analyzer.tests.ps1.example" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Analyzer.tests.ps1.example" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\MetaFixers.psm1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\MetaFixers.psm1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Features\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Features\Feature.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Unit\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Unit\Regression.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Regression.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Unit\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+
+        <message condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;">
+
+Setting up support for PS ScriptAnalyzer
+----------------------------------------
+
+        </message>
+        <file source="\Build\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\PSScriptAnalyzerSettings.psd1" condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;" />
+
+        <message condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;">
+
+Setting up Support for PlatyPS
+------------------------------
+
+        </message>
+        <requireModule name="PlatyPS" minimumVersion="0.14.0" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
+        <file source="Scaffold\about_PSNow.help.md" destination="${PLASTER_PARAM_ModuleName}\Help\about_${PLASTER_PARAM_ModuleName}.help.md" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
+
+        <message>
+
+We're Done!
+-----------
+Your new PowerShell module project '$PLASTER_PARAM_ModuleName' has been created.
+
+        </message>
+
+        <message condition="$PLASTER_PARAM_Options -contains 'Pester'">
+A Pester test has been created to validate the module's manifest file.  Add additional tests to the test directory.
+You can run the Pester tests in your project by executing the 'test' task.  Press Ctrl+P, then type 'task test'.
+
+        </message>
+
+        <message condition="$PLASTER_PARAM_Options -contains 'psake'">
+You can build your project by executing the 'buildNuget' task.  Press Ctrl+P, then type 'task build'.
+You can publish your project to the PSGallery by pressing Ctrl+P, then type 'task publish'.
+
+        </message>
+
+        <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
+You can generate help and additional documentation using platyPS by running the 'build help' task.
+Add additional documentation written in platyPS markdown to the docs directory. You can update the help by
+running the 'build help' task again.
+
+        </message>
+
   </content>
 </plasterManifest>

@@ -1,5 +1,5 @@
 
-# New-MyPSModule
+# New-PSNow
 
 <%= $PLASTER_PARAM_ModuleDesc %>
 

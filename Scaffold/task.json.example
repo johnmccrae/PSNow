@@ -1,0 +1,108 @@
+// Available variables which can be used inside of strings.
+// $ {workspaceRoot}: the root folder of the team
+// $ {file}: the current opened file
+// $ {relativeFile}: the current opened file relative to workspaceRoot
+// $ {fileBaseName}: the current opened file's basename
+// $ {fileDirname}: the current opened file's dirname
+// $ {fileExtname}: the current opened file's extension
+// $ {cwd}: the current working directory of the spawned process
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    // Start PowerShell
+    "windows": {
+        "command": "$ {env.windir} \\ sysnative \\ windowspowershell \\ v1.0 \\ PowerShell.exe"
+    },
+    "linux": {
+        "command": "/ usr / bin / powershell"
+    },
+    "osx": {
+        "command": "/ usr / local / bin / powershell"
+    },
+    // The command is a shell script
+    "isShellCommand": true,
+    // Show the output window always
+    "showOutput": "always",
+    "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass"
+    ]
+    // Associate with test task runner
+    "tasks": [
+        {
+            "taskName": "CreateDocs",
+            "suppressTaskName": true,
+            "isTestCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking CreateDocs'; ./helper/*.Create-Docs.ps1;",
+                "Invoke-Command {Write-Host 'Completed CreateDocs task in task runner.' } "
+            ]
+        },
+        {
+            "taskName": "UpdateManifestData-Patch",
+            "suppressTaskName": true,
+            "isTestCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host' Invoking Patch UpdateManifestData '; Import Modules ./helper/Update-ModuleManifestData.ps1 -Force; ",
+                "Update-ModuleManifestData -Path ./*.psd1 -Patch;",
+                "Invoke-Command {Write-Host 'Completed Patch Update ManifestData task in task runner.' } "
+            ]
+        },
+        {
+            "taskName": "UpdateManifestData-Minor",
+            "suppressTaskName": true,
+            "isTestCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking Minor Update Manifest Data'; Import Modules ./helper/Update-ModuleManifestData.ps1 -Force; ",
+                "Update-ModuleManifestData -Path ./*.psd1 -Minor;",
+                "Invoke-Command {Write-Host 'Completed Minor Update ManifestData task in task runner.' } "
+            ]
+        },
+        {
+            "taskName": "UpdateManifestData-Major",
+            "suppressTaskName": true,
+            "isTestCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking Major Update Manifest Data; Import Modules ./helper/Update-ModuleManifestData.ps1 -Force;",
+                "Update-ModuleManifestData -Path ./*.psd1 -Major;",
+                "Invoke-Command {Write-Host 'Completed Major Update ManifestData task in task runner.' } "
+            ]
+        },
+        {
+            "taskName": "Test",
+            "suppressTaskName": true,
+            "isTestCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking Pester'; Invoke-Pester -PesterOption @ {IncludeVSCodeMarker = $ true};",
+                "Invoke-Command {Write-Host 'Completed Test task in task runner.' } "
+            ],
+            "problemMatcher": [
+                {
+                    "owner": "powershell",
+                    "fileLocation": [
+                        "absolute"
+                    ],
+                    "severity": "error",
+                    "pattern": [
+                        {
+                            "regexp": "^ \\ s * (\\ [- \\] \\ s *. *?) (\\ d +) ms \\ s * $",
+                            "message": 1
+                        },
+                        {
+                            "regexp": "^ \\ s + at \\ s + [^,] +, \\ s * (. *?): \\ s + line \\ s + (\\ d +) $",
+                            "file": 1,
+                            "line": 2
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

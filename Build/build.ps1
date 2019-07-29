@@ -3,23 +3,27 @@
     Builds your PowerShell module.
 
     .DESCRIPTION
-    A tool to Build your module with. It can take several variables to flesh out your build environment and do
+    A tool to Build a basic module with. It can take several variables to flesh out your build environment and do
     your testing, build and publishing
 
     .PARAMETER Tasklist
     Tasks are:
     'Init' - sets the build location to the project root. Also adds /Staging and /Artifacts folders to .gitignore
     'Clean' - cleans up any files/folders from a previous build and creates the Aritact and Staging directories
-    'CombineFunctionsAndStage' - pulls all your function files into a .psm1 and copies everything to /Staging
-    'CreateModuleAndStage' - pulls all your files into /Staging in preparation for creation a .nupkg file
+    'CombineAndStage' - pulls all your function files into a .psm1 and copies everything to /Staging
+    'Stage' - pulls all your files into /Staging in preparation for creation a .nupkg file. Retains
+    current directory structure.
     'ImportStagingModule' - Import the module you just staged, you'll use that for making a .zip or .nupkg
     'Analyze' - Run PSScriptAnalyzer on the modules in /Staging to ensure linting and syntax are correct
     'Test' - Run Pester tests against the code. Tests are coming from /Tests
     'UpdateDocumentation' - Create/Update markdown helpfiles using PlatyPS
     'UpdateBuildVersion' - based on a parameter you pass (see below) the build number is updated
     'UpdateRepo' - does a git push back to your repo to sync your current files. Also tags files with the current build
-    'CreateNuGetPackage' - builds a .nupkg file in the /Artifacts directory
-    'CreateBuildArtifact' - creates a .zip file of your creation in the /Artifacts folder
+    'BuildNuget' - builds a .nupkg file in the /Artifacts directory
+    'BuildZip' - creates a .zip file of your creation in the /Artifacts folder
+    'DeployAzure' - invokes Publish-Module to publish your code to your Azure Repo
+    'DeployPSGallery' - invokes Publish-Module to publish to PowerShellGallery
+    'Secure' - used to sign your module with a certificate
 
     .PARAMETER PricingMatrix
     A hashtable pricing matrix for different tiers, with the keys being a concatenation of CPU count and
@@ -112,22 +116,39 @@ else {
     Write-Output "Skipping dependency check...`n" -ForegroundColor 'Yellow'
 }
 
+
 # Init BuildHelpers
 Set-BuildEnvironment -Force
+
+if ($PSVersionTable.PSEdition -eq "Desktop") {
+    $PathDivider = "\"
+}
+elseif ($PSVersionTable.PSEdition -eq "Core") {
+
+    if (($isMACOS) -or ($isLinux)) {
+        $PathDivider = "/"
+    }
+    else {
+        $PathDivider = "\"
+    }
+}
+
+
 
 #region - BHBUILDVARS
 Set-Item -Path Env:BHBuildSystem -Value "Azure Pipelines"
 $manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
 [version]$script:Version = $manifest.ModuleVersion
 Set-Item -Path Env:BHBuildNumber -Value $script:Version
-$stagingfolder = (Get-item env:\BHPSModulePath).Value + "/Staging"
+$stagingfolder = (Get-item env:\BHPSModulePath).Value + $PathDivider + "Staging"
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
-$publishfolder = $ENV:BHModulePath + "/Staging/" + $ENV:BHProjectName
+$publishfolder = $ENV:BHModulePath + $PathDivider + "Staging" + $PathDivider + $ENV:BHProjectName
 Set-Item -Path env:\BHModulePath -Value $publishfolder
 #endregion
 
-# Capture the build version type - Major, Minor, Build, Revision. Used later to bump that version number
+# Capture the build version type - Major, Minor, Build, Revision. Used later to bump the version number of your package
 # The revision is passed in via the BuildRev parameter.
+# also grabbing a Commit message so we an do a git push to your Repo.
 if ($PSBoundParameters.Keys -contains 'Parameters') {
     foreach ($key in $Parameters.Keys) {
         if ($key -eq 'BuildRev') {

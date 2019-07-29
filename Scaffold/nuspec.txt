@@ -7,8 +7,8 @@
     <owners><%= $PLASTER_PARAM_CompanyName %></owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description><%= $PLASTER_PARAM_Description %></description>
-    <releaseNotes>2nd release</releaseNotes>
-    <copyright>Copyright 2018</copyright>
+    <releaseNotes>1st release</releaseNotes>
+    <copyright>Copyright 2019</copyright>
     <tags>PSModule Plaster</tags>
     <dependencies></dependencies>
   </metadata>
