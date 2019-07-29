@@ -87,7 +87,7 @@ You should check your code for defects and linting issues by running PS Script A
 
 For more information
 
-* [github.com/johnmccrae/New-PSNow](https://github.com/johnmccrae/PSNow)
+* [github.com/johnmccrae/PSNow](https://github.com/johnmccrae/PSNow)
 * [johnmccrae.github.io](https://johnmccrae.github.io)
 
 
