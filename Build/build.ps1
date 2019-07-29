@@ -23,7 +23,7 @@
     'BuildZip' - creates a .zip file of your creation in the /Artifacts folder
     'DeployAzure' - invokes Publish-Module to publish your code to your Azure Repo
     'DeployPSGallery' - invokes Publish-Module to publish to PowerShellGallery
-    'Secure' - used to sign your module with a certificate
+    'Sign' - used to sign your module with a certificate
 
     .PARAMETER PricingMatrix
     A hashtable pricing matrix for different tiers, with the keys being a concatenation of CPU count and
@@ -134,7 +134,7 @@ elseif ($PSVersionTable.PSEdition -eq "Core") {
 }
 
 
-
+# The Default Build Helpers variable settings leave some gaps that need resolving. Doing that here.
 #region - BHBUILDVARS
 Set-Item -Path Env:BHBuildSystem -Value "Azure Pipelines"
 $manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
