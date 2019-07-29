@@ -40,9 +40,10 @@ Get-Item env:BH*
 
 This module supports the Gherkin DSL as well as Pester for Test Driven Development. When following that pattern, you write your tests first to clarify your thinking around what you expect your module and scripts to do. Then go back and write your first script. Navigate to /Tests/Features and write the test for your first script there. Then run this to test your code.
 
+Just below you'll notice that we 'stage' the project. This creates a directory called /Staging and puts a working copy of your code there. We're following the principle that the default
+
 ```powershell
 ./Build/Build.ps1 -tasklist stage
-cd ./yourmoduledir/staging
 ./Build/Build.ps1 -tasklist test
 ```
 

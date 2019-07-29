@@ -3,7 +3,7 @@
 Helper function to trim whitespace on all scripts in the local module structure
 
 .DESCRIPTION
-Long description
+Helper function to trim whitespace on all scripts in the local module structure. The other option you have is to set the flag   "files.trimTrailingWhitespace": true   in your VSCode settings
 
 .EXAMPLE
 Write-ChefScriptNoWhitespace

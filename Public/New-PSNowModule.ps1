@@ -3,20 +3,24 @@
 A module used to create new PS Modules with.
 
 .DESCRIPTION
-This module uses Plaster to create all the essential parts of a PowerShell Module
+This module uses Plaster to create all the essential parts of a PowerShell Module. It runs on PSCore and all supported platforms.
 
 .EXAMPLE
-New-PSNow -NewModuleName "MyFabModule" -
+New-PSNow -NewModuleName "MyFabModule" -BaseManifest Advanced
+
+.EXAMPLE
+New-PSNow -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot ~/modules/myfabmodule
+
+.EXAMPLE
+New-PSNow -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot c:\myfabmodule
 
 .DEPENDENCIES
 The following modules must be installed or this won't work at all
 Plaster
-InvokeBuild
-PSGraph
+Psake
 PlatyPS
 Pester
 PSDepend
-PSCI
 
 
 .NOTES
