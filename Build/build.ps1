@@ -11,7 +11,7 @@
     'Init' - sets the build location to the project root. Also adds /Staging and /Artifacts folders to .gitignore
     'Clean' - cleans up any files/folders from a previous build and creates the Aritact and Staging directories
     'CombineAndStage' - pulls all your function files into a .psm1 and copies everything to /Staging
-    'Stage' - pulls all your files into /Staging in preparation for creation a .nupkg file. Retains
+    'Stage' - pulls all your specified files into the /Staging folder in preparation for creation a .nupkg file or other artifact. Retains
     current directory structure.
     'ImportStagingModule' - Import the module you just staged, you'll use that for making a .zip or .nupkg
     'Analyze' - Run PSScriptAnalyzer on the modules in /Staging to ensure linting and syntax are correct
@@ -25,31 +25,28 @@
     'DeployPSGallery' - invokes Publish-Module to publish to PowerShellGallery
     'Sign' - used to sign your module with a certificate
 
-    .PARAMETER PricingMatrix
-    A hashtable pricing matrix for different tiers, with the keys being a concatenation of CPU count and
-    Memory in GB.
+    .PARAMETER Parameters
+    A hashtable of parameters you want to pass into your build. Ex.: @{BuildRev="REVISION", CommitMessage"I updated the bbuild revision"}
 
-    .PARAMETER ValidCPUMemoryMap
-    A hashtable to validate acceptable CPU / Memory configurations.
+    .PARAMETER Properties
+    A hashtable to update various pathes and other settings used by this script
 
     .INPUTS
     System.Object
 
     .OUTPUTS
-    PSCustomObject
+    PS Module
 
     .EXAMPLE
-    Get-CIVM | Get-CIVMPrice
+   ./Build/build.ps1 -Tasklist init -ResolveDependency
 
-    Returns prices for all CIVMs.
+   Resolves your dependencies as specified in the build.depend.ps1 file and sets the build environment up for you.
 
     .EXAMPLE
-    Get-CIVMPrice -CIVM $CIVM01, $CIVM02
-
-    Returns prices for two CIVMs.
+    ./Build/build.ps1 -Tasklist BuildNuget -Parameters @{BuildRev="Revision", CommitMessage="First Commit"}
 
     .NOTES
-    Author: Adam Rush
+    Author: John McCrae
 
     .REFERENCES
     thanks to Adam Rush UK - https://adamrushuk.github.io/example-azure-devops-build-pipeline-for-powershell-modules/#test-1

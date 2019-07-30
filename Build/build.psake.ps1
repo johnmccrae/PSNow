@@ -47,13 +47,16 @@ Task 'Init' {
     Write-Output "Settng up Staging and Artifacts folders in .gitignore`n"
     Set-Location $ProjectRoot
 
-    #Add Folders to gitignore. You don't need this in your repo
-    $file = Get-Content "./.gitignore"
-    $containsWord = $file | % { $_ -match "Staging|Artifacts" }
-    if ($containsWord -notcontains $true) {
-        Add-Content -Path .gitignore -Value "Staging/"
-        Add-Content -Path .gitignore -Value "Artifacts/"
+    if(Test-Path "$ProjectRoot\.gitignore" -eq $true){
+        #Add Folders to gitignore. You don't need these in your repo
+        $file = Get-Content "./.gitignore"
+        $containsWord = $file | % { $_ -match "Staging|Artifacts" }
+        if ($containsWord -notcontains $true) {
+            Add-Content -Path .gitignore -Value "Staging/"
+            Add-Content -Path .gitignore -Value "Artifacts/"
+        }
     }
+
     "`n"
     "Build System Details:`n"
     Get-Item ENV:BH*
