@@ -27,7 +27,7 @@ For your first module, execute that statement verbatim, adding in your module na
 
 A basic function-based script is ready for you in ~/modules/<your module>/public. Feel free to interogate it and modify it as necessary. Don't forget to update the comments in the Header - you'll need them later when you make your help files.
 
-Now setup your environment. The second command will duplicate your build environment variables but will let you see them outside the rest of the process.
+Now setup your environment. 
 
 ```powershell
 ./Build/Build.ps1 -tasklist init
@@ -40,11 +40,18 @@ Get-Item env:BH*
 
 This module supports the Gherkin DSL as well as Pester for Test Driven Development. When following that pattern, you write your tests first to clarify your thinking around what you expect your module and scripts to do. Then go back and write your first script. Navigate to /Tests/Features and write the test for your first script there. Then run this to test your code.
 
-Just below you'll notice that we 'stage' the project. This creates a directory called /Staging and puts a working copy of your code there. We're following the principle that the default
+```powershell
+./Build/Build.ps1 -tasklist test
+```
+
+### Stage your Code for Testing and Eventual Deployment
+
+Now that you have some basic code and the tests for it all done. Let's stage your code and get it ready to publish or deploy. 
+
+This step creates verifies that there is a folder called /Staging/<your module>
 
 ```powershell
-./Build/Build.ps1 -tasklist stage
-./Build/Build.ps1 -tasklist test
+./Build/build.ps1 -tasklist stage
 ```
 
 
@@ -54,7 +61,7 @@ Just below you'll notice that we 'stage' the project. This creates a directory c
 You should check your code for defects and linting issues by running PS Script Analyzer
 
 ```powershell
-./Build/build.ps1 -tasklist analyze
+./Build/build.ps1 -tasklist analyze,test
 ```
 
 
