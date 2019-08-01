@@ -47,7 +47,7 @@ Task 'Init' {
     Write-Output "Settng up Staging and Artifacts folders in .gitignore`n"
     Set-Location $ProjectRoot
 
-    if(Test-Path "$ProjectRoot\.gitignore" -eq $true){
+    if((Test-Path "$ProjectRoot\.gitignore") -eq $true){
         #Add Folders to gitignore. You don't need these in your repo
         $file = Get-Content "./.gitignore"
         $containsWord = $file | % { $_ -match "Staging|Artifacts" }
@@ -130,7 +130,7 @@ Task 'Stage' -Depends 'Clean' {
     # Copy required folders and files
     $pathsToCopy = @(
         Join-Path -Path $ProjectRoot -ChildPath 'en-US'
-        Join-Path -Path $ProjectRoot -ChildPath 'Docs'
+        Join-Path -Path $ProjectRoot -ChildPath 'Documentation'
         Join-Path -Path $ProjectRoot -ChildPath 'Build'
         Join-Path -Path $ProjectRoot -ChildPath 'Certs'
         Join-Path -Path $ProjectRoot -ChildPath 'PlasterTemplate'
@@ -263,9 +263,15 @@ Task 'UpdateDocumentation' -Depends 'ImportStagingModule' {
     $platyPSParams = @{
         Module       = $env:BHProjectName
         OutputFolder = $DocumentationPath
-        NoMetadata   = $true
+        NoMetadata   = $false
     }
     New-MarkdownHelp @platyPSParams -ErrorAction 'SilentlyContinue' -Verbose | Out-Null
+    Copy-Item -Path "$DocumentationPath\*.*" -Destination "$env:BHProjectPath\Documentation" -Force
+
+    # Create the XML help file which you need when calling get-help mymodule
+    Write-Output "Now updating External Help for the Module in [$StagingModulePath]"
+    New-ExternalHelp $DocumentationPath -OutputPath en-US\ -force
+    Copy-Item -Path "$StagingModulePath\en-US\*.*" -Destination "$env:BHProjectPath\en-US" -Force
 
     # Update index.md
     Write-Output "Copying index.md...`n"

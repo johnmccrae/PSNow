@@ -8,8 +8,12 @@ This module uses all these marvelous technologies to do great things
 .PARAMETER Parameter1
 A parameter for your module
 
+This first parameter does important things
+
 .PARAMETER Parameter2
 A second parameter
+
+This second parameter does more import things
 
 .EXAMPLE
 Mymodule -myparameter1 -myparameter2
@@ -19,8 +23,7 @@ Go here for more details - https://docs.microsoft.com/en-us/powershell/module/mi
 
 
 #>
-
-function New-PSNow {
+function New-${PLASTER_PARAM_ModuleName} {
 
     [CmdletBinding()]
     param (
@@ -40,4 +43,4 @@ function New-PSNow {
 
 }
 
-Export-ModuleMember -Function new-myposmodule
+Export-ModuleMember -Function New-PSNow

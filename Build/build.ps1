@@ -141,6 +141,7 @@ $stagingfolder = (Get-item env:\BHPSModulePath).Value + $PathDivider + "Staging"
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
 $publishfolder = $ENV:BHModulePath + $PathDivider + "Staging" + $PathDivider + $ENV:BHProjectName
 Set-Item -Path env:\BHModulePath -Value $publishfolder
+Set-Item -Path env:\BHPathDivider -Value $PathDivider
 #endregion
 
 # Capture the build version type - Major, Minor, Build, Revision. Used later to bump the version number of your package

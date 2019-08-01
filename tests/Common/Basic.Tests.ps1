@@ -1,4 +1,5 @@
-$moduleName = $Env:BHPSModulePath
+$moduleName = $Env:BHProjectName
+$moduleroot = $Env:BHModulePath
 
 Describe "General project validation: $moduleName" {
     Context "Are these valid PowerShell Scripts?"{

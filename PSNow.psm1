@@ -11,19 +11,4 @@ Foreach ($import in @($Public + $Private)) {
     }
 }
 
-<# Add-Type -path "$PSSCriptRoot\Chef.PowerShell.GetChefPendingReboot.dll"
-
-                  -OR-
-
-$module = 'MyModule'
-$manifestSplat = @{
-    Path              = ".\$module\$module.psd1"
-    Author            = 'Kevin Marquette'
-    NestedModules     = @('bin\MyModule.dll')
-    RootModule        = "$module.psm1"
-    FunctionsToExport = @('Resolve-MyCmdlet')
-}
-New-ModuleManifest @manifestSplat
- #>
-
 Export-ModuleMember -Function $Public.Basename

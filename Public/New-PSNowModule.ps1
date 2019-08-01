@@ -5,39 +5,33 @@ A module used to create new PS Modules with.
 .DESCRIPTION
 This module uses Plaster to create all the essential parts of a PowerShell Module. It runs on PSCore and all supported platforms.
 
-.EXAMPLE
-New-PSNow -NewModuleName "MyFabModule" -BaseManifest Advanced
+.PARAMETER NewModuleName
+The name you wish to give your new module
+
+.PARAMETER BaseManifest
+You are selecting from 3 Plaster manifests located in the /PlasterTemplate directory - Advanced is the best choice
+
+.PARAMETER ModuleRoot
+Where do you want your new module to live? The default is to put it in a /Modules folder off your drive root
 
 .EXAMPLE
-New-PSNow -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot ~/modules/myfabmodule
+New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest basic
+
+Creates the new PS Module using the "basic" plaster mainfest which creates a minimal module for you
 
 .EXAMPLE
-New-PSNow -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot c:\myfabmodule
+New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest Extended -ModuleRoot ~/modules/myfabmodule
 
-.DEPENDENCIES
-The following modules must be installed or this won't work at all
-Plaster
-Psake
-PlatyPS
-Pester
-PSDepend
+This choice uses the Extended manifest and create the module in /modules. Note that the module and pathing work for all versions of PS Core and PS Windows - Linux and OSX are supported platforms
 
+.EXAMPLE
+New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot c:\myfabmodule
+
+This choice creates a fully fleshed out PowerShell module with full support for Pester, Git, PlatyPS and more. See the Advanced.xml file located in /PlasterTemplate
 
 .NOTES
-
-    # reference - https://kevinmarquette.github.io/2017-05-12-Powershell-Plaster-adventures-in/
-    # reference - https://mikefrobbins.com/2018/02/15/using-plaster-to-create-a-powershell-script-module-template/
-    # reference - Auf Deutsch! https://mycloudrevolution.com/2017/06/01/my-custom-plaster-template/
-    # reference - https://kevinmarquette.github.io/2017-01-21-powershell-module-continious-delivery-pipeline/?utm_source=blog&utm_medium=blog&utm_content=titlelink
-    # reference - https://github.com/PowerShell/platyPS
-    # reference - https://overpoweredshell.com/Working-with-Plaster/#using-token-replacement
-    # reference - https://github.com/ObjectivityLtd/PSCI
-
-    General notes
-
+General Notes
 #>
-
-
 function New-PSNowModule {
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
@@ -126,7 +120,7 @@ function New-PSNowModule {
             #Description       = 'PowerShell Script Module Building Toolkit'
             #Version           = '1.0.0'
             ModuleAuthor       = '<Your Full Name Goes Here>'
-            #CompanyName       = 'Chef Software Inc'
+            #CompanyName       = 'ACME Corp'
             #FunctionFolders   = 'public', 'private'
             #Git               = 'Yes'
             GitHubUserName	   = '<Your GitHub Name Goes Here>'
@@ -140,41 +134,17 @@ function New-PSNowModule {
 
         $NewModuleName = $NewModuleName -replace '.ps1', ''
 
-        #region File contents
-        #keep this formatted as is. the format is output to the file as is, including indentation
-        #$scriptCode = "function $NewModuleName {$([System.Environment]::NewLine)$([System.Environment]::NewLine)}"
-
-        $scriptCode =
-        @"
-{
-    function <%= $PLASTER_PARAM_ModuleName %> {
-        [cmdletbinding()]
-        param()
-        begin{}
-        process {}
-        end {}
-    }
-}
-"@
-
         $Path = "$moduleroot$PathDivider$NewModuleName"
 
         Write-Output "`nYour module was built at: $Path`n"
-
-        if (Test-Path "$Path\public"){
-            New-Item -Path "$Path\Public" -ItemType File -Name "$NewModuleName.ps1" -Value $scriptCode | Out-Null
-        }
-        else {
-            New-Item -Path $Path -Name "$NewModuleName.ps1" -Content $scriptCode | Out-Null
-        }
 
         if (-not (& Test-Path -Path $Path)) {
             New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | Out-Null
         }
         else{
-            add-content -path "$templateroot\currentmodules.txt" -value "$Path" | Out-Null
+            $doc = "$templateroot$env:BHPathDivider" + "Currentmodules.txt"
+            add-content -path $doc  -value "$Path" | Out-Null
         }
-
 
     }
     end{}
