@@ -1,6 +1,6 @@
 ---
 external help file: PSNow-help.xml
-Module Name: PSNow
+Module Name: psnow
 online version:
 schema: 2.0.0
 ---
@@ -24,14 +24,14 @@ It runs on PSCore and all supported platforms.
 ## EXAMPLES
 
 ### EXAMPLE 1
-```powershell
+```
 New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest basic
 ```
 
 Creates the new PS Module using the "basic" plaster mainfest which creates a minimal module for you
 
 ### EXAMPLE 2
-```powershell
+```
 New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest Extended -ModuleRoot ~/modules/myfabmodule
 ```
 
@@ -39,7 +39,7 @@ This choice uses the Extended manifest and create the module in /modules.
 Note that the module and pathing work for all versions of PS Core and PS Windows - Linux and OSX are supported platforms
 
 ### EXAMPLE 3
-```powershell
+```
 New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot c:\myfabmodule
 ```
 

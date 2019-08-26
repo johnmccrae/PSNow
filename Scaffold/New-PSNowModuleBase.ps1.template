@@ -43,4 +43,4 @@ function New-${PLASTER_PARAM_ModuleName} {
 
 }
 
-Export-ModuleMember -Function New-PSNow
+Export-ModuleMember -Function New-${PLASTER_PARAM_ModuleName}

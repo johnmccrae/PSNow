@@ -16,7 +16,7 @@
         <parameter name='Description' type='text' prompt='Brief description of module (required for publishing to the PowerShell Gallery)' />
         <parameter name='Version' type='text' default='0.1.0' prompt='Enter the version number of the module' />
         <parameter name='ModuleAuthor' type='user-fullname' prompt="Module author's name" store='text' />
-        <parameter name='CompanyName' type='text' prompt='Name of your Company' default='Chef Software Inc.' />
+        <parameter name='CompanyName' type='text' prompt='Name of your Company' default='<Your Company Goes Here>' />
         <parameter name='PowerShellVersion' default='3.0' type='text' prompt='Minimum PowerShell version' />
       </parameters>
 <content>
@@ -58,7 +58,7 @@
 
     <file source='template.psm1' destination='\${PLASTER_PARAM_Name}\${PLASTER_PARAM_Name}.psm1'/>
 
-    <newModuleManifest 
+    <newModuleManifest
         destination='\${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1'
         moduleVersion='$PLASTER_PARAM_Version'
         rootModule='${PLASTER_PARAM_ModuleName}.psm1'

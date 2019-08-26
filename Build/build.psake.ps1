@@ -147,7 +147,6 @@ Task 'Stage' -Depends 'Clean' {
         Join-Path -Path $ProjectRoot -ChildPath '.gitignore'
     )
     Copy-Item -Path $pathsToCopy -Destination $StagingModulePath -Recurse
-
 }
 
 # Import new module
@@ -248,7 +247,7 @@ Task 'Test' -Depends 'ImportStagingModule' {
 
 
 # Create new Documentation markdown files from comment-based help
-Task 'UpdateDocumentation' -Depends 'ImportStagingModule' {
+Task 'UpdateDocumentation' -Depends 'Test' {
     $lines
     Write-Output "Updating Markdown help in Staging folder: [$DocumentationPath]`n"
 
@@ -282,29 +281,30 @@ Task 'UpdateBuildVersion' -Depends 'UpdateDocumentation' {
     $lines
     Write-Output "Updating the Module Version`n"
 
-    $manifest = Import-PowerShellDataFile (Get-item Env:\BHPSModuleManifest).Value
+    #$manifest = Import-PowerShellDataFile (Get-item Env:\BHPSModuleManifest).Value
+    $manifest = Import-PowerShellDataFile $env:BHPSModuleManifest
     [version]$Version = $manifest.ModuleVersion
+
     switch ( $BuildRev ) {
         Major { [version]$NewVersion = "{0}.{1}.{2}.{3}" -f ($Version.Major + 1), $Version.Minor, $Version.Build, $version.Revision }
         Minor { [version]$NewVersion = "{0}.{1}.{2}.{3}" -f $Version.Major, ($Version.Minor + 1), $Version.Build, $version.Revision }
         Build { [version]$NewVersion = "{0}.{1}.{2}.{3}" -f $Version.Major, $Version.Minor, ($Version.Build + 1), $version.Revision }
         Revision { [version]$NewVersion = "{0}.{1}.{2}.{3}" -f $Version.Major, $Version.Minor, $Version.Build, ($version.Revision + 1) }
+        None { [version]$NewVersion = $env:BHBuildNumber}
     }
-    Update-ModuleManifest -Path (Get-Item env:\BHPSModuleManifest).Value -ModuleVersion $NewVersion
+
+    Update-ModuleManifest -Path $env:BHPSModuleManifest -ModuleVersion $NewVersion
     Set-Item -Path Env:BHBuildNumber -Value $NewVersion
 
     $MonolithFile = "$env:BHProjectPath/$env:BHProjectName.nuspec"
-    #Import the New PSD file
-    $newString = Import-PowerShellDataFile $env:BHPSModuleManifest
     #Create a new file and Update each time.
     $xmlFile = New-Object xml
     $xmlFile.Load($MonolithFile)
     #Set the version to the one that is in the manifest.
-    $xmlFile.package.metadata.version = $newString.ModuleVersion
+    $xmlFile.package.metadata.version = $manifest.ModuleVersion
     $xmlFile.Save($MonolithFile)
 
     #exec { git commit $manifest -m "Updated the module version" }
-
 }
 
 Task 'UpdateRepo' -Depends 'Init' {
@@ -334,21 +334,35 @@ Task 'UpdateRepo' -Depends 'Init' {
         Exec { git tag -a "v$env:BHBuildNumber" -m "v$env:BHBuildNumber" }
         Exec { git push origin $env:BHBranchName }
     }
+    Set-Item -Path Env:BHCommitFlag -Value 0
 }
 
+# https://www.mono-project.com/docs/about-mono/supported-platforms/macos/
 Task 'BuildNuget' -Depends 'UpdateBuildVersion' {
     $lines
     Write-Output "Creating a Nuget Package in Aritfacts folder: [$ArtifactFolder]`n"
 
-    exec { nuget pack "$env:BHProjectName.nuspec" -Version $env:BHBuildNumber }
+    if ($PSVersionTable.PSEdition -eq "Desktop") {
+        exec { nuget pack $("$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) }
+    }
+    elseif ($PSVersionTable.PSEdition -eq "Core") {
+        if (($isMACOS) -or ($isLinux)) {
+            exec { bash -c "nuget pack -Version $($env:BHBuildNumber)" }
+        }
+        else {
+            exec { nuget pack $("$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) }
+        }
+    }
+
     $newpackagename = $env:BHProjectName + "." + $env:BHBuildNumber + ".nupkg"
     Move-Item -Path $newpackagename -Destination $ArtifactFolder
-    Set-Location -Path $Env:BHModulePath
+
+    Write-Output "`nFINISHED: Nuget artifact creation."
 }
 
 # Create a versioned zip file of all staged files
 # NOTE: Admin Rights are needed if you run this locally
-Task 'BuildZip' -Depends 'Init' {
+Task 'BuildZip' -Depends 'UpdateBuildVersion' {
     $lines
     Write-Output "`nCreating a Build Artifact"
 
@@ -379,18 +393,29 @@ Task 'BuildZip' -Depends 'Init' {
     Write-Output "`nFINISHED: Release artifact creation."
 }
 
-Task 'DeployAzure' -Depends 'Init' {
+Task 'PublishAzure' -Depends 'BuildNuget' {
     $lines
-    Write-Output "Deploying to Azure Repo"
+    Write-Output "Publishing to Azure Repo"
 
-    $patUser = $env:BHChefITAzureBuildUser
-    $patToken = $env:BHChefITAzureBuildPassword
+    $patUser = $env:BHAzureBuildUser
+    $patToken = $env:BHAzureBuildPassword
     $securePat = ConvertTo-SecureString -String $patToken -AsPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential($patUser, $securePat)
 
     Publish-Module  -Path $env:BHModulePath -Repository $env:BHPublishRepo -Credential $credential -Verbose
     #Do I need a NuGetAPIKey parameter here?
+    Write-Output "`nFINISHED: Deployed to Azure."
 }
+
+Task 'PublishPSGallery' -Depends 'BuildNuget' {
+    $lines
+    Write-Output "Publishing to PowerShell Gallery"
+
+    Publish-Module  -Path $env:BHModulePath -Repository 'PSGallery' -NuGetApiKey $env:BHPSGalleryKey
+    #Do I need a NuGetAPIKey parameter here?
+    Write-Output "`nFINISHED: Deployed to PSGallery."
+}
+
 
 Task 'Sign' {
     $Lines
@@ -419,15 +444,19 @@ Task 'Sign' {
     elseif ($PSVersionTable.PSEdition -eq "Core") {
 
         if (($isMACOS) -or ($isLinux)) {
-
+            "`n"
+            Write-Output "As of August 2019, there is no PowerShell module for PS Core on OSX that will let you sign a script"
+            <#
             Write-Output "You are going to need to enter a password for your pfx file"
 
             # using this article as a reference - http://thecuriousgeek.org/2014/02/creating-openssl-code-signing-certs-on-windows/
-            Exec {openssl genrsa -out $env:BHModulePath/Certs/ca.key 2048}
+            # and this one for installing a signing cert on a Mac - https://wilsonmar.github.io/powershell-on-mac/
+            Exec {openssl genrsa -out "$env:BHModulePath/Certs/ca.key" 2048}
             Exec {openssl req -config $env:BHModulePath/Certs/openssl.cfg -new -x509 -days 1826 -key $env:BHModulePath/Certs/ca.key -out $env:BHModulePath/Certs/ca.crt}
             Exec {openssl genrsa -out $env:BHModulePath/Certs/codesign.key 2048} ## Can I delete this line?
             Exec {openssl req -config $env:BHModulePath/Certs/openssl.cfg -new -key $env:BHModulePath/Certs/codesign.key -reqexts v3_req -out $env:BHModulePath/Certs/codesign.csr}
             Exec {openssl x509 -req -days 1826 -in $env:BHModulePath/Certs/codesign.csr -CA $env:BHModulePath/Certs/ca.crt -CAkey $env:BHModulePath/Certs/ca.key -extfile $env:BHModulePath/Certs/openssl.cfg -set_serial 01 -out $env:BHModulePath/Certs/codesign.crt}
+            Exec {certtool i $env:BHModulePath/Certs/ca.crt}
             Exec {openssl pkcs12 -export -out $env:BHModulePath/Certs/codesign.pfx -inkey $env:BHModulePath/Certs/codesign.key -in $env:BHModulePath/Certs/codesign.crt}
             $MyCertFromPfx = Get-PfxCertificate -FilePath $env:BHModulePath/Certs/codesign.pfx
 
@@ -435,7 +464,7 @@ Task 'Sign' {
             foreach($function in $publicFunctions){
                 Set-AuthenticodeSignature -FilePath $function -Certificate $MyCertFromPfx
             }
-
+                #>
         }
         else {
 
@@ -459,9 +488,6 @@ Task 'Sign' {
             else {
                 Write-Output "Sorry, no soup for you - no cert options configured"
             }
-
-
-
 
         }
     }

@@ -21,8 +21,8 @@
     'UpdateRepo' - does a git push back to your repo to sync your current files. Also tags files with the current build
     'BuildNuget' - builds a .nupkg file in the /Artifacts directory
     'BuildZip' - creates a .zip file of your creation in the /Artifacts folder
-    'DeployAzure' - invokes Publish-Module to publish your code to your Azure Repo
-    'DeployPSGallery' - invokes Publish-Module to publish to PowerShellGallery
+    'PublishAzure' - invokes Publish-Module to publish your code to your Azure Repo
+    'PublishPSGallery' - invokes Publish-Module to publish to PowerShellGallery
     'Sign' - used to sign your module with a certificate
 
     .PARAMETER Parameters
@@ -52,6 +52,7 @@
     thanks to Adam Rush UK - https://adamrushuk.github.io/example-azure-devops-build-pipeline-for-powershell-modules/#test-1
 
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "")]
 [CmdletBinding()]
 param (
     [Parameter()]
@@ -98,11 +99,11 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
 
     $invokePSDependParams = @{
         Path    = $psdependencyConfigPath
-        # Tags = 'Bootstrap'
+        Tags    = 'Bootstrap'
         Import  = $true
         Confirm = $false
         Install = $true
-        # Verbose = $true
+        Verbose = $true
     }
     Invoke-PSDepend @invokePSDependParams
 
@@ -161,6 +162,19 @@ if ($PSBoundParameters.Keys -contains 'Parameters') {
     }
 }
 
+# If you don't specify a build version change, we go with no change
+if ($PSBoundParameters.ContainsKey('Tasklist')) {
+    if ((($TaskList -like "*Build*") -or ($TaskList -like "*Publish*")) -and ($Parameters.Keys -notcontains "BuildRev")) {
+        $PSBoundParameters.Parameters += @{BuildRev = 'None' }
+    }
+    elseif (($TaskList -like "*Publish*") -and ((Get-Item -Path env:\BH*).Name -notcontains "BHPSGalleryKey")) {
+        Write-Host "You need to create the environmental variable 'BHPSGalleryKey' with your PowerShell Gallery key" -ForegroundColor 'Red' -BackgroundColor 'Black'
+        Break
+    }
+}
+
+#new-item -path "variable:\psjohn" -value $PSBoundParameters.Keys
+#exit
 # Execute PSake tasks
 $invokePsakeParams = @{
     buildFile = (Join-Path -Path $env:BHProjectPath -ChildPath 'Build\build.psake.ps1')

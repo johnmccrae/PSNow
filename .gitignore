@@ -1,7 +1,6 @@
 /output/
 /_build-cache/
 .vscode/
-ChefITPS/
 .DS_Store
 Staging/
 Artifacts/

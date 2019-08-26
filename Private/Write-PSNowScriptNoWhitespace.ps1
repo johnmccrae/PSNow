@@ -6,7 +6,7 @@ Helper function to trim whitespace on all scripts in the local module structure
 Helper function to trim whitespace on all scripts in the local module structure. The other option you have is to set the flag   "files.trimTrailingWhitespace": true   in your VSCode settings
 
 .EXAMPLE
-Write-ChefScriptNoWhitespace
+Write-PSNowScriptNoWhitespace
 
 .NOTES
 General notes
