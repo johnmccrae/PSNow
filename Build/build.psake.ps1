@@ -493,35 +493,3 @@ Task 'Sign' {
     }
 
 }
-
-
-#region NOT USED FOR THIS DEMO
-# Task 'Release' -Depends 'Clean', 'Test', 'UpdateDocumentation', 'CombineFunctionsAndStage', 'CreateBuildArtifact' #'UpdateManifest', 'UpdateTag'
-Task 'Build' -Depends 'Init' {
-    $lines
-
-    # Load the module, read the exported functions, update the psd1 FunctionsToExport
-    Set-ModuleFunctions -Name $env:BHPSModuleManifest
-
-    # Bump the module version
-    try {
-        $Version = Get-NextPSGalleryVersion -Name $env:BHProjectName -ErrorAction 'Stop'
-        Update-Metadata -Path $env:BHPSModuleManifest -PropertyName 'ModuleVersion' -Value $Version -ErrorAction 'Stop'
-    }
-    catch {
-        "Failed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
-    }
-}
-
-
-Task 'DeployToPSGallery' -Depends 'Init' {
-    $lines
-
-    $Params = @{
-        Path    = "$ProjectRoot"
-        Force   = $true
-        Recurse = $false
-    }
-    Invoke-PSDeploy @Verbose @Params
-}
-#endregion NOT USED FOR THIS DEMO

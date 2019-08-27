@@ -44,7 +44,7 @@ Get-Item env:BH*
 This module supports the Gherkin DSL as well as Pester for Test Driven Development. When following that pattern, you write your tests first to clarify your thinking around what you expect your module and scripts to do. Then go back and write your first script. Navigate to /Tests/Features and write the test for your first script there. Then run this to test your code.
 
 ```powershell
-./Build/Build.ps1 -tasklist
+./Build/Build.ps1 -tasklist test
 ```
 
 ### Stage your Code for Testing and Eventual Deployment
@@ -71,8 +71,11 @@ You should check your code for defects and linting issues by running PS Script A
 
 ### Sign your code with a self-signed certificate
 
-@lbertolotti You're getting UnkownError because your self-signed certificate isn't trusted in the Root certificate store. While New-SelfSignedCertificate won't let you store in the Root store, you can do it with Export/Import-Certificate. Here's some repro code:
+You can sign your code on a Windows device right now but Linux or OSX. The PKI module support isn't there yet. If you get an Unknown error it might be because your self-signed certificate isn't trusted in the Root Certificate store. While New-SelfSignedCertificate won't let you store in the Root store, you can do it with Export/Import-Certificate
 
+```powershell
+./Build/Build.ps1 -tasklist sign
+```
 
 
 ### Build your scripts into nuspec modules
@@ -83,31 +86,40 @@ The tool fully supports current package management tools like nuget. You get a p
 ./Build/build.ps1 -tasklist UpdateBuildVersion, BuildNuget -parameters ` @{BuildRev='Revision'}
 ```
 
+### Push your Changes to your Git Repo
+```powershell
+./Build/Build.ps1 -tasklist UpdateRepo -parameters {CommitMessage="I fixed a thing and rev'd the build number"}
+```
 
+### Using nuget on OSX/Linux
 
-#### Using nuget on OSX/Linux
-
-You'll need to add a couple of tools to get Nuget to work on OSX/Linux
+You'll need to add a couple of tools to get Nuget to work on OSX/Linux. Don't forget to set the 'nuget' alias in your PowerShell profile.
 
 https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools
 
-
-
-
-
-### Deploy your module to your nodes using Azure CI CD Pipelines
-
-
-
+### Deploy your module to your Azure Repo
+```powershell
+./Build/Build.ps1 -tasklist PublishAzure
+```
 
 
 ### Publish your module to PSGallery
+```powershell
+./Build/Build.ps1 -tasklist PublishPSGallery
+```
 
 
+### You will need to create the following environmental variables:
 
+This tool makes extensive use of PSake for build automation. That module sets a number of environment variables. We are adding more here to make your workflow smoother. Please set these into your PowerShell Profile
 
-
-
+```powershell
+set-item -Path Env:BHChefITAzureBuildUser  -Value "<name of Azure build user>"
+set-item -Path Env:BHChefITAzureBuildPassword  -Value "<password for that user>"
+set-item -Path Env:BHAzureRepoUrl -Value "https://pkgs.dev.azure.com/<your org>/_packaging/<your repo>/nuget/v2/"
+set-item -Path Env:BHAzurePublishRepo -Value '<your repository name>'
+set-item -path Env:BHPSGalleryKey -Value '<your PS Gallery publishing key>'
+```
 
 ## More Information
 
@@ -116,7 +128,10 @@ For more information
 * [github.com/johnmccrae/PSNow](https://github.com/johnmccrae/PSNow)
 
 ## Tested On
-https://atlassianps.org/module/JiraPS/
+
+* OSX
+* Windows 10
+* Ubuntu 18.04
 
 ### Credits
 
