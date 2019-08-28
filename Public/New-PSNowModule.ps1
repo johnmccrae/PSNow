@@ -123,7 +123,7 @@ function New-PSNowModule {
             #CompanyName       = 'ACME Corp'
             #FunctionFolders   = 'public', 'private'
             #Git               = 'Yes'
-            GitHubUserName	   = '<Your GitHub Name Goes Here>'
+            GitHubUserName	   = $env:BHGitHubUser
             #GitHubRepo        = 'ModuleBuildTools'
             #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
             PowerShellVersion  = '3.0' #minimum PS version
@@ -136,14 +136,15 @@ function New-PSNowModule {
 
         $Path = "$moduleroot$PathDivider$NewModuleName"
 
-        Write-Output "`nYour module was built at: $Path`n"
+        Write-Output "`nYour module was built at: [$Path]`n"
 
         if (-not (& Test-Path -Path $Path)) {
             New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | Out-Null
+            Add-Content -path $doc  -value $Path | Out-Null
         }
         else{
-            $doc = "$templateroot$env:BHPathDivider" + "Currentmodules.txt"
-            add-content -path $doc  -value "$Path" | Out-Null
+            $doc = "$templateroot$PathDivider" + "Currentmodules.txt"
+            Add-Content -path $doc  -value $Path | Out-Null
         }
 
     }

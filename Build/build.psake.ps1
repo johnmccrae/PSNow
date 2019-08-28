@@ -158,7 +158,7 @@ Task 'ImportStagingModule' -Depends 'Init' {
     if (Get-Module -Name $env:BHProjectName) {
         Remove-Module -Name $env:BHProjectName
     }
-    # Global scope used for UpdateDocumentation (PlatyPS)
+    # Global scope used for Help creation (PlatyPS)
     Import-Module -Name $StagingModulePath -ErrorAction 'Stop' -Force -Global
 }
 
@@ -247,7 +247,7 @@ Task 'Test' -Depends 'ImportStagingModule' {
 
 
 # Create new Documentation markdown files from comment-based help
-Task 'UpdateDocumentation' -Depends 'Test' {
+Task 'Help' -Depends 'Test' {
     $lines
     Write-Output "Updating Markdown help in Staging folder: [$DocumentationPath]`n"
 
@@ -277,7 +277,7 @@ Task 'UpdateDocumentation' -Depends 'Test' {
     Copy-Item -Path "$env:BHProjectPath\README.md" -Destination "$($DocumentationPath)\index.md" -Force -Verbose | Out-Null
 }
 
-Task 'UpdateBuildVersion' -Depends 'UpdateDocumentation' {
+Task 'UpdateBuildVersion' -Depends 'Help' {
     $lines
     Write-Output "Updating the Module Version`n"
 

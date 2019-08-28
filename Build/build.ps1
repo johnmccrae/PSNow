@@ -16,7 +16,7 @@
     'ImportStagingModule' - Import the module you just staged, you'll use that for making a .zip or .nupkg
     'Analyze' - Run PSScriptAnalyzer on the modules in /Staging to ensure linting and syntax are correct
     'Test' - Run Pester tests against the code. Tests are coming from /Tests
-    'UpdateDocumentation' - Create/Update markdown helpfiles using PlatyPS
+    'Help' - Create/Update markdown helpfiles using PlatyPS
     'UpdateBuildVersion' - based on a parameter you pass (see below) the build number is updated
     'UpdateRepo' - does a git push back to your repo to sync your current files. Also tags files with the current build
     'BuildNuget' - builds a .nupkg file in the /Artifacts directory

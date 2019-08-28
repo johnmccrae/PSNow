@@ -5,3 +5,5 @@
 Staging/
 Artifacts/
 Scratch/
+Currentmodules.txt
+azure-pipelines.yml

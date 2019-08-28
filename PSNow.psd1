@@ -51,9 +51,9 @@ Description = 'This is a scaffolding module used to create other PS Modules with
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @(@{ModuleName = 'Pester'; ModuleVersion = '4.6.0'; }, 
-               @{ModuleName = 'PSDeploy'; ModuleVersion = '1.0.2'; }, 
-               @{ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.18.1'; }, 
+RequiredModules = @(@{ModuleName = 'Pester'; ModuleVersion = '4.6.0'; },
+               @{ModuleName = 'PSDeploy'; ModuleVersion = '1.0.2'; },
+               @{ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.18.1'; },
                @{ModuleName = 'Psake'; ModuleVersion = '4.8.0'; })
 
 # Assemblies that must be loaded prior to importing this module
@@ -72,7 +72,7 @@ RequiredModules = @(@{ModuleName = 'Pester'; ModuleVersion = '4.6.0'; },
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'New-PSNowModule'
+FunctionsToExport = 'New-PSNowModule', 'Find-PSNowModule'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()

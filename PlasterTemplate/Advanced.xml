@@ -94,7 +94,7 @@ Setting up Your Project
 
 
         </message>
-        <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="$PLASTER_PARAM_ModuleVersion" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="$PLASTER_PARAM_ModuleAuthor" companyName="$PLASTER_PARAM_ModuleCompanyName" description="$PLASTER_PARAM_ModuleDesc" encoding='UTF8-NoBOM'/>
+        <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="${PLASTER_PARAM_ModuleVersion}" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="${PLASTER_PARAM_ModuleAuthor}" companyName="${PLASTER_PARAM_CompanyName}" description="${PLASTER_PARAM_Description}" encoding='UTF8-NoBOM'/>
         <templateFile source="Scaffold\template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
         <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" />
 
@@ -112,7 +112,7 @@ Creating First Function File
 ----------------------
 
         </message>
-        <templateFile source="Scaffold\New-PSNowBaseManifest.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1">
+        <templateFile source="Scaffold\New-PSNowModuleBase.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1" />
 
 
         <message>
@@ -121,8 +121,8 @@ Deploying Common Files
 ----------------------
 
         </message>
-        <templateFile source="Scaffold\initialize-readme.ps1.txt" destination="${PLASTER_PARAM_ModuleName}\initialize-readme.ps1" />
-        <templateFile source="LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
+        <templateFile source="Scaffold\LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
+        <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Readme.md" />
 
         <message>
 
@@ -133,9 +133,9 @@ Staging Support Folders
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
         <templateFile source="Scaffold\PSNow.feature.template" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.feature" />
         <file source="Scaffold\PSNow.Steps.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.Steps.ps1" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\.vscode">
-        <file source="Scaffold\settings.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\settings.json">
-        <file source="Scaffold\task.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\task.json">
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\.vscode" />
+        <file source="Scaffold\settings.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\settings.json" />
+        <file source="Scaffold\task.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\task.json" />
 
 
         <message condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;">
@@ -145,7 +145,6 @@ Setting up Support for Git
 
         </message>
         <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;" />
-        <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Readme.md" condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;" />
 
         <message condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;">
 
@@ -223,7 +222,7 @@ You can publish your project to the PSGallery by pressing Ctrl+P, then type 'tas
         </message>
 
         <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
-You can generate help and additional documentation using platyPS by running the 'build help' task.
+You can generate help and additional documentation using platyPS by running the 'build.ps1 -tasklist help' task.
 Add additional documentation written in platyPS markdown to the docs directory. You can update the help by
 running the 'build help' task again.
 
