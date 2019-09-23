@@ -1,9 +1,9 @@
+# PSNow
+
 ![Made With Powershell](https://img.shields.io/badge/Made%20With-PowerShell-green "Powered by PowerShell")
 [![Build Status](https://dev.azure.com/chefcorp-chefIT/PSNow/_apis/build/status/johnmccrae.PSNow?branchName=master)](https://dev.azure.com/chefcorp-chefIT/PSNow/_build/latest?definitionId=21&branchName=master)
 
-# PSNow
-
-A PowerShell module for making modules. PSNow creates the entire framework you need to create, analyze, test, sign, build, deploy and publish your code with one module.
+A PowerShell module for making modules. PSNow creates the entire framework you need to create, analyze, test, sign, build, deploy and publish your code with one module. All you need to do after you run the module is to write your functions.
 
 Follow the directions below to get started. The process will ask you some basic questions about your new module and will then create everything you need to get going with.
 
@@ -12,15 +12,16 @@ Using this tool, there are 3 stages to module development:
 2 - Write your functions
 3 - Use the built in tools to build, anaylize, test, sign and publish your work.
 
-
 There are 2 basic components for this module - the New-PSNowModule function uses Plaster to create a robust, fully built out, but empty, module structure. You'll then create your functions and use build.ps1 for everything else. Open build.ps1 and read the comments in the header. The comments will give you an idea of everything you can do with it. Individual build tasks are defined in build.psake.ps1. You can interrogate that file to add your own tweaks.
 
 ## Getting Started
 
 ### Install from the PSGallery and Import the module
 
+```powershell
     Install-Module PSNow
     Import-Module PSNow
+```
 
 ### You will need to create the following environmental variables before you start:
 
@@ -36,9 +37,11 @@ set-item -path Env:BHGitHubUser -Value '<your Github username>'
 ```
 
 ### Create your module - New-PSNowModule
+
 ```powershell
-New-PSNowModule -NewModuleName <your module name goes here> -BaseManifest Advanced
+New-PSNowModule -NewModuleName <String> -BaseManifest Advanced
 ```
+
 For your first module, execute that statement, adding in only your module name. You'll be asked some questions about your github username, some details about the module and some things about support details for your module. Accept the defaults and hit enter. When the tool is done, navigate to ~/modules/<your module> and explore.
 
 ### Your First Script
@@ -51,6 +54,16 @@ Now setup your environment.
 ./Build/Build.ps1 -tasklist init
 Get-Item env:BH*
 ```
+
+### Check for And Install Depdencies
+
+PSNow has dependencies on several outside modules. You can view them in /Build/build.depend.psd1. To install them execute the following command:
+
+```powershell
+./Build/Build.ps1 -ResolveDependency
+```
+
+
 
 ### Write Out Test Cases for Your Code
 
@@ -86,7 +99,6 @@ You can sign your code on a Windows device right now but Linux or OSX. The PKI m
 ./Build/Build.ps1 -tasklist sign
 ```
 
-
 ### Build your scripts into nuspec modules
 
 The tool fully supports current package management tools like nuget. You get a pre-built nuspec file with your new module so all you have to is execute these commands to update your build number and then create the package.
@@ -112,16 +124,17 @@ Making help files for your scripts is really easy. Start by decorating the top o
 ### Using nuget on OSX/Linux
 
 You'll need to add a couple of tools to get Nuget to work on OSX/Linux. Don't forget to set the 'nuget' alias in your PowerShell profile.
-
-https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools
+[Here for details](https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools)
 
 ### Deploy your module to your Azure Repo
+
 ```powershell
 ./Build/Build.ps1 -tasklist PublishAzure
 ```
 
 
 ### Publish your module to PSGallery
+
 ```powershell
 ./Build/Build.ps1 -tasklist PublishPSGallery
 ```
@@ -149,9 +162,8 @@ Inspiration from Adam Bertram aka [Adam the Automator](https://adamtheautomator.
 
 Inspiration also came from [Warren Frame the Rambling Cookie Monster](http://ramblingcookiemonster.github.io/)
 
+Shout out to [Mike Robbins](https://mikefrobbins.com)
+
 ## License
 
 This project is [licensed under the MIT License](LICENSE.md).
-
-
-

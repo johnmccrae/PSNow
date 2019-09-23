@@ -5,5 +5,7 @@
 Staging/
 Artifacts/
 Scratch/
+Scratch*
+scratch*
 Currentmodules.txt
 azure-pipelines.yml
