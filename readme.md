@@ -63,8 +63,6 @@ PSNow has dependencies on several outside modules. You can view them in /Build/b
 ./Build/Build.ps1 -ResolveDependency
 ```
 
-
-
 ### Write Out Test Cases for Your Code
 
 This module supports the Gherkin DSL as well as Pester for Test Driven Development. When following that pattern, you write your tests first to clarify your thinking around what you expect your module and scripts to do. Then go back and write your first script. Navigate to /Tests/Features and write the test for your first script there. Then run this to test your code.
@@ -93,7 +91,7 @@ You should check your code for defects and linting issues by running PS Script A
 
 ### Sign your code with a self-signed certificate
 
-You can sign your code on a Windows device right now but Linux or OSX. The PKI module support isn't there yet. If you get an Unknown error it might be because your self-signed certificate isn't trusted in the Root Certificate store. While New-SelfSignedCertificate won't let you store in the Root store, you can do it with Export/Import-Certificate
+You can sign your code on a Windows device right now but not Linux or OSX. The PKI module support isn't there yet for PS Core on non-windows platforms. If you get an Unknown error it might be because your self-signed certificate isn't trusted in the Root Certificate store. While New-SelfSignedCertificate won't let you store in the Root store, you can do it with Export/Import-Certificate
 
 ```powershell
 ./Build/Build.ps1 -tasklist sign

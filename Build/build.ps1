@@ -92,6 +92,26 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
         Write-Output "`nPSDepend already installed...skipping."
     }
 
+    #checking for the presence of Git. The Buildhelpers dependency will fail at the end of setup if Git isn't installed
+
+    try {
+        git | Out-Null
+        $gitinstalled = $true
+    }
+    catch [System.Management.Automation.CommandNotFoundException] {
+        $gitinstalled = $false
+    }
+
+    switch ($gitinstalled) {
+        'True' {
+            return
+        }
+        'False' {
+            Write-Host "Git is not installed, BuildHelpers functions that load Git specific commands will fail installation"
+            pause
+        }
+    }
+
     # Install build dependencies
     $psdependencyConfigPath = Join-Path -Path $PSScriptRoot -ChildPath 'build.depend.psd1'
     Write-Output "Checking / resolving module dependencies from [$psdependencyConfigPath]...`n"
