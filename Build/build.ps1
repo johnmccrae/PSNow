@@ -93,23 +93,14 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
     }
 
     #checking for the presence of Git. The Buildhelpers dependency will fail at the end of setup if Git isn't installed
-
     try {
         git | Out-Null
         $gitinstalled = $true
     }
     catch [System.Management.Automation.CommandNotFoundException] {
+        $LASTEXITCODE = 1
         $gitinstalled = $false
-    }
-
-    switch ($gitinstalled) {
-        'True' {
-            return
-        }
-        'False' {
-            Write-Host "Git is not installed, BuildHelpers functions that load Git specific commands will fail installation"
-            pause
-        }
+        throw "A git client was not detected. Please install one and re-run 'build.ps1 -tasklist init -ResolveDependency'"
     }
 
     # Install build dependencies
