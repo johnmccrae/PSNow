@@ -50,14 +50,14 @@
         Tags           = 'bootstrap'
     }
 
-    Psake_4_8_0 = @{
+    Psake_4_9_0 = @{
         Name           = 'psake'
         DependencyType = 'PSGalleryModule'
         Parameters     = @{
             Repository         = 'PSGallery'
             SkipPublisherCheck = $true
         }
-        Version        = '4.8.0'
+        Version        = '4.9.0'
         Tags           = 'bootstrap'
     }
 

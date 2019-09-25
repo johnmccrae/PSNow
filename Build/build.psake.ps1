@@ -40,10 +40,11 @@ Properties {
 # Define top-level tasks
 Task 'Default' -Depends 'Test'
 
+FormatTaskName "-------- {0} --------"
 
 # Show build variables
-Task 'Init' {
-    $lines
+Task Init {
+    #$lines
     Write-Output "Settng up Staging and Artifacts folders in .gitignore`n"
     Set-Location $ProjectRoot
 
@@ -66,7 +67,7 @@ Task 'Init' {
 
 # Clean the Artifact and Staging folders
 Task 'Clean' -Depends 'Init' {
-    $lines
+    #$lines
     Write-Output "Resetting Staging and Artifacts Folders`n"
 
     $foldersToClean = @(
@@ -84,7 +85,7 @@ Task 'Clean' -Depends 'Init' {
 # Create a single .psm1 module file containing all functions
 # Copy new module and other supporting files (Documentation / Examples) to Staging folder
 Task 'CombineFunctionsAndStage' -Depends 'Clean' {
-    $lines
+    #$lines
     Write-Output "Combining Functions into one PSM1 and Staging`n"
 
     # Create folders
@@ -116,7 +117,7 @@ Task 'CombineFunctionsAndStage' -Depends 'Clean' {
 # Create a folder structure containing Public, Private and whatever else folders
 # Copy new module and other supporting files (Documentation / Examples) to Staging folder
 Task 'Stage' -Depends 'Clean' {
-    $lines
+    #$lines
     Write-Output "Building a Module folder at: [$StagingModulePath]`n"
 
     # Create folders
@@ -151,7 +152,7 @@ Task 'Stage' -Depends 'Clean' {
 
 # Import new module
 Task 'ImportStagingModule' -Depends 'Init' {
-    $lines
+    #$lines
     Write-Output "Reloading staged module from path: [$StagingModulePath]`n"
 
     # Reload module
@@ -165,7 +166,7 @@ Task 'ImportStagingModule' -Depends 'Init' {
 
 # Run PSScriptAnalyzer against code to ensure quality and best practices are used
 Task 'Analyze' -Depends 'ImportStagingModule' {
-    $lines
+    #$lines
     Write-Output "Running PSScriptAnalyzer on path: [$StagingModulePath]`n"
 
     $Results = Invoke-ScriptAnalyzer -Path $StagingFolder -Recurse -Settings $ScriptAnalyzerSettingsPath -Verbose:$VerbosePreference
@@ -209,7 +210,7 @@ Task 'Analyze' -Depends 'ImportStagingModule' {
 # Unit tests: verify inputs / outputs / expected execution path
 # Misc tests: verify manifest data, check comment-based help exists
 Task 'Test' -Depends 'ImportStagingModule' {
-    $lines
+    #$lines
     Write-Output "Running Tests against the module`n"
 
     # PSScriptAnalyzer doesn't ignore files, only rules. Temporarily renaming files here which can safely skip Linting
@@ -248,7 +249,7 @@ Task 'Test' -Depends 'ImportStagingModule' {
 
 # Create new Documentation markdown files from comment-based help
 Task 'Help' -Depends 'Test' {
-    $lines
+    #$lines
     Write-Output "Updating Markdown help in Staging folder: [$DocumentationPath]`n"
 
     # $null = Import-Module -Name $env:BHPSModuleManifest -Global -Force -PassThru -Verbose
@@ -278,7 +279,7 @@ Task 'Help' -Depends 'Test' {
 }
 
 Task 'UpdateBuildVersion' -Depends 'Help' {
-    $lines
+    #$lines
     Write-Output "Updating the Module Version`n"
 
     #$manifest = Import-PowerShellDataFile (Get-item Env:\BHPSModuleManifest).Value
@@ -308,7 +309,7 @@ Task 'UpdateBuildVersion' -Depends 'Help' {
 }
 
 Task 'UpdateRepo' -Depends 'Init' {
-    $lines
+    #$lines
     Write-Output "Updating the repository`n"
 
     if ( ($env:BHCommitFlag -eq 0) -or (  (Test-Path -Path Env:BHCommitFlag) -eq $false   ) ) {
@@ -339,7 +340,7 @@ Task 'UpdateRepo' -Depends 'Init' {
 
 # https://www.mono-project.com/docs/about-mono/supported-platforms/macos/
 Task 'BuildNuget' -Depends 'UpdateBuildVersion' {
-    $lines
+    #$lines
     Write-Output "Creating a Nuget Package in Aritfacts folder: [$ArtifactFolder]`n"
 
     if ($PSVersionTable.PSEdition -eq "Desktop") {
@@ -363,7 +364,7 @@ Task 'BuildNuget' -Depends 'UpdateBuildVersion' {
 # Create a versioned zip file of all staged files
 # NOTE: Admin Rights are needed if you run this locally
 Task 'BuildZip' -Depends 'UpdateBuildVersion' {
-    $lines
+    #$lines
     Write-Output "`nCreating a Build Artifact"
 
     # Create /Release folder
@@ -394,7 +395,7 @@ Task 'BuildZip' -Depends 'UpdateBuildVersion' {
 }
 
 Task 'PublishAzure' -Depends 'BuildNuget' {
-    $lines
+    #$lines
     Write-Output "Publishing to Azure Repo"
 
     $patUser = $env:BHAzureBuildUser
@@ -408,7 +409,7 @@ Task 'PublishAzure' -Depends 'BuildNuget' {
 }
 
 Task 'PublishPSGallery' -Depends 'BuildNuget' {
-    $lines
+    #$lines
     Write-Output "Publishing to PowerShell Gallery"
 
     Publish-Module  -Path $env:BHModulePath -Repository 'PSGallery' -NuGetApiKey $env:BHPSGalleryKey
@@ -418,7 +419,7 @@ Task 'PublishPSGallery' -Depends 'BuildNuget' {
 
 
 Task 'Sign' {
-    $Lines
+    #$Lines
     Write-Output "Checking for Self-Signed Certs and Signing Your Code`n"
 
     if ($PSVersionTable.PSEdition -eq "Desktop") {

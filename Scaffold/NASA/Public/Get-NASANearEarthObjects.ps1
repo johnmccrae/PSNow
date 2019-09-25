@@ -48,17 +48,23 @@ function Get-NASANearEarthObjects {
     param(
         [Parameter()]
         [System.String]
-        $url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=$yesterday&end_date=$today&api_key=$token"
+        $token = $env:NasaKey,
+        [Parameter()]
+        [System.String]
+        $url,
+        [Parameter()]
+        [System.DateTime]
+        $startdate = (get-date (get-date).addDays(-1) -Format "yyyy-MM-dd"),
+        [Parameter()]
+        [System.DateTime]
+        $enddate = (Get-Date -format "yyyy-MM-dd")
     )
     begin {
-        $token = $env:NasaKey
-        $today = Get-Date -format "yyyy-MM-dd"
-        $yesterday = (get-date (get-date).addDays(-1) -Format "yyyy-MM-dd")
+
     }
     process {
 
-
-        $nasa_data = Invoke-RestMethod -Uri $url
+        $nasa_data = Get-NasaData -url "https://api.nasa.gov/neo/rest/v1/feed?start_date=$yesterday&end_date=$today&api_key=$token"
 
         Write-Output "`n"
         Write-Host -NoNewline "NASA is tracking a total of [$($nasa_data.element_count)] Near Earth objects today: $(Get-Date -format D)"

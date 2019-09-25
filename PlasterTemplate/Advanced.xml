@@ -176,7 +176,6 @@ Setting up Support for Pester
         <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\MetaFixers.psm1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\MetaFixers.psm1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Features\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Features\Feature.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Unit\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
@@ -210,14 +209,14 @@ Your new PowerShell module project '$PLASTER_PARAM_ModuleName' has been created.
         </message>
 
         <message condition="$PLASTER_PARAM_Options -contains 'Pester'">
-A Pester test has been created to validate the module's manifest file.  Add additional tests to the test directory.
-You can run the Pester tests in your project by executing the 'test' task.  Press Ctrl+P, then type 'task test'.
+A Pester test has been executed to validate the module's manifest file.  Add additional tests to the test directory.
+You can run the Pester tests in your project by executing the 'test' task.  '.\build\build.ps1 -tasklist analyze, test'.
 
         </message>
 
         <message condition="$PLASTER_PARAM_Options -contains 'psake'">
-You can build your project by executing the 'buildNuget' task.  Press Ctrl+P, then type 'task build'.
-You can publish your project to the PSGallery by pressing Ctrl+P, then type 'task publish'.
+You can build your project by executing the 'buildNuget' task: '.\build\build.ps1 -tasklist BuildNuget'.
+You can publish your project to the PSGallery by pressing typing '.\build\build.ps1 -tasklist publishpsgallery'.
 
         </message>
 

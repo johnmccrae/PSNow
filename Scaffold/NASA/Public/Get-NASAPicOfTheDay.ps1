@@ -48,24 +48,17 @@ function Get-NASAPicOfTheDay {
     param(
         [Parameter()]
         [System.String]
-        $token = $env:NasaKey,
-        [Parameter()]
-        [System.String]
-        $url = "https://api.nasa.gov/planetary/apod?api_key=$token"
+        $token = $env:NasaKey
     )
     begin {
-
+        $nasa_data = Get-NASAData -url "https://api.nasa.gov/planetary/apod?api_key=$token"
     }
     process {
-#region Testing Region
-# for testing uncomment the return statement
-        $nasa_data = Invoke-RestMethod -Uri $url
-        return $nasa_data
         Start-Process -FilePath $nasa_data.hdurl -PassThru | Out-Null
         Write-Host "`n"
         Write-Host "$($nasa_data.title)"
         Write-Host "--------------------------------------------------------"
         $nasa_data | Format-Table -Wrap -HideTableHeaders @{Expression = 'Explanation'; Width = 120 } | Out-String
-#endregion
     }
+
 }

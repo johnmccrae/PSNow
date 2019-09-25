@@ -176,7 +176,6 @@ Setting up Support for Pester
         <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\MetaFixers.psm1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\MetaFixers.psm1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Features\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Features\Feature.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Unit\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
@@ -222,7 +221,7 @@ You can publish your project to the PSGallery by pressing Ctrl+P, then type 'tas
         </message>
 
         <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
-You can generate help and additional documentation using platyPS by running the 'build help' task.
+You can generate help and additional documentation using platyPS by running the 'build.ps1 -tasklist help' task.
 Add additional documentation written in platyPS markdown to the docs directory. You can update the help by
 running the 'build help' task again.
 

@@ -80,15 +80,17 @@ function Get-NASAGeneLabData {
     param(
         [Parameter()]
         [System.String]
+        $token = $env:NasaKey,
+        [Parameter()]
+        [System.String]
         $url = "https://genelab-data.ndc.nasa.gov/genelab/data/search?term=space&from=0&type=cgene,nih_geo_gse&ffield=links&fvalue=GPL16417&ffield=Data Source Accession&fvalue=GSE82255&api_key=$token"
     )
     begin {
-        $token = $env:NasaKey
+
     }
     process {
 
         $linewidth = 120
-
 
         $nasa_data = Invoke-RestMethod -Uri $url
         Write-Output "`n"

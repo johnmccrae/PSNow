@@ -9,15 +9,20 @@ elseif ($PSVersionTable.PSEdition -eq "Core") {
     if (($isMACOS) -or ($isLinux)) {
         $PathDivider = "/"
     }
+    else {
+        $PathDivider = "\"
+    }
 }
-else {
-    $PathDivider = "\"
-}
+
 
 Get-Module -ListAvailable -Name $ThisModule -All | Remove-Module -Force -ErrorAction Ignore
 Import-Module -Name "$Here$PathDivider$ThisModule.psd1" -Force -ErrorAction Stop
 
-$mockeddata = @'
+Describe -Name 'Get-NASAPicOfTheDay Unit Tests' -Tags 'Unit'{
+
+    InModuleScope $ThisModule {
+
+        $mockeddata = @'
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
   <Obj RefId="0">
     <TN RefId="0">
@@ -36,27 +41,71 @@ $mockeddata = @'
   </Obj>
 </Objs>
 '@
+        Context -Name 'Unit Testing for POTD Data' {
 
-$moremockeddata = Import-Clixml -Path $("$Here$PathDivider" + "APODData.xml")
+            $picdata = [System.Management.Automation.PSSerializer]::DeserializeAsList($mockeddata)
+
+            $testdata = $picdata[0]
+
+            It "The POTD Title [$($testdata.title)] should not be null" {
+                $testdata.title | Should not BeNullOrEmpty
+            }
+
+            It "Should properly describe the POTD" {
+                $testdata.explanation | Should not BeNullOrEmpty
+            }
+
+            It "Should have a properly formed URL" {
+                [bool]([system.uri]::IsWellFormedUriString($testdata.hdurl, [System.UriKind]::Absolute)) | Should be True
+            }
 
 
-Describe -Name "Get-NASAPicOfTheDay Tests"{
-
-    $picdata = Get-NASAPicOfTheDay
-    Write-Debug "here is the picdata [$picdata]"
-
-    Context -Name "The APOD data object should have all the properties"{
-
-        It -Name "The Picture data should not be null or empty" {
-            $picdata | Should not BeNullOrEmpty
+            #It "Image $imgFileName should exist in download list" {
+            #    [bool]($imgFileName -in $downloadedImages) | Should Be $true
+            #}
         }
 
-        $properties = ('date', 'explanation', 'hdurl', 'media_type', 'service_version', 'title', 'url' )
+    }
 
-        foreach($property in $properties){
 
-            It -Name "The picture data should have a property of $property"{
-                [bool]($picdata.PSObject.Properties.Name -match $property) | Should Be $true
+
+}
+
+
+Describe -Name 'Get-NASAPicOfTheDay Acceptance Tests' -Tags 'Acceptance' {
+
+    InModuleScope $ThisModule {
+
+        $picdata = Get-NASAPicOfTheDay -output
+        Write-Debug "here is the picdata [$picdata]"
+
+        Context -Name "The APOD data object should have all the properties"{
+
+            It -Name "The Picture data should not be null or empty" {
+                $picdata | Should not BeNullOrEmpty
+            }
+
+            $properties = ('date', 'explanation', 'hdurl', 'media_type', 'service_version', 'title', 'url' )
+
+
+            foreach($property in $properties){
+
+                It -Name "The picture data should have a property of $property"{
+                    [bool]($picdata.PSObject.Properties.Name -match $property) | Should Be $true
+                }
+
+            }
+
+            It "The POTD Title [$($picdata.title)] should not be null" {
+                $picdata.title | Should not BeNullOrEmpty
+            }
+
+            It "The explanation field should properly describe the POTD" {
+                $picdata.explanation | Should not BeNullOrEmpty
+            }
+
+            It "The URL should be properly formed" {
+                [bool]([system.uri]::IsWellFormedUriString($picdata.hdurl, [System.UriKind]::Absolute)) | Should be True
             }
 
         }
