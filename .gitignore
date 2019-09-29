@@ -2,6 +2,7 @@
 /_build-cache/
 .vscode/
 .DS_Store
+.github/
 Staging/
 Artifacts/
 Scratch/

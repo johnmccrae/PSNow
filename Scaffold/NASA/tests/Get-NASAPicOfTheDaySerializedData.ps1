@@ -16,7 +16,3 @@ else {
 
 Get-Module -ListAvailable -Name $ThisModule -All | Remove-Module -Force -ErrorAction Ignore
 Import-Module -Name "$Here$PathDivider$ThisModule.psd1" -Force -ErrorAction Stop
-
- $picdata = Get-NASAPicOfTheDay
-
- $picdata | Export-Clixml "$Here\APODData.xml"

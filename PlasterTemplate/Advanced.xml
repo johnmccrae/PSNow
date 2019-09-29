@@ -210,19 +210,19 @@ Your new PowerShell module project '$PLASTER_PARAM_ModuleName' has been created.
 
         <message condition="$PLASTER_PARAM_Options -contains 'Pester'">
 A Pester test has been executed to validate the module's manifest file.  Add additional tests to the test directory.
-You can run the Pester tests in your project by executing the 'test' task.  '.\build\build.ps1 -tasklist analyze, test'.
+You can run the Pester tests in your project by executing the 'test' task:  '.\build\build.ps1 -tasklist analyze, test'.
 
         </message>
 
         <message condition="$PLASTER_PARAM_Options -contains 'psake'">
 You can build your project by executing the 'buildNuget' task: '.\build\build.ps1 -tasklist BuildNuget'.
-You can publish your project to the PSGallery by pressing typing '.\build\build.ps1 -tasklist publishpsgallery'.
+Then, publish your project to the PSGallery by typing '.\build\build.ps1 -tasklist publishpsgallery'.
 
         </message>
 
         <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
 You can generate help and additional documentation using platyPS by running the 'build.ps1 -tasklist help' task.
-Add additional documentation written in platyPS markdown to the docs directory. You can update the help by
+Add additional documentation written in markdown to the docs directory. You can update the help by
 running the 'build.ps1 -tasklist help' task again.
 
         </message>

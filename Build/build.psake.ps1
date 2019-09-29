@@ -37,6 +37,9 @@ Properties {
 }
 
 
+Task 'FullAzure' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'Help', 'Test', 'PublishAzure'
+
+
 # Define top-level tasks
 Task 'Default' -Depends 'Test'
 
@@ -248,7 +251,7 @@ Task 'Test' -Depends 'ImportStagingModule' {
 
 
 # Create new Documentation markdown files from comment-based help
-Task 'Help' -Depends 'Test' {
+Task 'Help'  {
     #$lines
     Write-Output "Updating Markdown help in Staging folder: [$DocumentationPath]`n"
 
@@ -278,7 +281,7 @@ Task 'Help' -Depends 'Test' {
     Copy-Item -Path "$env:BHProjectPath\README.md" -Destination "$($DocumentationPath)\index.md" -Force -Verbose | Out-Null
 }
 
-Task 'UpdateBuildVersion' -Depends 'Help' {
+Task 'UpdateBuildVersion' {
     #$lines
     Write-Output "Updating the Module Version`n"
 
@@ -339,7 +342,7 @@ Task 'UpdateRepo' -Depends 'Init' {
 }
 
 # https://www.mono-project.com/docs/about-mono/supported-platforms/macos/
-Task 'BuildNuget' -Depends 'UpdateBuildVersion' {
+Task 'BuildNuget' {
     #$lines
     Write-Output "Creating a Nuget Package in Aritfacts folder: [$ArtifactFolder]`n"
 
@@ -363,7 +366,7 @@ Task 'BuildNuget' -Depends 'UpdateBuildVersion' {
 
 # Create a versioned zip file of all staged files
 # NOTE: Admin Rights are needed if you run this locally
-Task 'BuildZip' -Depends 'UpdateBuildVersion' {
+Task 'BuildZip' {
     #$lines
     Write-Output "`nCreating a Build Artifact"
 

@@ -1,3 +1,11 @@
+if (-not (Get-Module -Name 'Plaster' -ListAvailable)) {
+    Write-Output "`nPlaster is not yet installed...installing Plaster now..."
+    Install-Module -Name 'Plaster' -Scope 'CurrentUser' -Force
+}
+else {
+    Write-Output "Module Plaster is already installed"
+}
+
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 

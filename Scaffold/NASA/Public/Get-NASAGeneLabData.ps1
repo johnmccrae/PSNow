@@ -89,9 +89,6 @@ function Get-NASAGeneLabData {
 
     }
     process {
-
-        $linewidth = 120
-
         $nasa_data = Invoke-RestMethod -Uri $url
         Write-Output "`n"
         Write-Output "This is a static link to a study of mice RNA in space studying the stress response. If you would like to examine other studies, please take a look here: https://api.nasa.gov/api.html#genelab"

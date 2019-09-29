@@ -1,3 +1,6 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "")]
+[cmdletbinding()]
+
 $Here = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $ThisModule = Split-Path -Leaf $Here
 
@@ -120,7 +123,7 @@ Describe -Name 'Get-NASAPicOfTheDay Acceptance Tests' -Tags 'Acceptance' {
                 $Outfile = $tempfolder + $PathDivider + $filename
                 Invoke-WebRequest -Uri $picdata.hdurl -OutFile $Outfile
 
-                $imagedata = Get-ItemProperty -Path $Outfile
+                #$imagedata = Get-ItemProperty -Path $Outfile
                 $Image = [system.drawing.image]::fromfile($outfile)
 
                 $imageprops = $Image.PropertyItems
@@ -128,7 +131,7 @@ Describe -Name 'Get-NASAPicOfTheDay Acceptance Tests' -Tags 'Acceptance' {
                 #
 
                 if($imageprops.id -contains 513 ){
-                    Write-Host "Success" -ForegroundColor Green
+                    Write-Output "Success"
                 }
 
             }
