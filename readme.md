@@ -3,9 +3,9 @@
 ![Made With Powershell](https://img.shields.io/badge/Made%20With-PowerShell-green "Powered by PowerShell")
 [![Build Status](https://dev.azure.com/chefcorp-chefIT/PSNow/_apis/build/status/johnmccrae.PSNow?branchName=master)](https://dev.azure.com/chefcorp-chefIT/PSNow/_build/latest?definitionId=21&branchName=master)
 
-A PowerShell module for making modules. PSNow creates the entire framework you need to create, analyze, test, sign, build, deploy and publish your code with one module. All you need to do after you run the module is to write your functions.
+A PowerShell module for making modules. PSNow emits the entire framework you need to create, analyze, test, sign, build, deploy and publish your code with one module. All you need to do after you install the module is to run one command and then write your code.
 
-Follow the directions below to get started. The process will ask you some basic questions about your new module and will then create everything you need to get going with.
+Follow the directions below to get started. The process will ask you some basic questions about the  module you to make and will then create everything you need to get going with.
 
 Using this tool, there are 3 stages to module development:
 1 - Install PSNow and run New-PSNowModule
@@ -28,8 +28,8 @@ There are 2 basic components for this module - the New-PSNowModule function uses
 This tool makes extensive use of PSake for build automation. That module sets a number of environment variables. We are adding more here to make your workflow smoother. Please set these into your PowerShell Profile. Of course you should change these to match your build and deployment environment.
 
 ```powershell
-set-item -Path Env:BHChefITAzureBuildUser  -Value "<name of Azure build user>"
-set-item -Path Env:BHChefITAzureBuildPassword  -Value "<password for that user>"
+set-item -Path Env:BHAzureBuildUser  -Value "<name of Azure build user>"
+set-item -Path Env:BHAzureBuildPassword  -Value "<password for that user>"
 set-item -Path Env:BHAzureRepoUrl -Value "https://pkgs.dev.azure.com/<your org>/_packaging/<your repo>/nuget/v2/"
 set-item -Path Env:BHAzurePublishRepo -Value '<your repository name>'
 set-item -path Env:BHPSGalleryKey -Value '<your PS Gallery publishing key>'

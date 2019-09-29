@@ -154,12 +154,12 @@ Setting up Support for Psake Build Environment
         </message>
         <requireModule name="psake" minimumVersion="4.8.0" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Build\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="\Build\build.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="\Build\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="\Build\build.psake.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="\Build\deploy.psdeploy.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="Build\build.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="Build\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="Build\build.psake.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <file source="Build\deploy.psdeploy.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Certs\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <templateFile source="\Scaffold\openssl.cfg" destination="${PLASTER_PARAM_ModuleName}\Certs\openssl.cfg" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <templateFile source="Scaffold\openssl.cfg" destination="${PLASTER_PARAM_ModuleName}\Certs\openssl.cfg" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
 
         <message condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;">
 
@@ -188,7 +188,7 @@ Setting up support for PS ScriptAnalyzer
 ----------------------------------------
 
         </message>
-        <file source="\Build\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\PSScriptAnalyzerSettings.psd1" condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;" />
+        <file source="Build\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\PSScriptAnalyzerSettings.psd1" condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;" />
 
         <message condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;">
 
@@ -223,7 +223,7 @@ You can publish your project to the PSGallery by pressing typing '.\build\build.
         <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
 You can generate help and additional documentation using platyPS by running the 'build.ps1 -tasklist help' task.
 Add additional documentation written in platyPS markdown to the docs directory. You can update the help by
-running the 'build help' task again.
+running the 'build.ps1 -tasklist help' task again.
 
         </message>
 

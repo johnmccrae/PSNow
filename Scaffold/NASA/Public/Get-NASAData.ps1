@@ -1,40 +1,32 @@
 <#
     .SYNOPSIS
 
-    Gets the Astronomy Pic Of the Day from NASA
+    Gets data from NASA at the url provided
 
     .DESCRIPTION
 
-    This function connects to NASA via Rest API and pulls the Astronomy Pic Of the Day and displays it in your browser along with displaying
-    the description of what you are looking at in your PowerShell window
+    This is a helper function designed to retrieve data at the designated url and ship it back to the calling app.
 
     .INPUTS
 
-    None.
+    Token
+
+    .INPUTS
+
+    URL
+
+    .INPUTS
+
+    PARAMETERS - a hashtable object that takes in any parameters associated with the url or calling function.
 
     .OUTPUTS
 
-    System.String. A String object containing a usually verbose description of the celestial body now open in your browser window.
+    System.Array
 
-    .OUTPUTS
-
-    System.Object. A jpg or png file containing an image of today's picture of the day
 
     .EXAMPLE
 
-    PS> Get-NASAPicOfTheDay
-    Perijove 11: Passing Jupiter
-    --------------------------------------------------------
-
-    Here comes Jupiter! NASA's robotic spacecraft Juno is continuing on its 53-day, highly-elongated orbits around our
-    Solar System's largest planet.  The featured video is from perijove 11 in early 2018, the eleventh time Juno has passed
-    near Jupiter since it arrived in mid-2016.  This time-lapse, color-enhanced movie covers about four hours and morphs
-    between 36 JunoCam images. The video begins with Jupiter rising as Juno approaches from the north. As Juno reaches its
-    closest view -- from about 3,500 kilometers over Jupiter's cloud tops -- the spacecraft captures the great planet in
-    tremendous detail. Juno passes light zones and dark belt of clouds that circle the planet, as well as numerous swirling
-    circular storms, many of which are larger than hurricanes on Earth.  After the perijove, Jupiter recedes into the
-    distance, now displaying the unusual clouds that appear over Jupiter's south.  To get desired science data, Juno swoops
-    so close to Jupiter that its instruments are exposed to very high levels of radiation.
+    PS> $foo = Get-Nasadata -url "https://api.nasa.gov/something-interesting$token"
 
     .LINK
 
@@ -61,6 +53,5 @@ function Get-NASAData {
         $nasa_data = Invoke-RestMethod -Uri $url
         return $nasa_data
     }
-
 
 }

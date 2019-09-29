@@ -28,6 +28,17 @@
         #DependsOn      = 'some_task'
     }
 
+    Plaster_1_1_3     = @{
+        Name           = 'plaster'
+        DependencyType = 'PSGalleryModule'
+        Parameters     = @{
+            Repository         = 'PSGallery'
+            SkipPublisherCheck = $true
+        }
+        Version        = '1.1.3'
+        Tags           = 'prod', 'test', 'bootstrap'
+    }
+
     Pester_4_9_0 = @{
         Name           = 'pester'
         DependencyType = 'PSGalleryModule'
@@ -71,7 +82,6 @@
         Version        = '1.0.3'
         Tags           = 'build', 'test', 'deploy', 'bootstrap'
     }
-
 
     PSScriptAnalyzer_1_18_3 = @{
         Name           = 'psscriptanalyzer'

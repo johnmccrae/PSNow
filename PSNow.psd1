@@ -51,10 +51,7 @@ Description = 'This is a scaffolding module used to create other PS Modules with
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-#RequiredModules = @(@{ModuleName = 'Pester'; ModuleVersion = '4.6.0'; },
- #              @{ModuleName = 'PSDeploy'; ModuleVersion = '1.0.2'; },
- #              @{ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.18.1'; },
- #             @{ModuleName = 'Psake'; ModuleVersion = '4.8.0'; })
+RequiredModules = @{ModuleName = 'Plaster'; ModuleVersion = '1.1.3'; }
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -119,7 +116,7 @@ PrivateData = @{
         # RequireLicenseAcceptance = $false
 
         # External dependent modules of this module
-        # ExternalModuleDependencies = @('Pester','PSDeploy','PSScriptAnalyzer','PSake')
+        ExternalModuleDependencies = @('Plaster')
 
     } # End of PSData hashtable
 

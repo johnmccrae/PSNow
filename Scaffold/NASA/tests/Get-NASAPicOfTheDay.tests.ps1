@@ -76,7 +76,8 @@ Describe -Name 'Get-NASAPicOfTheDay Acceptance Tests' -Tags 'Acceptance' {
 
     InModuleScope $ThisModule {
 
-        $picdata = Get-NASAPicOfTheDay -output
+        $token = $env:Nasakey
+        $picdata = Get-NASAData -url "https://api.nasa.gov/planetary/apod?api_key=$token"
         Write-Debug "here is the picdata [$picdata]"
 
         Context -Name "The APOD data object should have all the properties"{
@@ -86,7 +87,6 @@ Describe -Name 'Get-NASAPicOfTheDay Acceptance Tests' -Tags 'Acceptance' {
             }
 
             $properties = ('date', 'explanation', 'hdurl', 'media_type', 'service_version', 'title', 'url' )
-
 
             foreach($property in $properties){
 
@@ -106,6 +106,31 @@ Describe -Name 'Get-NASAPicOfTheDay Acceptance Tests' -Tags 'Acceptance' {
 
             It "The URL should be properly formed" {
                 [bool]([system.uri]::IsWellFormedUriString($picdata.hdurl, [System.UriKind]::Absolute)) | Should be True
+            }
+
+            It "Should download a valid image file"{
+
+                # create a unique temp folder to download the new file to.
+                $parent = [system.io.path]::GetTempPath()
+                [string]$name = [System.Guid]::NewGuid()
+                $subdir = New-Item -ItemType Directory -Path (Join-Path $parent $name)
+                $tempfolder = $subdir.Fullname
+
+                $filename = $picdata.hdurl.Split("/")[-1]
+                $Outfile = $tempfolder + $PathDivider + $filename
+                Invoke-WebRequest -Uri $picdata.hdurl -OutFile $Outfile
+
+                $imagedata = Get-ItemProperty -Path $Outfile
+                $Image = [system.drawing.image]::fromfile($outfile)
+
+                $imageprops = $Image.PropertyItems
+                # Id 513 and 514 are JPG props. Does that match the downloaded file?
+                #
+
+                if($imageprops.id -contains 513 ){
+                    Write-Host "Success" -ForegroundColor Green
+                }
+
             }
 
         }
