@@ -100,7 +100,7 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
     catch [System.Management.Automation.CommandNotFoundException] {
         $LASTEXITCODE = 1
         #$gitinstalled = $false
-        throw "A git client was not detected. Please install one and re-run 'build.ps1 -tasklist init -ResolveDependency'"
+        throw "A git client was not detected. Please install one and re-run 'build.ps1  -ResolveDependency'"
     }
 
     # Install build dependencies
@@ -145,6 +145,7 @@ elseif ($PSVersionTable.PSEdition -eq "Core") {
 
 # The Default Build Helpers variable settings leave some gaps that need resolving. Doing that here.
 #region - BHBUILDVARS
+Set-Item -Path Env:BHBuildCulture -Value (get-culture).name
 Set-Item -Path Env:BHBuildSystem -Value "Azure Pipelines"
 $manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
 [version]$script:Version = $manifest.ModuleVersion
@@ -182,16 +183,15 @@ if ($PSBoundParameters.ContainsKey('Tasklist')) {
         Write-Host "You need to create the environmental variable 'BHPSGalleryKey' with your PowerShell Gallery key" -ForegroundColor 'Red' -BackgroundColor 'Black'
         Break
     }
-}
 
-#new-item -path "variable:\psjohn" -value $PSBoundParameters.Keys
-#exit
-# Execute PSake tasks
-$invokePsakeParams = @{
-    buildFile = (Join-Path -Path $env:BHProjectPath -ChildPath 'Build\build.psake.ps1')
-    nologo    = $true
+    # Execute PSake tasks
+    $invokePsakeParams = @{
+        buildFile = (Join-Path -Path $env:BHProjectPath -ChildPath 'Build\build.psake.ps1')
+        nologo    = $true
+    }
+    Invoke-Psake @invokePsakeParams @PSBoundParameters
+
 }
-Invoke-Psake @invokePsakeParams @PSBoundParameters
 
 Write-Output "`nFINISHED TASKS: $($TaskList -join ',')"
 exit ( [int](-not $psake.build_success) )

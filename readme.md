@@ -46,14 +46,7 @@ For your first module, execute that statement, adding in only your module name. 
 
 ### Your First Script
 
-A basic function-based script template is ready for you in ~/modules/<your module>/public/<your module>.ps1. Once you are done writing your code, don't forget to update the comments in the Header - you'll need them later when you make your help files.
-
-Now setup your environment.
-
-```powershell
-./Build/Build.ps1 -tasklist init
-Get-Item env:BH*
-```
+A basic function-based script template is ready for you in ~/modules/<your module>/public/<your module>.ps1. Once you are done writing your code, don't forget to update the comments in the Header - you'll need them later when you make your help files. Help on writing comment-based help can be found here.
 
 ### Check for And Install Depdencies
 
@@ -61,6 +54,15 @@ PSNow has dependencies on several outside modules. You can view them in /Build/b
 
 ```powershell
 ./Build/Build.ps1 -ResolveDependency
+```
+
+### Your Build Environment is now Set.
+
+To see or reset your build environment, execute the following command
+
+```powershell
+./Build/Build.ps1 -tasklist init
+Get-Item env:BH*
 ```
 
 ### Write Out Test Cases for Your Code
@@ -154,13 +156,13 @@ For more information
 
 This project was generated using [Kevin Marquette's](http://kevinmarquette.github.io) [Full Module Plaster Template](https://github.com/KevinMarquette/PlasterTemplates/tree/master/FullModuleTemplate).
 
-Special Shout Out to Adam Rush for his tutorial on using [PSake.](https://adamrushuk.github.io/example-azure-devops-build-pipeline-for-powershell-modules/)
+Special Shout Out to Adam Rush for his tutorial on using [PSake.](https://adamrushuk.github.io/example-azure-devops-build-pipeline-for-powershell-modules/). I borrowed heavily from his examples.
 
-Inspiration from Adam Bertram aka [Adam the Automator](https://adamtheautomator.com/)
+I got a lot of inspiration from Adam Bertram aka [Adam the Automator](https://adamtheautomator.com/)
 
 Inspiration also came from [Warren Frame the Rambling Cookie Monster](http://ramblingcookiemonster.github.io/)
 
-Shout out to [Mike Robbins](https://mikefrobbins.com)
+And don't forget a shout out to [Mike Robbins](https://mikefrobbins.com)
 
 ## License
 

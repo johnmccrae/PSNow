@@ -6,6 +6,13 @@ else {
     Write-Output "Module Plaster is already installed"
 }
 
+if (-not (Test-Path -path .gitignore)){
+    New-Item -ItemType File -Name ".gitignore"
+    Add-Content -Path "$PSScriptRoot\.gitignore" -Value ".vscode/"
+    Add-Content -Path "$PSScriptRoot\.gitignore" -Value ".github/"
+}
+
+
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 

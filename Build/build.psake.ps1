@@ -36,14 +36,14 @@ Properties {
     $DocumentationPath = Join-Path -Path $StagingModulePath -ChildPath 'Documentation'
 }
 
+FormatTaskName "-------- {0} --------"
 
 Task 'FullAzure' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'Help', 'Test', 'PublishAzure'
 
+Task 'FullPSGallery' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'Help', 'Test', 'PublishPSGallery'
 
 # Define top-level tasks
-Task 'Default' -Depends 'Test'
-
-FormatTaskName "-------- {0} --------"
+Task 'Default' -Depends 'Init'
 
 # Show build variables
 Task Init {
@@ -51,14 +51,18 @@ Task Init {
     Write-Output "Settng up Staging and Artifacts folders in .gitignore`n"
     Set-Location $ProjectRoot
 
-    if((Test-Path "$ProjectRoot\.gitignore") -eq $true){
+    if((Test-Path "$ProjectRoot$env:BHPathDivider.gitignore") -eq $true){
         #Add Folders to gitignore. You don't need these in your repo
-        $file = Get-Content "./.gitignore"
+        $file = Get-Content ".$env:BHPathDivider.gitignore"
         $containsWord = $file | % { $_ -match "Staging|Artifacts" }
         if ($containsWord -notcontains $true) {
             Add-Content -Path .gitignore -Value "Staging/"
             Add-Content -Path .gitignore -Value "Artifacts/"
         }
+    }
+
+    if (-not(Test-Path "$ProjectRoot$env:BHPathDivider$env:BHBuildCulture")){
+        New-Item -path $ProjectRoot -Name $env:BHBuildCulture -ItemType Directory
     }
 
     "`n"
@@ -133,7 +137,7 @@ Task 'Stage' -Depends 'Clean' {
 
     # Copy required folders and files
     $pathsToCopy = @(
-        Join-Path -Path $ProjectRoot -ChildPath 'en-US'
+        Join-Path -Path $ProjectRoot -ChildPath $env:BHBuildCulture
         Join-Path -Path $ProjectRoot -ChildPath 'Documentation'
         Join-Path -Path $ProjectRoot -ChildPath 'Build'
         Join-Path -Path $ProjectRoot -ChildPath 'Certs'
@@ -148,7 +152,6 @@ Task 'Stage' -Depends 'Clean' {
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psd1'
         Join-Path -Path $ProjectRoot -ChildPath 'readme.md'
         Join-Path -Path $ProjectRoot -ChildPath 'LICENSE.md'
-        Join-Path -Path $ProjectRoot -ChildPath '.gitignore'
     )
     Copy-Item -Path $pathsToCopy -Destination $StagingModulePath -Recurse
 }
@@ -344,17 +347,20 @@ Task 'UpdateRepo' -Depends 'Init' {
 # https://www.mono-project.com/docs/about-mono/supported-platforms/macos/
 Task 'BuildNuget' {
     #$lines
+
+    #test for staged files and error out if they don't exist
+
     Write-Output "Creating a Nuget Package in Aritfacts folder: [$ArtifactFolder]`n"
 
     if ($PSVersionTable.PSEdition -eq "Desktop") {
-        exec { nuget pack $("$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) }
+        exec { nuget pack $("$env:BHModulePath$env:BHPathDivider$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) -NoDefaultExcludes }
     }
     elseif ($PSVersionTable.PSEdition -eq "Core") {
         if (($isMACOS) -or ($isLinux)) {
-            exec { bash -c "nuget pack -Version $($env:BHBuildNumber)" }
+            exec { bash -c "nuget pack -Version $($env:BHBuildNumber) -NoDefaultExcludes" }
         }
         else {
-            exec { nuget pack $("$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) }
+            exec { nuget pack $("$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) -NoDefaultExcludes }
         }
     }
 

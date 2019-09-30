@@ -12,7 +12,7 @@
 RootModule = 'PSNow.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.1.33'
+ModuleVersion = '0.0.1.37'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -51,7 +51,7 @@ Description = 'This is a scaffolding module used to create other PS Modules with
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @(@{ModuleName='Plaster';ModuleVersion='1.1.3'; })
+# RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -116,11 +116,11 @@ PrivateData = @{
         # RequireLicenseAcceptance = $false
 
         # External dependent modules of this module
-        # ExternalModuleDependencies = @('Plaster')
+        # ExternalModuleDependencies = @()
 
     } # End of PSData hashtable
 
- } # End of PrivateData hashtable
+} # End of PrivateData hashtable
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''

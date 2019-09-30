@@ -105,6 +105,8 @@ Setting up Your Project
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Private&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
+
 
         <message condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;">
 
@@ -156,7 +158,7 @@ Setting up Support for Psake Build Environment
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Build\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <file source="Build\build.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <file source="Build\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="Build\build.psake.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <templateFile source="Scaffold\build.psake.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <file source="Build\deploy.psdeploy.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Certs\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
         <templateFile source="Scaffold\openssl.cfg" destination="${PLASTER_PARAM_ModuleName}\Certs\openssl.cfg" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
@@ -204,7 +206,10 @@ Setting up Support for PlatyPS
 
 We're Done!
 -----------
-Your new PowerShell module project '$PLASTER_PARAM_ModuleName' has been created.
+Your new PowerShell module $PLASTER_PARAM_ModuleName has been created.
+
+If you noted any 'Missing The required module 'abcde' (minimum version: 0.14.0) was not found' errors,
+you correct those by running .\build\build.ps1 -ResolveDependency.
 
         </message>
 
