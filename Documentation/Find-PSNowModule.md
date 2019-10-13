@@ -27,7 +27,7 @@ That list is returned to you here.
 Find-PSNowModule
 ```
 
-There are no switches to execute here, you're just getting a list of modules returned to you.
+There are no parameters to add here, you're just getting a list of modules returned to you.
 
 ## PARAMETERS
 

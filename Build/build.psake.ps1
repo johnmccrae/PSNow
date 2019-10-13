@@ -38,9 +38,9 @@ Properties {
 
 FormatTaskName "-------- {0} --------"
 
-Task 'FullAzure' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'Help', 'Test', 'PublishAzure'
+Task 'FullAzure' -Depends 'Init', 'UpdateBuildVersion', 'ImportStagingModule', 'Stage', 'Help', 'Test', 'PublishAzure'
 
-Task 'FullPSGallery' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'Help', 'Test', 'PublishPSGallery'
+Task 'FullPSGallery' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'ImportStagingModule', 'Help', 'Test', 'PublishPSGallery'
 
 # Define top-level tasks
 Task 'Default' -Depends 'Init'
@@ -301,12 +301,12 @@ Task 'UpdateBuildVersion' {
     Update-ModuleManifest -Path $env:BHPSModuleManifest -ModuleVersion $NewVersion
     Set-Item -Path Env:BHBuildNumber -Value $NewVersion
 
-    $MonolithFile = $env:BHProjectPath + $env:BHPathDivider + "$env:BHProjectName.nuspec"
+    $MonolithFile = $($env:BHProjectPath + $env:BHPathDivider + "$env:BHProjectName.nuspec")
     #Create a new file and Update each time.
     $xmlFile = New-Object xml
     $xmlFile.Load($MonolithFile)
     #Set the version to the one that is in the manifest.
-    $xmlFile.package.metadata.version = $manifest.ModuleVersion
+    $xmlFile.package.metadata.version = $NewVersion.ToString()
     $xmlFile.Save($MonolithFile)
 
     #exec { git commit $manifest -m "Updated the module version" }

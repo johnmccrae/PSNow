@@ -33,8 +33,7 @@ This choice creates a fully fleshed out PowerShell module with full support for 
 General Notes
 #>
 function New-PSNowModule {
-
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
     param (
         [Parameter(Mandatory = $true)]
         [string]$NewModuleName,
@@ -56,13 +55,14 @@ function New-PSNowModule {
         $templateroot = Split-Path $PSScriptRoot -Parent
         Set-Location $templateroot
 
-        function Remove-OldPSNOWManifest{
+        function Remove-OldPSNowManifest{
+
             # check for old plastermanifest and delete it.
             if (Test-Path $($templateroot + $env:BHPathDivider + "PlasterManifest.xml") -PathType Leaf) {
                 Remove-Item -Path PlasterManifest.xml
             }
 
-            $plasterdoc = Get-ChildItem $($templateroot + $env:BHPathDivider + "PlasterTemplate") -Filter "$basemanifest.xml" | ForEach-Object { $_.FullName }
+            $plasterdoc = Get-ChildItem $($templateroot + $env:BHPathDivider + "PlasterTemplate") -Filter "$BaseManifest.xml" | ForEach-Object { $_.FullName }
             Copy-Item -Path $plasterdoc $($templateroot + $env:BHPathDivider + "PlasterManifest.xml")
         }
 
@@ -72,7 +72,7 @@ function New-PSNowModule {
             Set-Item -Path env:\BHBuildOS -Value 'Windows'
             Set-Item -Path env:\BHPathDivider -Value "\"
             Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
-            Remove-OldPSNOWManifest
+            Remove-OldPSNowManifest
             if (!$ModuleRoot) {
                 $ModuleRoot = "c:\modules"
             }
@@ -85,7 +85,7 @@ function New-PSNowModule {
             Set-Item -Path env:\BHBuildOS -Value 'Windows'
             Set-Item -Path env:\BHPathDivider -Value "\"
             Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
-            Remove-OldPSNOWManifest
+            Remove-OldPSNowManifest
             if (!$ModuleRoot) {
                 $ModuleRoot = "c:\modules"
             }
@@ -98,7 +98,7 @@ function New-PSNowModule {
             Set-Item -Path env:\BHBuildOS -Value 'macOS'
             Set-Item -Path env:\BHPathDivider -Value "/"
             Set-Item -Path env:\BHTempDirectory -Value "/private/tmp"
-            Remove-OldPSNOWManifest
+            Remove-OldPSNowManifest
             if (!$ModuleRoot) {
                 $ModuleRoot = "~/modules"
             }
@@ -111,7 +111,7 @@ function New-PSNowModule {
             Set-Item -Path env:\BHBuildOS -Value 'Linux'
             Set-Item -Path env:\BHPathDivider -Value "/"
             Set-Item -Path env:\BHTempDirectory -Value "/tmp"
-            Remove-OldPSNOWManifest
+            Remove-OldPSNowManifest
             if (!$ModuleRoot) {
                 $ModuleRoot = "~/modules"
             }
@@ -134,7 +134,7 @@ function New-PSNowModule {
             GitHubUserName	   = $env:BHGitHubUser
             #GitHubRepo        = 'ModuleBuildTools'
             #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
-            PowerShellVersion  = '3.0' #minimum PS version
+            PowerShellVersion  = '5.0' #minimum PS version
             # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest.
         }
 
@@ -145,33 +145,14 @@ function New-PSNowModule {
         Set-Location -Path $Path
         Write-Output "`nYour module was built at: [$Path]`n"
 
-        if (-not (& Test-Path -Path $Path)) {
-            New-Item -ItemType "file" -Path $templateroot -Name "currentmodules.txt" -Value $Path | Out-Null
-            Add-Content -path $doc  -value $Path | Out-Null
+        $doc = $($templateroot + $env:BHPathDivider + "currentmodules.txt")
+        if (-not (Test-Path -Path $doc)) {
+            New-Item -ItemType "file" -Path $doc -Value $Path | Out-Null
         }
         else{
-            $doc = $($templateroot + $env:BHPathDivider + "currentmodules.txt")
-            Add-Content -path $doc  -value $Path | Out-Null
+            Add-Content -path $doc -value "`r$Path" | Out-Null
         }
     }
-    end{
-        if ($PSVersionTable.PSEdition -eq "Desktop") {
-            if (-not($((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major) -ge 5) ) {
-                Write-Output "You're not running on a current version of Windows PowerShell, please upgrade to V5 at least"
-            }
-            else{
-                [bool]$test = Test-ModuleManifest $($ModuleRoot + $env:BHPathDivider + $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")
-                if (-Not($test)) {
-                    Write-Output "Testing the new module manifest failed. Make sure it was properly written to the path: [$($ModuleRoot + $env:BHPathDivider + $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")]"
-                }
-            }
-        }
-        elseif ($PSVersionTable.PSEdition -eq "Core") {
-            [bool]$test = Test-ModuleManifest $($ModuleRoot + $env:BHPathDivider + $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")
-            if(-Not($test)){
-                Write-Output "Testing the new module manifest failed. Make sure it was properly written to the path: [$($ModuleRoot + $env:BHPathDivider+ $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")]"
-            }
-        }
-    }
+
 }
 
