@@ -29,11 +29,12 @@ This tool makes extensive use of PSake for build automation. That module sets a 
 
 ```powershell
 set-item -Path Env:BHAzureBuildUser  -Value "<name of Azure build user>"
-set-item -Path Env:BHAzureBuildPassword  -Value "<password for that user>"
+set-item -Path Env:BHAzureBuildPassword  -Value "<password/token for that user>"
 set-item -Path Env:BHAzureRepoUrl -Value "https://pkgs.dev.azure.com/<your org>/_packaging/<your repo>/nuget/v2/"
 set-item -Path Env:BHAzurePublishRepo -Value '<your repository name>'
 set-item -path Env:BHPSGalleryKey -Value '<your PS Gallery publishing key>'
 set-item -path Env:BHGitHubUser -Value '<your Github username>'
+# Change these or add others to suit your particular needs. You'll need to update the build.ps1, build.psake.ps1 and the plaster templates accordingly.
 ```
 
 ### Create your module - New-PSNowModule

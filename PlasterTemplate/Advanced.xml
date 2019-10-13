@@ -173,15 +173,14 @@ Setting up Support for Pester
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Features\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Analyzer.tests.ps1.example" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Analyzer.tests.ps1.example" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Common\Environment.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Features\Feature.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Features\Feature.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Unit\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Unit\Regression.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Regression.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <file source="Tests\Acceptance\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="Tests\Unit\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
 
         <message condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;">
@@ -206,7 +205,7 @@ Setting up Support for PlatyPS
 
 We're Done!
 -----------
-Your new PowerShell module $PLASTER_PARAM_ModuleName has been created.
+Your new PowerShell module -[ $PLASTER_PARAM_ModuleName ]- has been created.
 
 If you noted any 'Missing The required module 'abcde' (minimum version: 0.14.0) was not found' errors,
 you correct those by running .\build\build.ps1 -ResolveDependency.

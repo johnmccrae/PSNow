@@ -15,7 +15,7 @@
   <files>
     <file src="<%= $PLASTER_PARAM_ModuleName %>.psd1" target="<%= $PLASTER_PARAM_ModuleName %>.psd1"/>
     <file src="<%= $PLASTER_PARAM_ModuleName %>.psm1" target="<%= $PLASTER_PARAM_ModuleName %>.psm1"/>
-    <file src="Docs\*.*" target="Docs"/>
+    <file src="Documentation\*.*" target="Docs"/>
     <file src="en-US\*.*" target="en-US"/>
     <file src="Public\*.*" target="Public"/>
   </files>

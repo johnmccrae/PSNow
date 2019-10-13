@@ -15,7 +15,6 @@ General Notes
 
 #>
 function Find-PSNowModule {
-
     [CmdletBinding()]
     param (
     )
@@ -25,17 +24,16 @@ function Find-PSNowModule {
     }
 
     process{
+        $scriptPath = Split-Path $PSScriptRoot -Parent
+        $thefile = Get-ChildItem -path $scriptPath -Name "currentmodules.txt"
+        $modules = Get-Content -Path $thefile
+        Write-Output "`n"
         Write-Output "Here's your list of PSNow Modules"
         Write-Output "---------------------------------"
-        Write-Output "`n"
-
-        $templateroot = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
-
-        $thefile = Get-ChildItem -path $templateroot -Include "currentmodules.txt"
-        $modules = Get-Content -Path $thefile
         foreach($module in $modules){
             Write-Output $module
         }
+        Write-Output "`n"
 
     }
 }

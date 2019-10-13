@@ -9,4 +9,4 @@ scratch*
 Currentmodules.txt
 azure-pipelines.yml
 Staging/
-Artifacts/
+BuildOutput/

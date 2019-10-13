@@ -53,69 +53,77 @@ function New-PSNowModule {
 
     process {
 
-        $templateroot = $MyInvocation.MyCommand.Module.ModuleBase
-
+        $templateroot = Split-Path $PSScriptRoot -Parent
         Set-Location $templateroot
 
-        # check for old plastermanifest and delete it.
-        if (Test-Path $templateroot\PlasterManifest.xml -PathType Leaf)
-            {
+        function Remove-OldPSNOWManifest{
+            # check for old plastermanifest and delete it.
+            if (Test-Path $($templateroot + $env:BHPathDivider + "PlasterManifest.xml") -PathType Leaf) {
                 Remove-Item -Path PlasterManifest.xml
             }
 
-        $plasterdoc = Get-ChildItem "$templateroot\PlasterTemplate" -Filter "$basemanifest.xml" | ForEach-Object { $_.FullName }
-
-        Copy-Item -Path $plasterdoc "$templateroot\PlasterManifest.xml"
-
-        if ($PSVersionTable.PSEdition -eq "Desktop") {
-
-            if (!$moduleroot){
-                $moduleroot = "c:\modules"
-            }
-            if (-not (Test-Path -path $moduleroot) ) {
-
-                New-Item -Path "$moduleroot" -ItemType Directory
-            }
-
-            Set-Location $moduleroot
-            $PathDivider = "\"
-
+            $plasterdoc = Get-ChildItem $($templateroot + $env:BHPathDivider + "PlasterTemplate") -Filter "$basemanifest.xml" | ForEach-Object { $_.FullName }
+            Copy-Item -Path $plasterdoc $($templateroot + $env:BHPathDivider + "PlasterManifest.xml")
         }
-        elseif ($PSVersionTable.PSEdition -eq "Core") {
 
-            if (($isMACOS) -or ($isLinux)) {
+        Set-Item -Path env:\BHPSVersionNumber -Value $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
 
-                if (!$moduleroot) {
-                    $moduleroot = "~/modules"
-                }
-                if (-not (Test-Path -path $moduleroot) ) {
-
-                    New-Item -Path "$moduleroot" -ItemType Directory
-                }
-
-                Set-Location $ModuleRoot
-                $PathDivider = "/"
-
+        if ($env:BHPSVersionNumber -lt 6) {
+            Set-Item -Path env:\BHBuildOS -Value 'Windows'
+            Set-Item -Path env:\BHPathDivider -Value "\"
+            Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
+            Remove-OldPSNOWManifest
+            if (!$ModuleRoot) {
+                $ModuleRoot = "c:\modules"
             }
-            else {
-
-                if (!$moduleroot) {
-                    $moduleroot = "c:\modules"
-                }
-                if (-not (Test-Path -path $moduleroot) ) {
-
-                    New-Item -Path "$moduleroot" -ItemType Directory
-                }
-
-                Set-Location $moduleroot
-                $PathDivider = "\"
-
+            if (-not (Test-Path -path $ModuleRoot) ) {
+                New-Item -Path "$ModuleRoot" -ItemType Directory
             }
+            Set-Location $ModuleRoot
+        }
+        elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+            Set-Item -Path env:\BHBuildOS -Value 'Windows'
+            Set-Item -Path env:\BHPathDivider -Value "\"
+            Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
+            Remove-OldPSNOWManifest
+            if (!$ModuleRoot) {
+                $ModuleRoot = "c:\modules"
+            }
+            if (-not (Test-Path -path $ModuleRoot) ) {
+                New-Item -Path "$ModuleRoot" -ItemType Directory
+            }
+            Set-Location $ModuleRoot
+        }
+        elseif (Get-Variable -Name 'IsMacOS' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+            Set-Item -Path env:\BHBuildOS -Value 'macOS'
+            Set-Item -Path env:\BHPathDivider -Value "/"
+            Set-Item -Path env:\BHTempDirectory -Value "/private/tmp"
+            Remove-OldPSNOWManifest
+            if (!$ModuleRoot) {
+                $ModuleRoot = "~/modules"
+            }
+            if (-not (Test-Path -path $ModuleRoot) ) {
+                New-Item -Path "$ModuleRoot" -ItemType Directory
+            }
+            Set-Location $ModuleRoot
+        }
+        elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+            Set-Item -Path env:\BHBuildOS -Value 'Linux'
+            Set-Item -Path env:\BHPathDivider -Value "/"
+            Set-Item -Path env:\BHTempDirectory -Value "/tmp"
+            Remove-OldPSNOWManifest
+            if (!$ModuleRoot) {
+                $ModuleRoot = "~/modules"
+            }
+            if (-not (Test-Path -path $ModuleRoot) ) {
+                New-Item -Path "$ModuleRoot" -ItemType Directory
+            }
+            Set-Location $ModuleRoot
         }
 
         $PlasterParams = @{
             TemplatePath       = $templateroot #where the plaster manifest xml file lives
-            Destination        = $moduleroot #where my new module is going to live
+            Destination        = $ModuleRoot #where my new module is going to live
             ModuleName         = $NewModuleName
             #Description       = 'PowerShell Script Module Building Toolkit'
             #Version           = '1.0.0'
@@ -133,9 +141,8 @@ function New-PSNowModule {
         Invoke-Plaster @PlasterParams -Force -Verbose
 
         $NewModuleName = $NewModuleName -replace '.ps1', ''
-
-        $Path = "$moduleroot$PathDivider$NewModuleName"
-
+        $Path = $($ModuleRoot + $env:BHPathDivider + $NewModuleName)
+        Set-Location -Path $Path
         Write-Output "`nYour module was built at: [$Path]`n"
 
         if (-not (& Test-Path -Path $Path)) {
@@ -143,11 +150,28 @@ function New-PSNowModule {
             Add-Content -path $doc  -value $Path | Out-Null
         }
         else{
-            $doc = "$templateroot$PathDivider" + "Currentmodules.txt"
+            $doc = $($templateroot + $env:BHPathDivider + "currentmodules.txt")
             Add-Content -path $doc  -value $Path | Out-Null
         }
-
     }
-    end{}
+    end{
+        if ($PSVersionTable.PSEdition -eq "Desktop") {
+            if (-not($((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major) -ge 5) ) {
+                Write-Output "You're not running on a current version of Windows PowerShell, please upgrade to V5 at least"
+            }
+            else{
+                [bool]$test = Test-ModuleManifest $($ModuleRoot + $env:BHPathDivider + $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")
+                if (-Not($test)) {
+                    Write-Output "Testing the new module manifest failed. Make sure it was properly written to the path: [$($ModuleRoot + $env:BHPathDivider + $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")]"
+                }
+            }
+        }
+        elseif ($PSVersionTable.PSEdition -eq "Core") {
+            [bool]$test = Test-ModuleManifest $($ModuleRoot + $env:BHPathDivider + $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")
+            if(-Not($test)){
+                Write-Output "Testing the new module manifest failed. Make sure it was properly written to the path: [$($ModuleRoot + $env:BHPathDivider+ $NewModuleName + $env:BHPathDivider + "$NewModuleName.psd1")]"
+            }
+        }
+    }
 }
 

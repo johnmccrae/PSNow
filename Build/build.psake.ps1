@@ -25,7 +25,7 @@ Properties {
     $ScriptAnalyzerSettingsPath = "$ProjectRoot\Build\PSScriptAnalyzerSettings.psd1"
 
     # Build
-    $ArtifactFolder = Join-Path -Path $ProjectRoot -ChildPath 'Artifacts'
+    $ArtifactFolder = Join-Path -Path $ProjectRoot -ChildPath 'BuildOutput'
 
     # Staging
     $StagingFolder = Join-Path -Path $ProjectRoot -ChildPath 'Staging'
@@ -48,20 +48,20 @@ Task 'Default' -Depends 'Init'
 # Show build variables
 Task Init {
     #$lines
-    Write-Output "Settng up Staging and Artifacts folders in .gitignore`n"
+    Write-Output "Settng up Staging and BuildOutput folders in .gitignore`n"
     Set-Location $ProjectRoot
 
-    if((Test-Path "$ProjectRoot$env:BHPathDivider.gitignore") -eq $true){
+    if((Test-Path $($ProjectRoot + $env:BHPathDivider + ".gitignore")) -eq $true){
         #Add Folders to gitignore. You don't need these in your repo
-        $file = Get-Content ".$env:BHPathDivider.gitignore"
-        $containsWord = $file | % { $_ -match "Staging|Artifacts" }
+        $file = Get-Content $($ProjectRoot + $env:BHPathDivider + ".gitignore")
+        $containsWord = $file | % { $_ -match "Staging|BuildOutput" }
         if ($containsWord -notcontains $true) {
             Add-Content -Path .gitignore -Value "Staging/"
-            Add-Content -Path .gitignore -Value "Artifacts/"
+            Add-Content -Path .gitignore -Value "BuildOutput/"
         }
     }
 
-    if (-not(Test-Path "$ProjectRoot$env:BHPathDivider$env:BHBuildCulture")){
+    if (-not(Test-Path $($ProjectRoot + $env:BHPathDivider + $env:BHBuildCulture))){
         New-Item -path $ProjectRoot -Name $env:BHBuildCulture -ItemType Directory
     }
 
@@ -75,7 +75,7 @@ Task Init {
 # Clean the Artifact and Staging folders
 Task 'Clean' -Depends 'Init' {
     #$lines
-    Write-Output "Resetting Staging and Artifacts Folders`n"
+    Write-Output "Resetting Staging and BuildOutput Folders`n"
 
     $foldersToClean = @(
         $ArtifactFolder
@@ -222,7 +222,7 @@ Task 'Test' -Depends 'ImportStagingModule' {
     # PSScriptAnalyzer doesn't ignore files, only rules. Temporarily renaming files here which can safely skip Linting
     $directoriestoexclude = @('Spec' <#,'Scaffold'#>)
     foreach($directory in $directoriestoexclude){
-        $insidepath = $env:BHModulePath + "/" + $directory
+        $insidepath = $env:BHModulePath + $env:BHPathDivider + $directory
         $filestorename = @( Get-ChildItem -Path "$insidepath/*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
         foreach($file in $filestorename){
             $newname = $file.Name + ".hold"
@@ -241,15 +241,13 @@ Task 'Test' -Depends 'ImportStagingModule' {
 
     # PSScriptAnalyzer doesn't ignore files, only rules. Renaming the files back again
     foreach ($directory in $directoriestoexclude) {
-        $insidepath = $env:BHProjectPath + "/" + $directory
+        $insidepath = $env:BHProjectPath + $env:BHPathDivider + $directory
         $filestorename = @( Get-ChildItem -Path "$insidepath/*.hold" -Recurse -ErrorAction 'SilentlyContinue' )
         foreach ($file in $filestorename) {
             $newname = (Get-Item $file).Basename
             Rename-Item -path $file.PSPath -NewName $newname
         }
     }
-
-
 }
 
 
@@ -272,23 +270,23 @@ Task 'Help'  {
         NoMetadata   = $false
     }
     New-MarkdownHelp @platyPSParams -ErrorAction 'SilentlyContinue' -Verbose | Out-Null
-    Copy-Item -Path "$DocumentationPath\*.*" -Destination "$env:BHProjectPath\Documentation" -Force
+    Copy-Item -Path $($DocumentationPath + $env:BHPathDivider + "*.*") -Destination $($env:BHProjectPath + $env:BHPathDivider + "Documentation") -Force
 
     # Create the XML help file which you need when calling get-help mymodule
     Write-Output "Now updating External Help for the Module in [$StagingModulePath]"
-    New-ExternalHelp $DocumentationPath -OutputPath en-US\ -force
-    Copy-Item -Path "$StagingModulePath\en-US\*.*" -Destination "$env:BHProjectPath\en-US" -Force
+    New-ExternalHelp $DocumentationPath -OutputPath $($env:BHBuildCulture + $env:BHPathDivider) -force
+    # Sync help files from the staging folder back to the parent folder
+    Copy-Item -Path $($StagingModulePath + $env:BHPathDivider + $env:BHBuildCulture + $env:BHPathDivider + "*.*") -Destination $($env:BHProjectPath + $env:BHPathDivider + $env:BHBuildCulture) -Force
 
     # Update index.md
     Write-Output "Copying index.md...`n"
-    Copy-Item -Path "$env:BHProjectPath\README.md" -Destination "$($DocumentationPath)\index.md" -Force -Verbose | Out-Null
+    Copy-Item -Path $($env:BHProjectPath + $env:BHPathDivider + "README.md") -Destination $($DocumentationPath + $env:BHPathDivider + "index.md") -Force -Verbose | Out-Null
 }
 
 Task 'UpdateBuildVersion' {
     #$lines
     Write-Output "Updating the Module Version`n"
 
-    #$manifest = Import-PowerShellDataFile (Get-item Env:\BHPSModuleManifest).Value
     $manifest = Import-PowerShellDataFile $env:BHPSModuleManifest
     [version]$Version = $manifest.ModuleVersion
 
@@ -303,7 +301,7 @@ Task 'UpdateBuildVersion' {
     Update-ModuleManifest -Path $env:BHPSModuleManifest -ModuleVersion $NewVersion
     Set-Item -Path Env:BHBuildNumber -Value $NewVersion
 
-    $MonolithFile = "$env:BHProjectPath/$env:BHProjectName.nuspec"
+    $MonolithFile = $env:BHProjectPath + $env:BHPathDivider + "$env:BHProjectName.nuspec"
     #Create a new file and Update each time.
     $xmlFile = New-Object xml
     $xmlFile.Load($MonolithFile)
@@ -345,23 +343,32 @@ Task 'UpdateRepo' -Depends 'Init' {
 }
 
 # https://www.mono-project.com/docs/about-mono/supported-platforms/macos/
-Task 'BuildNuget' {
+Task 'BuildNuget' -Depends ImportStagingModule {
     #$lines
 
     #test for staged files and error out if they don't exist
 
-    Write-Output "Creating a Nuget Package in Aritfacts folder: [$ArtifactFolder]`n"
+    Write-Output "Creating a Nuget Package in the Aritfacts folder: [$ArtifactFolder]`n"
 
-    if ($PSVersionTable.PSEdition -eq "Desktop") {
-        exec { nuget pack $("$env:BHModulePath$env:BHPathDivider$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) -NoDefaultExcludes }
+    $NuSpecFile = $env:BHProjectPath + $env:BHPathDivider + "$env:BHProjectName.nuspec"
+
+    #Test to see if the Authors field has been properly updated
+    $loadedfile = Get-Content -Raw -Path $NuSpecFile
+    if ($loadedfile -match 'Your') {
+        throw "Your NuSpec file -> [$NuSpecFile] is not updated correctly. Please add your name to the Authors line and don't forget to remove the < > as well"
     }
-    elseif ($PSVersionTable.PSEdition -eq "Core") {
-        if (($isMACOS) -or ($isLinux)) {
-            exec { bash -c "nuget pack -Version $($env:BHBuildNumber) -NoDefaultExcludes" }
-        }
-        else {
-            exec { nuget pack $("$env:BHProjectName.nuspec") -Version $($env:BHBuildNumber) -NoDefaultExcludes }
-        }
+
+    if ($env:BHPSVersionNumber -lt 6) {
+        exec { nuget pack $($env:BHModulePath + $env:BHPathDivider + $env:BHProjectName.nuspec) -Version $($env:BHBuildNumber) -NoDefaultExcludes }
+    }
+    elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+        exec { nuget pack $($env:BHModulePath + $env:BHPathDivider + $env:BHProjectName.nuspec) -Version $($env:BHBuildNumber) -NoDefaultExcludes }
+    }
+    elseif (Get-Variable -Name 'IsMacOS' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+        exec { bash -c "nuget pack -Version $($env:BHBuildNumber) -NoDefaultExcludes" }
+    }
+    elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+        exec { bash -c "nuget pack -Version $($env:BHBuildNumber) -NoDefaultExcludes" }
     }
 
     $newpackagename = $env:BHProjectName + "." + $env:BHBuildNumber + ".nupkg"
@@ -372,7 +379,7 @@ Task 'BuildNuget' {
 
 # Create a versioned zip file of all staged files
 # NOTE: Admin Rights are needed if you run this locally
-Task 'BuildZip' {
+Task 'BuildZip' -Depends ImportStagingModule {
     #$lines
     Write-Output "`nCreating a Build Artifact"
 
@@ -394,7 +401,7 @@ Task 'BuildZip' {
         $releaseFilename = "$($env:BHProjectName)-v$($manifestVersion.ToString()).zip"
         $releasePath = Join-Path -Path $ArtifactFolder -ChildPath $releaseFilename
         Write-Host "Creating release artifact [$releasePath] using manifest version [$manifestVersion]" -ForegroundColor 'Yellow'
-        Compress-Archive -Path "$StagingFolder/*" -DestinationPath $releasePath -Force -Verbose -ErrorAction 'Stop'
+        Compress-Archive -Path $($StagingFolder + $env:BHPathDivider + "*") -DestinationPath $releasePath -Force -Verbose -ErrorAction 'Stop'
     }
     catch {
         throw "Could not create release artifact [$releasePath] using manifest version [$manifestVersion]"
@@ -434,28 +441,27 @@ Task 'Sign' {
     if ($PSVersionTable.PSEdition -eq "Desktop") {
 
         $OSVer = Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object Version
-        if ($OSVer.Version.StartsWith(10)){
-
-            $ExistingCerts = Get-ChildItem -Path cert:\LocalMachine\My -Recurse -CodeSigningCert
-            if (-not ($ExistingCerts)){
-            # specific to Win 10 and Server 2019 and later
-                New-SelfSignedCertificate -Type CodeSigningCert -Subject $env:BHProjectName | Out-Null
-                $ExistingCerts = Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert
+        if ($OSVer.Version.StartsWith(10)) {
+            $ExistingCerts = Get-ChildItem -Path Cert:\CurrentUser\Root -Recurse -CodeSigningCert
+            if (-not ($ExistingCerts)) {
+                # specific to Win 10 and Server 2019 and later
+                Write-Output "Creating a new self-signed Cert and adding it into your Personal Trusted Root`nWindows will prompt you to accept the new certifcate"
+                $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $env:BHProjectName -CertStorelocation Cert:\CurrentUser\My
+                Move-Item -Path $cert.PSPath -Destination "Cert:\CurrentUser\Root"
+                $ExistingCerts = Get-ChildItem -Path Cert:\CurrentUser\Root -CodeSigningCert
             }
 
             $publicFunctions = @( Get-ChildItem -Path "$env:BHModulePath\Public\*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
-            foreach($function in $publicFunctions){
+            foreach ($function in $publicFunctions) {
                 Set-AuthenticodeSignature -FilePath $function -Certificate $ExistingCerts[0]
             }
-
         }
-
     }
     elseif ($PSVersionTable.PSEdition -eq "Core") {
 
         if (($isMACOS) -or ($isLinux)) {
             "`n"
-            Write-Output "As of August 2019, there is no PowerShell module for PS Core on OSX that will let you sign a script"
+            Write-Output "As of August 2019, there is no PowerShell module for PS Core on OSX/Linux that will let you sign a script"
             <#
             Write-Output "You are going to need to enter a password for your pfx file"
 
@@ -488,7 +494,7 @@ Task 'Sign' {
                     $ExistingCerts = Get-ChildItem -Path Cert:\LocalMachine\My -CodeSigningCert
                 }
 
-                $publicFunctions = @( Get-ChildItem -Path "$env:BHModulePath\Public\*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
+                $publicFunctions = @( Get-ChildItem -Path $($env:BHModulePath + $env:BHPathDivider + "Public" + $env:BHPathDivider + "*.ps1") -Recurse -ErrorAction 'SilentlyContinue' )
                 foreach ($function in $publicFunctions) {
                     Set-AuthenticodeSignature -FilePath $function -Certificate $ExistingCerts[0]
                 }

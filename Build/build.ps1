@@ -8,7 +8,7 @@
 
     .PARAMETER Tasklist
     Tasks are:
-    'Init' - sets the build location to the project root. Also adds /Staging and /Artifacts folders to .gitignore
+    'Init' - sets the build location to the project root. Also adds /Staging and /BuildOutput folders to .gitignore
     'Clean' - cleans up any files/folders from a previous build and creates the Aritact and Staging directories
     'CombineAndStage' - pulls all your function files into a .psm1 and copies everything to /Staging
     'Stage' - pulls all your specified files into the /Staging folder in preparation for creation a .nupkg file or other artifact. Retains
@@ -19,8 +19,8 @@
     'Help' - Create/Update markdown helpfiles using PlatyPS
     'UpdateBuildVersion' - based on a parameter you pass (see below) the build number is updated
     'UpdateRepo' - does a git push back to your repo to sync your current files. Also tags files with the current build
-    'BuildNuget' - builds a .nupkg file in the /Artifacts directory
-    'BuildZip' - creates a .zip file of your creation in the /Artifacts folder
+    'BuildNuget' - builds a .nupkg file in the /BuildOutput directory
+    'BuildZip' - creates a .zip file of your creation in the /BuildOutput folder
     'PublishAzure' - invokes Publish-Module to publish your code to your Azure Repo
     'PublishPSGallery' - invokes Publish-Module to publish to PowerShellGallery
     'Sign' - used to sign your module with a certificate
@@ -122,39 +122,52 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
     $PSBoundParameters.Remove('ResolveDependency')
 }
 else {
-    Write-Output "Skipping dependency check...`n" -ForegroundColor 'Yellow'
+    Write-Host "Skipping dependency check...`n" -ForegroundColor 'Yellow'
 }
 
 
 # Init BuildHelpers
 Set-BuildEnvironment -Force
 
-if ($PSVersionTable.PSEdition -eq "Desktop") {
-    $PathDivider = "\"
-}
-elseif ($PSVersionTable.PSEdition -eq "Core") {
+## - jfm
+Set-Item -Path env:\BHPSVersionNumber -Value $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
 
-    if (($isMACOS) -or ($isLinux)) {
-        $PathDivider = "/"
-    }
-    else {
-        $PathDivider = "\"
-    }
+if ($env:BHPSVersionNumber -lt 6) {
+    Set-Item -Path env:\BHBuildOS -Value 'Windows'
+    Set-Item -Path env:\BHPathDivider -Value "\"
+    Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
 }
-
+elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+    Set-Item -Path env:\BHBuildOS -Value 'Windows'
+    Set-Item -Path env:\BHPathDivider -Value "\"
+    Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
+}
+elseif (Get-Variable -Name 'IsMacOS' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+    Set-Item -Path env:\BHBuildOS -Value 'macOS'
+    Set-Item -Path env:\BHPathDivider -Value "/"
+    Set-Item -Path env:\BHTempDirectory -Value "/private/tmp"
+}
+elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
+    Set-Item -Path env:\BHBuildOS -Value 'Linux'
+    Set-Item -Path env:\BHPathDivider -Value "/"
+    Set-Item -Path env:\BHTempDirectory -Value "/tmp"
+}
+## - jfm
 
 # The Default Build Helpers variable settings leave some gaps that need resolving. Doing that here.
 #region - BHBUILDVARS
 Set-Item -Path Env:BHBuildCulture -Value (get-culture).name
 Set-Item -Path Env:BHBuildSystem -Value "Azure Pipelines"
+
 $manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
 [version]$script:Version = $manifest.ModuleVersion
 Set-Item -Path Env:BHBuildNumber -Value $script:Version
-$stagingfolder = (Get-item env:\BHPSModulePath).Value + $PathDivider + "Staging"
+
+$stagingfolder = (Get-item env:\BHPSModulePath).Value + $env:BHPathDivider + "Staging"
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
-$publishfolder = $ENV:BHModulePath + $PathDivider + "Staging" + $PathDivider + $ENV:BHProjectName
+
+$publishfolder = $ENV:BHModulePath + $env:BHPathDivider + "Staging" + $env:BHPathDivider + $ENV:BHProjectName
 Set-Item -Path env:\BHModulePath -Value $publishfolder
-Set-Item -Path env:\BHPathDivider -Value $PathDivider
 #endregion
 
 # Capture the build version type - Major, Minor, Build, Revision. Used later to bump the version number of your package
@@ -186,7 +199,7 @@ if ($PSBoundParameters.ContainsKey('Tasklist')) {
 
     # Execute PSake tasks
     $invokePsakeParams = @{
-        buildFile = (Join-Path -Path $env:BHProjectPath -ChildPath 'Build\build.psake.ps1')
+        buildFile = (Join-Path -Path $env:BHProjectPath -ChildPath $("Build" + $env:BHPathDivider + "build.psake.ps1"))
         nologo    = $true
     }
     Invoke-Psake @invokePsakeParams @PSBoundParameters

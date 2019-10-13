@@ -19,7 +19,6 @@ Import-Module -Name "$moduleroot$PathDivider$moduleName.psm1" -Force -ErrorActio
 
 Describe -Name "New-PSNowModule Tests" {
 
-    #$picdata = New-PSNowModule -NewModuleName "testingmodule" -BaseManifest "Advanced" -ModuleRoot "~/modules"
 
 
 }
