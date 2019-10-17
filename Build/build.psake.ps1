@@ -38,9 +38,9 @@ Properties {
 
 FormatTaskName "-------- {0} --------"
 
-Task 'FullAzure' -Depends 'Init', 'UpdateBuildVersion', 'ImportStagingModule', 'Stage', 'Help', 'Test', 'PublishAzure'
+Task 'FullAzure' -Depends 'Init', 'UpdateBuildVersion', 'ImportStagingModule', 'Stage', 'Help', 'Test', 'UpdateRepo', 'PublishAzure'
 
-Task 'FullPSGallery' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'ImportStagingModule', 'Help', 'Test', 'PublishPSGallery'
+Task 'FullPSGallery' -Depends 'Init', 'UpdateBuildVersion', 'Stage', 'ImportStagingModule', 'Help', 'Test', 'UpdateRepo', 'PublishPSGallery'
 
 # Define top-level tasks
 Task 'Default' -Depends 'Init'

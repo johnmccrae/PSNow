@@ -11,9 +11,8 @@
     'Init' - sets the build location to the project root. Also adds /Staging and /BuildOutput folders to .gitignore
     'Clean' - cleans up any files/folders from a previous build and creates the Aritact and Staging directories
     'CombineAndStage' - pulls all your function files into a .psm1 and copies everything to /Staging
-    'Stage' - pulls all your specified files into the /Staging folder in preparation for creation a .nupkg file or other artifact. Retains
-    current directory structure.
-    'ImportStagingModule' - Import the module you just staged, you'll use that for making a .zip or .nupkg
+    'Stage' - pulls all your specified files into the /Staging folder in preparation for creation a .nupkg file or other artifact. Retains current directory structure.
+    'ImportStagingModule' - Import the module you just staged, you'll use that for making a .zip or .nupkg. Separates your working tree from the code you are going to deploy
     'Analyze' - Run PSScriptAnalyzer on the modules in /Staging to ensure linting and syntax are correct
     'Test' - Run Pester tests against the code. Tests are coming from /Tests
     'Help' - Create/Update markdown helpfiles using PlatyPS

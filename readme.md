@@ -3,16 +3,11 @@
 ![Made With Powershell](https://img.shields.io/badge/Made%20With-PowerShell-green "Powered by PowerShell")
 [![Build Status](https://dev.azure.com/chefcorp-chefIT/PSNow/_apis/build/status/johnmccrae.PSNow?branchName=master)](https://dev.azure.com/chefcorp-chefIT/PSNow/_build/latest?definitionId=21&branchName=master)
 
-A PowerShell module for making modules. PSNow emits the entire framework you need to create, analyze, test, sign, build, deploy and publish your code with one module. All you need to do after you install the module is to run one command and then write your code.
+A PowerShell module for making modules. PSNow emits the entire framework you need to create, analyze, test, sign, build, deploy and publish your code with one module. All you need to is run one command and then write your code.
 
-Follow the directions below to get started. The process will ask you some basic questions about the  module you to make and will then create everything you need to get going with.
+Follow the directions below to get started. The process will ask you some basic questions about the module you want to make and will then create everything you need to get going with.
 
-Using this tool, there are 3 stages to module development:
-1 - Install PSNow and run New-PSNowModule
-2 - Write your functions
-3 - Use the built in tools to build, anaylize, test, sign and publish your work.
-
-There are 2 basic components for this module - the New-PSNowModule function uses Plaster to create a robust, fully built out, but empty, module structure. You'll then create your functions and use build.ps1 for everything else. Open build.ps1 and read the comments in the header. The comments will give you an idea of everything you can do with it. Individual build tasks are defined in build.psake.ps1. You can interrogate that file to add your own tweaks.
+The New-PSNowModule function uses Plaster to create a robust, fully built out, but empty, module structure. You'll then create your functions and use build.ps1 for everything else. Open build.ps1 and read the comments in the header. The comments will give you an idea of everything you can do with it. Individual build tasks are defined in build.psake.ps1. You can interrogate that file to add your own tweaks.
 
 ## Getting Started
 
@@ -23,7 +18,7 @@ There are 2 basic components for this module - the New-PSNowModule function uses
     Import-Module PSNow
 ```
 
-### You will need to create the following environmental variables before you start:
+### You will need to create the following environmental variables:
 
 This tool makes extensive use of PSake for build automation. That module sets a number of environment variables. We are adding more here to make your workflow smoother. Please set these into your PowerShell Profile. Of course you should change these to match your build and deployment environment.
 
@@ -47,9 +42,9 @@ For your first module, execute that statement, adding in only your module name. 
 
 ### Your First Script
 
-A basic function-based script template is ready for you in ~/modules/<your module>/public/<your module>.ps1. Once you are done writing your code, don't forget to update the comments in the Header - you'll need them later when you make your help files. Help on writing comment-based help can be found here.
+A basic function-based script template is ready for you in ~/modules/your module/public/your module.ps1. Once you are done writing your code, don't forget to update the comments in the Header - you'll need them later when you make your help files. Help on writing comment-based help can be found here.
 
-### Check for And Install Depdencies
+### Check for And Install Dependencies
 
 PSNow has dependencies on several outside modules. You can view them in /Build/build.depend.psd1. To install them execute the following command:
 
