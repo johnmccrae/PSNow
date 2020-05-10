@@ -1,22 +1,8 @@
-$PVersionNumber = $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
-
-if ($PVersionNumber -lt 6) {
-    $BHPathDivider = "\"
-}
-elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
-    $BHPathDivider = "\"
-}
-elseif (Get-Variable -Name 'IsMacOS' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
-    $BHPathDivider = "/"
-}
-elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
-    $BHPathDivider = "/"
-}
-
+$BHPathDivider = [System.IO.Path]::DirectorySeparatorChar
 
 if (-not (Get-Module -Name 'Plaster' -ListAvailable)) {
     Write-Output "`nPlaster is not yet installed...installing Plaster now..."
-    Install-Module -Name 'Plaster' -Scope 'CurrentUser' -Force
+    Install-Module -Name 'Plaster' -Scope 'CurrentUser' -Repository PSGALLERY -Force
 }
 
 if (-not (Test-Path -path .gitignore)){

@@ -25,7 +25,7 @@
     'Sign' - used to sign your module with a certificate
 
     .PARAMETER Parameters
-    A hashtable of parameters you want to pass into your build. Ex.: @{BuildRev="REVISION", CommitMessage"I updated the bbuild revision"}
+    A hashtable of parameters you want to pass into your build. Ex.: @{BuildRev="REVISION", CommitMessage="I updated the build revision"}
 
     .PARAMETER Properties
     A hashtable to update various pathes and other settings used by this script
@@ -85,7 +85,7 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
     # Install PSDepend module if it is not already installed
     if (-not (Get-Module -Name 'PSDepend' -ListAvailable)) {
         Write-Output "`nPSDepend is not yet installed...installing PSDepend now..."
-        Install-Module -Name 'PSDepend' -Scope 'CurrentUser' -Force
+        Install-Module -Name 'PSDepend' -Scope 'CurrentUser'  -Repository PSGALLERY -Force
     }
     else {
         Write-Output "`nPSDepend already installed...skipping."
@@ -131,24 +131,23 @@ Set-BuildEnvironment -Force
 ## - jfm
 Set-Item -Path env:\BHPSVersionNumber -Value $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
 
+$pathChar = [System.IO.Path]::DirectorySeparatorChar
+Set-Item -Path env:\BHPathDivider -Value $pathChar
+
 if ($env:BHPSVersionNumber -lt 6) {
     Set-Item -Path env:\BHBuildOS -Value 'Windows'
-    Set-Item -Path env:\BHPathDivider -Value "\"
     Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
 }
 elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
     Set-Item -Path env:\BHBuildOS -Value 'Windows'
-    Set-Item -Path env:\BHPathDivider -Value "\"
     Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
 }
 elseif (Get-Variable -Name 'IsMacOS' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
     Set-Item -Path env:\BHBuildOS -Value 'macOS'
-    Set-Item -Path env:\BHPathDivider -Value "/"
     Set-Item -Path env:\BHTempDirectory -Value "/private/tmp"
 }
 elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
     Set-Item -Path env:\BHBuildOS -Value 'Linux'
-    Set-Item -Path env:\BHPathDivider -Value "/"
     Set-Item -Path env:\BHTempDirectory -Value "/tmp"
 }
 ## - jfm
