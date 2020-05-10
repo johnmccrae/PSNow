@@ -25,11 +25,13 @@ Describe -Name "Does the Find Function Work" -tags Build {
 
     It "It should have valid paths in it regardless of the OS"{
         $psnowroot = (get-item $moduleroot).parent.parent.FullName
-        $modulespath = $($psnowroot + $env:BHPathDivider + '.\Currentmodules.txt')
+        $modulespath = $($psnowroot + $env:BHPathDivider + 'Currentmodules.txt')
         $modules = Get-Content -Path $modulespath
-        foreach($module in $modules){
-            [bool]$goodpath = Test-Path $module
-            $goodpath | Should -BeTrue
+        if($null -ne $modules){
+            foreach($module in $modules){
+                [bool]$goodpath = Test-Path $module
+                $goodpath | Should -BeTrue
+            }
         }
     }
 
