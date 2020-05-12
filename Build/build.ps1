@@ -42,7 +42,7 @@
    Resolves your dependencies as specified in the build.depend.ps1 file and sets the build environment up for you.
 
     .EXAMPLE
-    ./Build/build.ps1 -Tasklist BuildNuget -Parameters @{BuildRev="Revision", CommitMessage="First Commit"}
+    ./Build/build.ps1 -Tasklist BuildNuget -Parameters @{BuildRev="Revision"; CommitMessage="First Commit"}
 
     .NOTES
     Author: John McCrae
