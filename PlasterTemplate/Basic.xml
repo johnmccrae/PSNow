@@ -1,16 +1,127 @@
-<?xml version="1.0" encoding="utf-8"?>
-<plasterManifest
-  schemaVersion="1.1"
-  templateType="Project" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+<?xml version="1.0" encoding="UTF-8"?>
+<plasterManifest xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1" schemaVersion="1.1">
   <metadata>
-    <name>ScriptModuleTemplate</name>
-    <id>2bf8bb9b-551a-45dc-9e9f-d0ec7aac2769</id>
-    <version>0.1.0</version>
-    <title>PSNow-TestModule</title>
-    <description>Scaffolds the files required for a PowerShell script module</description>
+    <name>BasicModuleTemplate</name>
+    <id>0b75c373-1e1f-4ce2-a3e7-d8749ef7ac6f</id>
+    <version>1.0.0</version>
+    <title>Basic Module Template</title>
+    <description>Minimal Plaster template - manifest, psm1, one starter function, README, and LICENSE</description>
     <author>John McCrae</author>
-    <tags>PowerShell, Module, ModuleManifest</tags>
+    <tags>Plaster, PowerShell, Module</tags>
   </metadata>
-  <parameters></parameters>
-  <content></content>
+
+  <parameters>
+
+    <parameter name="ModuleAuthor"
+               type="user-fullname"
+               prompt="Author" />
+
+    <parameter name="ModuleName"
+               type="text"
+               prompt="Name of your module"
+               default="MyNewModule" />
+
+    <parameter name="ModuleVersion"
+               type="text"
+               prompt="Version Number"
+               default="0.1.0" />
+
+    <parameter name="CompanyName"
+               type="text"
+               prompt="Name of your Organization"
+               default="" />
+
+    <parameter name="Description"
+               type="text"
+               prompt="Brief description of your module" />
+
+    <parameter name="GitHubUserName"
+               type="text"
+               prompt="Enter your GitHub username" />
+
+    <parameter name="GitHubRepo"
+               type="text"
+               prompt="Enter your GitHub repository name for this project" />
+
+    <parameter name="PowerShellVersion"
+               type="text"
+               prompt="Minimum PowerShell version required"
+               default="5.1" />
+
+  </parameters>
+
+  <content>
+    <message>
+
+Setting up Your Module
+----------------------
+
+    </message>
+
+    <newModuleManifest
+      destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1"
+      moduleVersion="${PLASTER_PARAM_ModuleVersion}"
+      rootModule="${PLASTER_PARAM_ModuleName}.psm1"
+      author="${PLASTER_PARAM_ModuleAuthor}"
+      companyName="${PLASTER_PARAM_CompanyName}"
+      description="${PLASTER_PARAM_Description}"
+      powerShellVersion="${PLASTER_PARAM_PowerShellVersion}"
+      encoding="UTF8-NoBOM" />
+
+    <templateFile
+      source="Scaffold\template.psm1"
+      destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
+
+    <message>Creating folders for module: $PLASTER_PARAM_ModuleName</message>
+
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
+
+    <message>
+
+Creating starter function
+-------------------------
+
+    </message>
+
+    <templateFile
+      source="Scaffold\New-PSNowModuleBase.ps1.template"
+      destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1" />
+
+    <message>
+
+Deploying common files
+----------------------
+
+    </message>
+
+    <templateFile source="Scaffold\LICENSE.md"    destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
+    <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\README.md" />
+    <file         source=".gitignore"             destination="${PLASTER_PARAM_ModuleName}\.gitignore" />
+
+    <message>
+
+Setting up AI scaffolding
+-------------------------
+
+    </message>
+
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\.github\" />
+    <templateFile
+      source="Scaffold\copilot-instructions-basic.md.template"
+      destination="${PLASTER_PARAM_ModuleName}\.github\copilot-instructions.md" />
+
+    <message>
+
+Done!
+-----
+Your new PowerShell module -[ $PLASTER_PARAM_ModuleName ]- has been created.
+
+Add your code to: $PLASTER_PARAM_ModuleName\Public\$PLASTER_PARAM_ModuleName.ps1
+Fill in the TODOs in: $PLASTER_PARAM_ModuleName\.github\copilot-instructions.md
+
+    </message>
+
+  </content>
 </plasterManifest>

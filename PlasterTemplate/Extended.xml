@@ -1,70 +1,211 @@
-<?xml version="1.0" encoding="utf-8"?>
-<plasterManifest
-  schemaVersion="1.1"
-  templateType="Project" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+<?xml version="1.0" encoding="UTF-8"?>
+<plasterManifest xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1" schemaVersion="1.1">
   <metadata>
-    <name>ScriptModuleTemplate</name>
-    <id>7b92c62e-2fc3-40da-84b6-b5cb0f489ce5</id>
+    <name>ExtendedModuleTemplate</name>
+    <id>9d95b432-e01e-45be-a30c-8e7ea2c2e461</id>
     <version>1.0.0</version>
-    <title>ScriptModuleTemplate</title>
-    <description>Scaffolds the files required for a PowerShell script module</description>
+    <title>Extended Module Template</title>
+    <description>Module skeleton plus PSake build tooling and Pester test structure. No publishing pipeline or documentation generation (use Advanced for those).</description>
     <author>John McCrae</author>
-    <tags>PowerShell, Module, ModuleManifest</tags>
+    <tags>Plaster, PSake, Pester, PSScriptAnalyzer</tags>
   </metadata>
-      <parameters>
-        <parameter name='ModuleName' type='text' prompt='Name of the module' />
-        <parameter name='Description' type='text' prompt='Brief description of module (required for publishing to the PowerShell Gallery)' />
-        <parameter name='Version' type='text' default='0.1.0' prompt='Enter the version number of the module' />
-        <parameter name='ModuleAuthor' type='user-fullname' prompt="Module author's name" store='text' />
-        <parameter name='CompanyName' type='text' prompt='Name of your Company' default='<Your Company Goes Here>' />
-        <parameter name='PowerShellVersion' default='3.0' type='text' prompt='Minimum PowerShell version' />
-      </parameters>
-<content>
+
+  <parameters>
+
+    <parameter name="ModuleAuthor"
+               type="user-fullname"
+               prompt="Author" />
+
+    <parameter name="ModuleName"
+               type="text"
+               prompt="Name of your module"
+               default="MyNewModule" />
+
+    <parameter name="ModuleVersion"
+               type="text"
+               prompt="Version Number"
+               default="0.1.0" />
+
+    <parameter name="CompanyName"
+               type="text"
+               prompt="Name of your Organization"
+               default="" />
+
+    <parameter name="Description"
+               type="text"
+               prompt="Brief description of your module" />
+
+    <parameter name="GitHubUserName"
+               type="text"
+               prompt="Enter your GitHub username" />
+
+    <parameter name="GitHubRepo"
+               type="text"
+               prompt="Enter your GitHub repository name for this project" />
+
+    <parameter name="PowerShellVersion"
+               type="text"
+               prompt="Minimum PowerShell version required"
+               default="5.1" />
+
+    <parameter name="FunctionFolders"
+               type="multichoice"
+               prompt="Please select folders to include"
+               default="0,3">
+
+      <choice label="&amp;Public"
+              value="Public"
+              help="Adds a public folder to module root" />
+
+      <choice label="&amp;Internal"
+              value="Internal"
+              help="Adds an internal folder to module root" />
+
+      <choice label="&amp;Classes"
+              value="Classes"
+              help="Adds a classes folder to module root" />
+
+      <choice label="P&amp;rivate"
+              value="Private"
+              help="Adds a private folder to module root" />
+
+      <choice label="&amp;Binaries"
+              value="Binaries"
+              help="Adds a binaries folder to module root" />
+
+    </parameter>
+
+  </parameters>
+
+  <content>
     <message>
-     Creating you folders for module: $PLASTER_PARAM_Name
+
+Setting up Your Module
+----------------------
+
     </message>
-    <file source='' destination='docs\images'/>
-    <file source='' destination='tests'/>
-    <file source='' destination='spec'/>
-    <file source='' destination='${PLASTER_PARAM_ModuleName}\Public\'/>
-    <file source='' destination='${PLASTER_PARAM_ModuleName}\private'/>
-    <file source='' destination='${PLASTER_PARAM_ModuleName}\classes'/>
-    <file source='' destination='${PLASTER_PARAM_ModuleName}\data'/>
-
-    <message>
-    Deploying common files
-    </message>
-    <file source='appveyor.yml' destination='${PLASTER_PARAM_ModuleName}\appveyor.yml'/>
-    <file source='build.ps1'    destination=''/>
-    <file source='mkdocs.yml'   destination=''/>
-    <file source='LICENSE.yml'  destination=''/>
-    <file source='PITCHME.md'   destination=''/>
-    <file source='psake.ps1'    destination=''/>
-    <file source='readme.ps1'   destination=''/>
-
-    <file source='docs\about.md' destination=''/>
-    <file source='docs\acknowledgements.md' destination=''/>
-    <file source='docs\index.md' destination='\docs'/>
-    <file source='docs\Quick-Start-Installation-and-Example.md' destination=''/>
-
-    <file source='tests\Project.Tests.ps1' destination=''/>
-    <file source='tests\Help.Tests.ps1' destination=''/>
-    <file source='tests\Feature.Tests.ps1' destination=''/>
-    <file source='tests\Regression.Tests.ps1' destination=''/>
-    <file source='tests\Unit.Tests.ps1' destination=''/>
-
-    <file source='spec\module.feature' destination=''/>
-    <file source='spec\module.Steps.ps1' destination=''/>
-
-    <file source='template.psm1' destination='\${PLASTER_PARAM_Name}\${PLASTER_PARAM_Name}.psm1'/>
 
     <newModuleManifest
-        destination='\${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1'
-        moduleVersion='$PLASTER_PARAM_Version'
-        rootModule='${PLASTER_PARAM_ModuleName}.psm1'
-        author='$PLASTER_PARAM_FullName'
-        description='$PLASTER_PARAM_ModuleDesc'
-        encoding='UTF8-NoBOM'/>
+      destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1"
+      moduleVersion="${PLASTER_PARAM_ModuleVersion}"
+      rootModule="${PLASTER_PARAM_ModuleName}.psm1"
+      author="${PLASTER_PARAM_ModuleAuthor}"
+      companyName="${PLASTER_PARAM_CompanyName}"
+      description="${PLASTER_PARAM_Description}"
+      powerShellVersion="${PLASTER_PARAM_PowerShellVersion}"
+      encoding="UTF8-NoBOM" />
 
-</content>
+    <templateFile source="Scaffold\template.psm1"
+                  destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
+
+    <templateFile source="Scaffold\nuspec.txt"
+                  destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" />
+
+    <message>Creating folders for module: $PLASTER_PARAM_ModuleName</message>
+
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\"
+          condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\"
+          condition="$PLASTER_PARAM_FunctionFolders -contains 'Internal'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\"
+          condition="$PLASTER_PARAM_FunctionFolders -contains 'Classes'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\"
+          condition="$PLASTER_PARAM_FunctionFolders -contains 'Private'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\"
+          condition="$PLASTER_PARAM_FunctionFolders -contains 'Binaries'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
+
+    <message condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'">
+
+Creating starter function
+-------------------------
+
+    </message>
+
+    <templateFile source="Scaffold\New-PSNowModuleBase.ps1.template"
+                  destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1"
+                  condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'" />
+
+    <message>
+
+Deploying common files
+----------------------
+
+    </message>
+
+    <templateFile source="Scaffold\LICENSE.md"    destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
+    <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\README.md" />
+    <file         source=".gitignore"             destination="${PLASTER_PARAM_ModuleName}\.gitignore" />
+
+    <message>
+
+Setting up VS Code support
+--------------------------
+
+    </message>
+
+    <file source=""                              destination="${PLASTER_PARAM_ModuleName}\.vscode" />
+    <file source="Scaffold\settings.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\settings.json" />
+    <file source="Scaffold\task.json.example"     destination="${PLASTER_PARAM_ModuleName}\.vscode\task.json" />
+
+    <message>
+
+Setting up PSake Build Environment
+-----------------------------------
+
+    </message>
+
+    <requireModule name="psake" minimumVersion="4.9.0" />
+    <file         source=""                              destination="${PLASTER_PARAM_ModuleName}\Build\" />
+    <file         source="Build\build.ps1"              destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" />
+    <file         source="Build\build.depend.psd1"      destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" />
+    <templateFile source="Scaffold\build.psake.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" />
+    <file         source="Build\deploy.psdeploy.ps1"    destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" />
+    <file         source="Build\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\PSScriptAnalyzerSettings.psd1" />
+    <file         source=""                              destination="${PLASTER_PARAM_ModuleName}\Certs\" />
+
+    <message>
+
+Setting up Pester Tests
+-----------------------
+
+    </message>
+
+    <requireModule name="Pester" minimumVersion="5.0.0" />
+    <file source=""                                           destination="${PLASTER_PARAM_ModuleName}\Tests\" />
+    <file source=""                                           destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" />
+    <file source=""                                           destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" />
+    <file source="Tests\Unit\Unit.Tests.ps1"                 destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" />
+    <file source="Tests\Common\Basic.tests.ps1"              destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" />
+    <file source="Tests\Common\Environment.tests.ps1"        destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" />
+    <file source="Tests\Common\Help.Tests.ps1"               destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" />
+    <file source="Tests\Common\Manifest.Tests.ps1"           destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" />
+
+    <message>
+
+Setting up AI scaffolding
+-------------------------
+
+    </message>
+
+    <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\" />
+    <templateFile source="Scaffold\copilot-instructions.md.template"  destination="${PLASTER_PARAM_ModuleName}\.github\copilot-instructions.md" />
+    <templateFile source="Scaffold\AGENTS.md.template"                destination="${PLASTER_PARAM_ModuleName}\AGENTS.md" />
+
+    <message>
+
+Done!
+-----
+Your new PowerShell module -[ $PLASTER_PARAM_ModuleName ]- has been created.
+
+Next steps:
+  1. Add your code to: $PLASTER_PARAM_ModuleName\Public\$PLASTER_PARAM_ModuleName.ps1
+  2. Install dependencies: .\Build\build.ps1 -ResolveDependency
+  3. Run tests:            .\Build\build.ps1 -TaskList test
+  4. Lint your code:       .\Build\build.ps1 -TaskList analyze,test
+  5. Fill in the TODOs in: $PLASTER_PARAM_ModuleName\.github\copilot-instructions.md
+
+    </message>
+
+  </content>
 </plasterManifest>

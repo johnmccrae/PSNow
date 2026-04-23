@@ -15,7 +15,7 @@
     'ImportStagingModule' - Import the module you just staged, you'll use that for making a .zip or .nupkg. Separates your working tree from the code you are going to deploy
     'Analyze' - Run PSScriptAnalyzer on the modules in /Staging to ensure linting and syntax are correct
     'Test' - Run Pester tests against the code. Tests are coming from /Tests
-    'Help' - Create/Update markdown helpfiles using PlatyPS
+    'Help' - Create/Update markdown helpfiles using Microsoft.PowerShell.PlatyPS
     'UpdateBuildVersion' - based on a parameter you pass (see below) the build number is updated
     'UpdateRepo' - does a git push back to your repo to sync your current files. Also tags files with the current build
     'BuildNuget' - builds a .nupkg file in the /BuildOutput directory
@@ -39,7 +39,7 @@
     .EXAMPLE
    ./Build/build.ps1 -Tasklist init -ResolveDependency
 
-   Resolves your dependencies as specified in the build.depend.ps1 file and sets the build environment up for you.
+   Resolves your dependencies as specified in the build.depend.psd1 file and sets the build environment up for you.
 
     .EXAMPLE
     ./Build/build.ps1 -Tasklist BuildNuget -Parameters @{BuildRev="Revision"; CommitMessage="First Commit"}
@@ -79,43 +79,39 @@ $PSVersionTable
 
 # Load dependencies
 if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
-    # Bootstrap environment
-    Get-PackageProvider -Name 'NuGet' -ForceBootstrap | Out-Null
-
-    # Install PSDepend module if it is not already installed
-    if (-not (Get-Module -Name 'PSDepend' -ListAvailable)) {
-        Write-Output "`nPSDepend is not yet installed...installing PSDepend now..."
-        Install-Module -Name 'PSDepend' -Scope 'CurrentUser'  -Repository PSGALLERY -Force
+    # Bootstrap Microsoft.PowerShell.PSResourceGet if not already available
+    # (built into PS 7.4+; may need installing on older PS versions)
+    if (-not (Get-Module -Name 'Microsoft.PowerShell.PSResourceGet' -ListAvailable)) {
+        Write-Output "`nInstalling Microsoft.PowerShell.PSResourceGet..."
+        Install-Module -Name 'Microsoft.PowerShell.PSResourceGet' -Scope CurrentUser -Force -AllowClobber
     }
-    else {
-        Write-Output "`nPSDepend already installed...skipping."
-    }
+    Import-Module -Name 'Microsoft.PowerShell.PSResourceGet'
 
     #checking for the presence of Git. The Buildhelpers dependency will fail at the end of setup if Git isn't installed
     try {
         git | Out-Null
-        #$gitinstalled = $true
     }
     catch [System.Management.Automation.CommandNotFoundException] {
         $LASTEXITCODE = 1
-        #$gitinstalled = $false
-        throw "A git client was not detected. Please install one and re-run 'build.ps1  -ResolveDependency'"
+        throw "A git client was not detected. Please install one and re-run 'build.ps1 -ResolveDependency'"
     }
 
-    # Install build dependencies
-    $psdependencyConfigPath = Join-Path -Path $PSScriptRoot -ChildPath 'build.depend.psd1'
-    Write-Output "Checking / resolving module dependencies from [$psdependencyConfigPath]...`n"
-    Import-Module -Name 'PSDepend'
+    # Install build dependencies from build.depend.psd1
+    $dependenciesPath = Join-Path -Path $PSScriptRoot -ChildPath 'build.depend.psd1'
+    Write-Output "Checking / resolving module dependencies from [$dependenciesPath]...`n"
+    $dependencies = Import-PowerShellDataFile -Path $dependenciesPath
 
-    $invokePSDependParams = @{
-        Path    = $psdependencyConfigPath
-        Tags    = 'Bootstrap'
-        Import  = $true
-        Confirm = $false
-        Install = $true
-        Verbose = $true
+    foreach ($dep in $dependencies.GetEnumerator()) {
+        $name    = $dep.Key
+        $version = $dep.Value
+        Write-Output "Ensuring $name >= $version..."
+        $installed = Get-InstalledPSResource -Name $name -ErrorAction SilentlyContinue |
+                     Where-Object { [version]$_.Version -ge [version]$version }
+        if (-not $installed) {
+            Install-PSResource -Name $name -Version "[$version]" -Scope CurrentUser -Repository PSGallery -TrustRepository -Quiet
+        }
+        Import-Module -Name $name -MinimumVersion $version -Force
     }
-    Invoke-PSDepend @invokePSDependParams
 
     # Remove ResolveDependency PSBoundParameter ready for passthru to PSake
     $PSBoundParameters.Remove('ResolveDependency')

@@ -1,0 +1,61 @@
+# <%= $PLASTER_PARAM_ModuleName %> — Agent Instructions
+
+This file provides context for AI agents (GitHub Copilot, Claude, OpenAI Codex, etc.) working in this repository.
+
+## What This Module Does
+
+<!-- TODO: describe what this module does, its target users, and main use cases -->
+
+## Build and Test
+
+```powershell
+.\Build\build.ps1 -ResolveDependency   # install build dependencies (first run)
+.\Build\build.ps1 -TaskList Test        # run all Pester tests
+.\Build\build.ps1 -TaskList Analyze     # run PSScriptAnalyzer
+.\Build\build.ps1 -TaskList Help        # regenerate help files
+.\Build\build.ps1 -TaskList BuildNuget  # build .nupkg artifact
+```
+
+## Repository Structure
+
+```
+Public/        Exported functions — one file per function, filename = function name
+Private/       Internal helpers — never exported
+Tests/
+  Unit/        Pester 5 unit tests (*Tests.ps1)
+  Common/      Shared tests: manifest, help coverage, PSSA
+Build/         build.ps1 entry, build.psake.ps1 tasks, build.depend.psd1
+Documentation/ PlatyPS markdown help
+en-US/         Compiled MAML help
+```
+
+## Coding Rules
+
+1. PowerShell 5.1+ compatible unless noted otherwise
+2. One exported function per file; file name must match function name
+3. Every exported function needs `[CmdletBinding()]` and comment-based help
+4. Use `Join-Path` / `$PSScriptRoot` for all paths — no hardcoded paths, no string concatenation
+5. Use `-ErrorAction` explicitly; avoid silently swallowing errors
+6. Follow approved PS verbs: https://learn.microsoft.com/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands
+7. New public functions get a matching test file in `Tests\Unit\<FunctionName>.Tests.ps1`
+
+## Pester 5 Test Syntax
+
+```powershell
+Describe 'Get-Something' {
+    It 'returns expected value' {
+        Get-Something -Input 'x' | Should -Be 'expected'
+    }
+    It 'calls dependency once' {
+        Mock Invoke-Something {}
+        Get-Something -Input 'x'
+        Should -Invoke Invoke-Something -Times 1 -Exactly
+    }
+}
+```
+
+## Notes for AI Agents
+
+<!-- TODO: add domain knowledge, architectural decisions, or gotchas that an agent should know -->
+- Do not edit `.psd1` module version by hand — use `Update-ModuleManifest` or the `UpdateBuildVersion` build task
+- Always run `.\Build\build.ps1 -TaskList Test` after any functional change to confirm nothing is broken

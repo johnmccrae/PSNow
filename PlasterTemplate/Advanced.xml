@@ -169,7 +169,7 @@ Setting up Support for Pester
 -----------------------------
 
         </message>
-        <requireModule name="Pester" minimumVersion="3.4.0" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <requireModule name="Pester" minimumVersion="5.0.0" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
@@ -197,7 +197,7 @@ Setting up Support for PlatyPS
 ------------------------------
 
         </message>
-        <requireModule name="PlatyPS" minimumVersion="0.14.0" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
+        <requireModule name="Microsoft.PowerShell.PlatyPS" minimumVersion="1.0.0" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
         <file source="Scaffold\about_PSNow.help.md" destination="${PLASTER_PARAM_ModuleName}\Help\about_${PLASTER_PARAM_ModuleName}.help.md" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
 
@@ -225,9 +225,29 @@ Then, publish your project to the PSGallery by typing '.\build\build.ps1 -taskli
         </message>
 
         <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
-You can generate help and additional documentation using platyPS by running the 'build.ps1 -tasklist help' task.
+You can generate help and additional documentation using Microsoft.PowerShell.PlatyPS by running the 'build.ps1 -tasklist help' task.
 Add additional documentation written in markdown to the docs directory. You can update the help by
 running the 'build.ps1 -tasklist help' task again.
+
+        </message>
+
+        <message>
+
+Setting up AI scaffolding
+--------------------------
+
+        </message>
+
+        <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\" />
+        <templateFile source="Scaffold\copilot-instructions.md.template"  destination="${PLASTER_PARAM_ModuleName}\.github\copilot-instructions.md" />
+        <templateFile source="Scaffold\AGENTS.md.template"                destination="${PLASTER_PARAM_ModuleName}\AGENTS.md" />
+        <templateFile source="Scaffold\CLAUDE.md.template"                destination="${PLASTER_PARAM_ModuleName}\CLAUDE.md" />
+
+        <message>
+Fill in the TODOs in the AI scaffolding files to give your AI assistant context about this module:
+  - $PLASTER_PARAM_ModuleName\.github\copilot-instructions.md  (GitHub Copilot)
+  - $PLASTER_PARAM_ModuleName\AGENTS.md                        (AI agents)
+  - $PLASTER_PARAM_ModuleName\CLAUDE.md                        (Claude)
 
         </message>
 

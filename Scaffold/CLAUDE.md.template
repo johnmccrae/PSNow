@@ -1,0 +1,43 @@
+# <%= $PLASTER_PARAM_ModuleName %>
+
+## Project Overview
+
+`<%= $PLASTER_PARAM_ModuleName %>` is a PowerShell module. <!-- TODO: describe purpose, target users, main use cases -->
+
+## Build and Test Commands
+
+```powershell
+# First run: install dependencies
+.\Build\build.ps1 -ResolveDependency
+
+# Common tasks
+.\Build\build.ps1 -TaskList Test        # run Pester tests
+.\Build\build.ps1 -TaskList Analyze     # lint with PSScriptAnalyzer
+.\Build\build.ps1 -TaskList Help        # generate help docs
+.\Build\build.ps1 -TaskList BuildNuget  # build .nupkg
+```
+
+## Architecture
+
+```
+Public/        Exported functions — one file per function, filename = function name
+Private/       Internal helpers — never exported
+Tests/
+  Unit/        Pester 5 unit tests (*Tests.ps1)
+  Common/      Shared tests (manifest, help, PSSA)
+Build/         PSake tasks, dependency file, deploy script
+Documentation/ Markdown help (PlatyPS)
+en-US/         Compiled MAML help files
+```
+
+## Development Rules
+
+- All paths via `Join-Path` or `$PSScriptRoot` — never concatenate or hardcode
+- `[CmdletBinding()]` on every function
+- Comment-based help required on all exported functions (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`)
+- Tests in `Tests\Unit\<FunctionName>.Tests.ps1`; use Pester 5 syntax (`Should -Be`, `Should -Invoke`)
+- Do not edit `.psd1` version manually; use `Update-ModuleManifest`
+
+## Domain Notes
+
+<!-- TODO: describe this module's domain and any knowledge Claude should have to work effectively in this codebase -->

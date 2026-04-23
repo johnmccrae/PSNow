@@ -15,8 +15,11 @@ Properties {
     $PSVersion = $PSVersionTable.PSVersion.Major
     $lines = '----------------------------------------------------------------------'
 
-    # Pester
-    $TestScripts = Get-ChildItem "$ProjectRoot\Tests\*\*Tests.ps1"
+    # Pester — unit/common/acceptance tests plus template integration tests
+    $TestScripts = @(
+        Get-ChildItem "$ProjectRoot\Tests\*\*Tests.ps1"
+        Get-ChildItem "$ProjectRoot\Tests\Integration\*Integration.Tests.ps1" -ErrorAction SilentlyContinue
+    )
     $TestFile = "Test-Unit_$($TimeStamp).xml"
 
     # Script Analyzer
@@ -165,7 +168,7 @@ Task 'ImportStagingModule' -Depends 'Init' {
     if (Get-Module -Name $env:BHProjectName) {
         Remove-Module -Name $env:BHProjectName
     }
-    # Global scope used for Help creation (PlatyPS)
+    # Global scope used for Help creation (Microsoft.PowerShell.PlatyPS)
     Import-Module -Name $StagingModulePath -ErrorAction 'Stop' -Force -Global
 }
 
@@ -219,34 +222,13 @@ Task 'Test' -Depends 'ImportStagingModule' {
     #$lines
     Write-Output "Running Tests against the module`n"
 
-    # PSScriptAnalyzer doesn't ignore files, only rules. Temporarily renaming files here which can safely skip Linting
-    $directoriestoexclude = @('Spec' <#,'Scaffold'#>)
-    foreach($directory in $directoriestoexclude){
-        $insidepath = $env:BHModulePath + $env:BHPathDivider + $directory
-        $filestorename = @( Get-ChildItem -Path "$insidepath/*.ps1" -Recurse -ErrorAction 'SilentlyContinue' )
-        foreach($file in $filestorename){
-            $newname = $file.Name + ".hold"
-            Rename-Item -path $file.PSPath -NewName $newname
-        }
-    }
-
     # Gather test results. Store them in a variable and file
     $TestFilePath = Join-Path -Path $StagingFolder -ChildPath $TestFile
-    $TestResults = Invoke-Pester -Script $TestScripts -PassThru -OutputFormat 'NUnitXml' -OutputFile $TestFilePath -PesterOption @{IncludeVSCodeMarker = $true }
+    $TestResults = Invoke-Pester -Path $TestScripts -PassThru -OutputFormat 'NUnitXml' -OutputFile $TestFilePath
 
     # Fail build if any tests fail
     if ($TestResults.FailedCount -gt 0) {
         Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"
-    }
-
-    # PSScriptAnalyzer doesn't ignore files, only rules. Renaming the files back again
-    foreach ($directory in $directoriestoexclude) {
-        $insidepath = $env:BHProjectPath + $env:BHPathDivider + $directory
-        $filestorename = @( Get-ChildItem -Path "$insidepath/*.hold" -Recurse -ErrorAction 'SilentlyContinue' )
-        foreach ($file in $filestorename) {
-            $newname = (Get-Item $file).Basename
-            Rename-Item -path $file.PSPath -NewName $newname
-        }
     }
 }
 
@@ -256,31 +238,34 @@ Task 'Help'  {
     #$lines
     Write-Output "Updating Markdown help in Staging folder: [$DocumentationPath]`n"
 
-    # $null = Import-Module -Name $env:BHPSModuleManifest -Global -Force -PassThru -Verbose
-
     # Cleanup
     Remove-Item -Path $DocumentationPath -Recurse -Force -ErrorAction 'SilentlyContinue'
     Start-Sleep -Seconds 5
     New-Item -Path $DocumentationPath -ItemType 'Directory' | Out-Null
 
-    # Create new Documentation markdown files
-    $platyPSParams = @{
-        Module       = $env:BHProjectName
-        OutputFolder = $DocumentationPath
-        NoMetadata   = $false
-    }
-    New-MarkdownHelp @platyPSParams -ErrorAction 'SilentlyContinue' -Verbose | Out-Null
-    Copy-Item -Path $($DocumentationPath + $env:BHPathDivider + "*.*") -Destination $($env:BHProjectPath + $env:BHPathDivider + "Documentation") -Force
+    # Create new Documentation markdown files (output goes to $DocumentationPath\$ModuleName\)
+    Get-Module -Name $env:BHProjectName |
+        New-MarkdownCommandHelp -OutputFolder $DocumentationPath -Force -ErrorAction 'SilentlyContinue' | Out-Null
 
-    # Create the XML help file which you need when calling get-help mymodule
+    # Sync markdown docs back to the repo Documentation folder
+    $moduleDocPath = Join-Path -Path $DocumentationPath -ChildPath $env:BHProjectName
+    Copy-Item -Path "$moduleDocPath\*.*" -Destination (Join-Path -Path $env:BHProjectPath -ChildPath 'Documentation') -Force
+
+    # Create the MAML help file for Get-Help support
     Write-Output "Now updating External Help for the Module in [$StagingModulePath]"
-    New-ExternalHelp $DocumentationPath -OutputPath $($env:BHBuildCulture + $env:BHPathDivider) -force
-    # Sync help files from the staging folder back to the parent folder
-    Copy-Item -Path $($StagingModulePath + $env:BHPathDivider + $env:BHBuildCulture + $env:BHPathDivider + "*.*") -Destination $($env:BHProjectPath + $env:BHPathDivider + $env:BHBuildCulture) -Force
+    $enUsPath = Join-Path -Path $StagingModulePath -ChildPath $env:BHBuildCulture
+    Get-ChildItem -Path $DocumentationPath -Filter '*.md' -Recurse |
+        Select-Object -ExpandProperty FullName |
+        Import-MarkdownCommandHelp |
+        Export-MamlCommandHelp -OutputFolder $enUsPath -Force | Out-Null
+
+    # Sync MAML back to the repo culture folder (Export-MamlCommandHelp creates a module subfolder)
+    $mamlSourcePath = Join-Path -Path $enUsPath -ChildPath $env:BHProjectName
+    Copy-Item -Path "$mamlSourcePath\*.*" -Destination (Join-Path -Path $env:BHProjectPath -ChildPath $env:BHBuildCulture) -Force
 
     # Update index.md
     Write-Output "Copying index.md...`n"
-    Copy-Item -Path $($env:BHProjectPath + $env:BHPathDivider + "README.md") -Destination $($DocumentationPath + $env:BHPathDivider + "index.md") -Force -Verbose | Out-Null
+    Copy-Item -Path (Join-Path -Path $env:BHProjectPath -ChildPath 'README.md') -Destination (Join-Path -Path $moduleDocPath -ChildPath 'index.md') -Force -Verbose | Out-Null
 }
 
 Task 'UpdateBuildVersion' {
@@ -459,7 +444,7 @@ Task 'Sign' {
     }
     elseif ($PSVersionTable.PSEdition -eq "Core") {
 
-        if (($isMACOS) -or ($isLinux)) {
+        if ($IsMacOS -or $IsLinux) {
             "`n"
             Write-Output "As of August 2019, there is no PowerShell module for PS Core on OSX/Linux that will let you sign a script"
             <#
@@ -485,6 +470,7 @@ Task 'Sign' {
         else {
 
             # If this is PS Core Running on Windows, what version is it? If Win10, great, here's something to try.
+            $OSVer = Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object Version
             if ($OSVer.Version.StartsWith(10)) {
 
                 $ExistingCerts = Get-ChildItem -Path cert:\LocalMachine\My -Recurse -CodeSigningCert

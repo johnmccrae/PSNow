@@ -2,7 +2,6 @@
 /_build-cache/
 .vscode/
 .DS_Store
-.github/
 Scratch/
 Scratch*
 scratch*
