@@ -50,7 +50,7 @@
 
     <parameter name="FunctionFolders"
                type="multichoice"
-               prompt="Select folders to create — press Enter to accept all, or type one letter at a time (P=Public I=Internal C=Classes R=Private B=Binaries), pressing Enter after each, then empty Enter to finish"
+               prompt="Select folders to create. Press Enter immediately to accept ALL folders. To choose a subset: type one letter at a time (P I C R B), pressing Enter after each, then an empty Enter to finish"
                default="0,1,2,3,4">
 
       <choice label="&amp;Public"

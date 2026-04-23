@@ -47,7 +47,7 @@
 
     <parameter name="FunctionFolders"
                type="multichoice"
-               prompt="Select folders to create — press Enter to accept all, or type one letter at a time (P=Public I=Internal C=Classes R=Private B=Binaries D=DSCResources), pressing Enter after each, then empty Enter to finish"
+               prompt="Select folders to create. Press Enter immediately to accept ALL folders. To choose a subset: type one letter at a time (P I C R B D), pressing Enter after each, then an empty Enter to finish"
                default="0,1,2,3,4,5">
 
       <choice label="&amp;Public"
@@ -75,7 +75,7 @@
               help="Adds a DSCResource folder to module root" />
     </parameter>
 
-    <parameter name='Options' type='multichoice' prompt='Select tooling — enter ONE letter per prompt and press Enter, then press Enter again on an empty line when done. Just press Enter now to accept the default (all tooling selected)' default='1,2,3,4,5' store='text' >
+    <parameter name='Options' type='multichoice' prompt='Select tooling to include. Press Enter immediately to accept ALL options. To choose a subset: type one letter at a time (G N P A L), pressing Enter after each, then an empty Enter to finish' default='1,2,3,4,5' store='text' >
       <choice label='&amp;None' help="No tooling options specified." value="None"/>
       <choice label='Add &amp;Git .gitignore file' help="Adds a .gitignore file." value="Git"/>
       <choice label='Add p&amp;sake build script' help="Adds psake build script that generates the module directory for publishing to the PowerShell Gallery." value="psake"/>
