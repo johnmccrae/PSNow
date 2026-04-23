@@ -50,7 +50,7 @@
 
     <parameter name="FunctionFolders"
                type="multichoice"
-               prompt="Please select folders to include"
+               prompt="Select folders to include — type comma-separated numbers from the list below (e.g. 0,3 for Public+Private). Press Enter to accept the default"
                default="0,3">
 
       <choice label="&amp;Public"
