@@ -50,8 +50,8 @@
 
     <parameter name="FunctionFolders"
                type="multichoice"
-               prompt="Select folders to include — type comma-separated letters shown in brackets, e.g. P,R for Public+Private. Press Enter to accept the default"
-               default="0,3">
+               prompt="Select folders to create — press Enter to accept all, or type one letter at a time (P=Public I=Internal C=Classes R=Private B=Binaries), pressing Enter after each, then empty Enter to finish"
+               default="0,1,2,3,4">
 
       <choice label="&amp;Public"
               value="Public"
