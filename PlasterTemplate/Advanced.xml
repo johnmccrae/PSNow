@@ -46,33 +46,22 @@
                prompt="Enter the minimum PS version needed to run this module" />
 
     <parameter name="FunctionFolders"
-               type="multichoice"
-               prompt="&#10;&#10;Select folders to create. Press Enter immediately to accept ALL folders. To choose a subset: type one letter at a time (P I C R B D), pressing Enter after each, then an empty Enter to finish"
-               default="0,1,2,3,4,5">
+               type="choice"
+               prompt="&#10;Select folder layout"
+               default="0">
 
-      <choice label="&amp;Public"
-              value="Public"
-              help="Adds a public folder to module root" />
+      <choice label="&amp;All folders"
+              value="All"
+              help="Creates Public, Internal, Classes, Private, Binaries, and DSCResources" />
 
-      <choice label="&amp;Internal"
-              value="Internal"
-              help="Adds a internal folder to module root" />
+      <choice label="&amp;Standard  (Public + Private)"
+              value="Standard"
+              help="Creates Public and Private — the classic PS module layout" />
 
-      <choice label="&amp;Classes"
-              value="Classes"
-              help="Adds a classes folder to module root" />
+      <choice label="&amp;Minimal   (Public only)"
+              value="Minimal"
+              help="Creates only the Public folder" />
 
-      <choice label="P&amp;rivate"
-              value="Private"
-              help="Adds a private folder to module root" />
-
-      <choice label="&amp;Binaries"
-              value="Binaries"
-              help="Adds a binaries folder to module root" />
-
-      <choice label="&amp;DSCResources"
-              value="DSCResources"
-              help="Adds a DSCResource folder to module root" />
     </parameter>
 
     <parameter name='Options' type='multichoice' prompt='&#10;&#10;Select tooling to include. Press Enter immediately to accept ALL options. To choose a subset: type one letter at a time (G N P A L), pressing Enter after each, then an empty Enter to finish' default='1,2,3,4,5' store='text' >
@@ -99,16 +88,16 @@ Setting up Your Project
         <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" />
 
         <message>Creating Base Folders for module: $PLASTER_PARAM_ModuleName</message>
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Internal&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Classes&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Private&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Binaries&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains &quot;DSCResources&quot;" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\"     condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\"      condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\"      condition="$PLASTER_PARAM_FunctionFolders -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\"     condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
 
 
-        <message condition="$PLASTER_PARAM_FunctionFolders -contains &quot;Public&quot;">
+        <message condition="$true">
 
 Creating First Function File
 ----------------------

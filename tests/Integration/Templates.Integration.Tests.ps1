@@ -154,7 +154,7 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
         Copy-Item "$($script:PSNowRoot)\PlasterTemplate\Extended.xml" `
                   "$($script:PSNowRoot)\PlasterManifest.xml" -Force
 
-        # FunctionFolders default = all folders
+        # FunctionFolders default = All
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
             -DestinationPath   $outDir `
@@ -166,7 +166,7 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
             -GitHubUserName    'testuser' `
             -GitHubRepo        'testrepo' `
             -PowerShellVersion '5.1' `
-            -FunctionFolders   @('Public', 'Internal', 'Classes', 'Private', 'Binaries') `
+            -FunctionFolders   'All' `
             -Force -NoLogo -ErrorAction Stop
 
         $modRoot = Join-Path $outDir $modName
@@ -278,7 +278,7 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
         Copy-Item "$($script:PSNowRoot)\PlasterTemplate\Advanced.xml" `
                   "$($script:PSNowRoot)\PlasterManifest.xml" -Force
 
-        # FunctionFolders default = all folders; Options default = all tooling
+        # FunctionFolders default = All; Options default = all tooling
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
             -DestinationPath   $outDir `
@@ -290,7 +290,7 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
             -GitHubUserName    'testuser' `
             -GitHubRepo        'testrepo' `
             -PowerShellVersion '5.1' `
-            -FunctionFolders   @('Public', 'Internal', 'Classes', 'Private', 'Binaries', 'DSCResources') `
+            -FunctionFolders   'All' `
             -Options           @('Git', 'psake', 'Pester', 'PSScriptAnalyzer', 'platyPS') `
             -Force -NoLogo -ErrorAction Stop
 

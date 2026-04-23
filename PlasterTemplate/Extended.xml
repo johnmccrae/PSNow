@@ -49,29 +49,21 @@
                default="5.1" />
 
     <parameter name="FunctionFolders"
-               type="multichoice"
-               prompt="&#10;&#10;Select folders to create. Press Enter immediately to accept ALL folders. To choose a subset: type one letter at a time (P I C R B), pressing Enter after each, then an empty Enter to finish"
-               default="0,1,2,3,4">
+               type="choice"
+               prompt="&#10;Select folder layout"
+               default="0">
 
-      <choice label="&amp;Public"
-              value="Public"
-              help="Adds a public folder to module root" />
+      <choice label="&amp;All folders"
+              value="All"
+              help="Creates Public, Internal, Classes, Private, and Binaries" />
 
-      <choice label="&amp;Internal"
-              value="Internal"
-              help="Adds an internal folder to module root" />
+      <choice label="&amp;Standard  (Public + Private)"
+              value="Standard"
+              help="Creates Public and Private — the classic PS module layout" />
 
-      <choice label="&amp;Classes"
-              value="Classes"
-              help="Adds a classes folder to module root" />
-
-      <choice label="P&amp;rivate"
-              value="Private"
-              help="Adds a private folder to module root" />
-
-      <choice label="&amp;Binaries"
-              value="Binaries"
-              help="Adds a binaries folder to module root" />
+      <choice label="&amp;Minimal   (Public only)"
+              value="Minimal"
+              help="Creates only the Public folder" />
 
     </parameter>
 
@@ -103,19 +95,18 @@ Setting up Your Module
 
     <message>Creating folders for module: $PLASTER_PARAM_ModuleName</message>
 
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\"
-          condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\"
-          condition="$PLASTER_PARAM_FunctionFolders -contains 'Internal'" />
+          condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\"
-          condition="$PLASTER_PARAM_FunctionFolders -contains 'Classes'" />
+          condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\"
-          condition="$PLASTER_PARAM_FunctionFolders -contains 'Private'" />
+          condition="$PLASTER_PARAM_FunctionFolders -in @('All','Standard')" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\"
-          condition="$PLASTER_PARAM_FunctionFolders -contains 'Binaries'" />
+          condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
 
-    <message condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'">
+    <message condition="$true">
 
 Creating starter function
 -------------------------
@@ -123,8 +114,7 @@ Creating starter function
     </message>
 
     <templateFile source="Scaffold\New-PSNowModuleBase.ps1.template"
-                  destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1"
-                  condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'" />
+                  destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1" />
 
     <message>
 
