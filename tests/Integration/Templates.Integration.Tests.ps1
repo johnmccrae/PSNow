@@ -154,7 +154,7 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
         Copy-Item "$($script:PSNowRoot)\PlasterTemplate\Extended.xml" `
                   "$($script:PSNowRoot)\PlasterManifest.xml" -Force
 
-        # FunctionFolders default (0,3) = Public + Private
+        # FunctionFolders default = all folders
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
             -DestinationPath   $outDir `
@@ -166,7 +166,7 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
             -GitHubUserName    'testuser' `
             -GitHubRepo        'testrepo' `
             -PowerShellVersion '5.1' `
-            -FunctionFolders   @('Public', 'Private') `
+            -FunctionFolders   @('Public', 'Internal', 'Classes', 'Private', 'Binaries') `
             -Force -NoLogo -ErrorAction Stop
 
         $modRoot = Join-Path $outDir $modName
@@ -190,6 +190,9 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
     Context 'Module folders' {
         It 'Creates Public folder'        { "$modRoot\Public"        | Should -Exist }
         It 'Creates Private folder'       { "$modRoot\Private"       | Should -Exist }
+        It 'Creates Internal folder'      { "$modRoot\Internal"      | Should -Exist }
+        It 'Creates Classes folder'       { "$modRoot\Classes"       | Should -Exist }
+        It 'Creates Binaries folder'      { "$modRoot\Binaries"      | Should -Exist }
         It 'Creates Documentation folder' { "$modRoot\Documentation" | Should -Exist }
         It 'Creates Certs folder'         { "$modRoot\Certs"         | Should -Exist }
     }
@@ -275,8 +278,7 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
         Copy-Item "$($script:PSNowRoot)\PlasterTemplate\Advanced.xml" `
                   "$($script:PSNowRoot)\PlasterManifest.xml" -Force
 
-        # FunctionFolders default (0,3) = Public + Private
-        # Options default (1-5) = Git, psake, Pester, PSScriptAnalyzer, platyPS
+        # FunctionFolders default = all folders; Options default = all tooling
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
             -DestinationPath   $outDir `
@@ -288,7 +290,7 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
             -GitHubUserName    'testuser' `
             -GitHubRepo        'testrepo' `
             -PowerShellVersion '5.1' `
-            -FunctionFolders   @('Public', 'Private') `
+            -FunctionFolders   @('Public', 'Internal', 'Classes', 'Private', 'Binaries', 'DSCResources') `
             -Options           @('Git', 'psake', 'Pester', 'PSScriptAnalyzer', 'platyPS') `
             -Force -NoLogo -ErrorAction Stop
 
@@ -314,6 +316,10 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
     Context 'Module folders' {
         It 'Creates Public folder'        { "$modRoot\Public"        | Should -Exist }
         It 'Creates Private folder'       { "$modRoot\Private"       | Should -Exist }
+        It 'Creates Internal folder'      { "$modRoot\Internal"      | Should -Exist }
+        It 'Creates Classes folder'       { "$modRoot\Classes"       | Should -Exist }
+        It 'Creates Binaries folder'      { "$modRoot\Binaries"      | Should -Exist }
+        It 'Creates DSCResources folder'  { "$modRoot\DSCResources"  | Should -Exist }
         It 'Creates Documentation folder' { "$modRoot\Documentation" | Should -Exist }
     }
 
