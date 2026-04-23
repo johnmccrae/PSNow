@@ -110,7 +110,16 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
         if (-not $installed) {
             Install-PSResource -Name $name -Version "[$version]" -Scope CurrentUser -Repository PSGallery -TrustRepository -Quiet
         }
-        Import-Module -Name $name -MinimumVersion $version -Force
+        # Import-Module may fail for modules with native assembly conflicts (e.g. PlatyPS / YamlDotNet).
+        # Those modules are only needed for specific tasks (Help, UpdateRepo) and can be imported
+        # on demand in a fresh session — a failed bootstrap import is non-fatal.
+        try {
+            Import-Module -Name $name -MinimumVersion $version -Force -ErrorAction Stop
+        }
+        catch {
+            Write-Warning "Could not import $name $version into the current session: $_"
+            Write-Warning "$name is installed and will be available for tasks that need it in a fresh session."
+        }
     }
 
     # Remove ResolveDependency PSBoundParameter ready for passthru to PSake
