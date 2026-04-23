@@ -165,6 +165,7 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
             -GitHubUserName    'testuser' `
             -GitHubRepo        'testrepo' `
             -PowerShellVersion '5.1' `
+            -FunctionFolders   @('Public','Internal','Classes','Private','Binaries') `
             -Force -NoLogo -ErrorAction Stop
 
         $modRoot = Join-Path $outDir $modName
@@ -287,6 +288,7 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
             -GitHubUserName    'testuser' `
             -GitHubRepo        'testrepo' `
             -PowerShellVersion '5.1' `
+            -FunctionFolders   @('Public','Internal','Classes','Private','Binaries','DSCResources') `
             -Options           'All' `
             -Force -NoLogo -ErrorAction Stop
 

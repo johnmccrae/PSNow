@@ -45,6 +45,20 @@
                type="text"
                prompt="Enter the minimum PS version needed to run this module" />
 
+    <parameter name="FunctionFolders"
+               type="multichoice"
+               prompt="&#10;Select folders to include (press Enter twice to accept all defaults)"
+               default="0,1,2,3,4,5">
+
+      <choice label="&amp;Public"       value="Public"       help="Adds a Public folder" />
+      <choice label="&amp;Internal"     value="Internal"     help="Adds an Internal folder" />
+      <choice label="&amp;Classes"      value="Classes"      help="Adds a Classes folder" />
+      <choice label="P&amp;rivate"      value="Private"      help="Adds a Private folder" />
+      <choice label="&amp;Binaries"     value="Binaries"     help="Adds a Binaries folder" />
+      <choice label="&amp;DSCResources" value="DSCResources" help="Adds a DSCResources folder" />
+
+    </parameter>
+
     <parameter name='Options' type='choice' prompt='&#10;Select tooling' default='0' store='text' >
       <choice label='&amp;All tooling'      value='All'      help='Git + psake + Pester + PSScriptAnalyzer + platyPS help generation' />
       <choice label='&amp;Standard'         value='Standard' help='Git + psake + Pester + PSScriptAnalyzer (no help generation)' />
@@ -66,12 +80,12 @@ Setting up Your Project
         <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" />
 
         <message>Creating Base Folders for module: $PLASTER_PARAM_ModuleName</message>
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\"       condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\"     condition="$PLASTER_PARAM_FunctionFolders -contains 'Internal'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\"      condition="$PLASTER_PARAM_FunctionFolders -contains 'Classes'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\"      condition="$PLASTER_PARAM_FunctionFolders -contains 'Private'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\"     condition="$PLASTER_PARAM_FunctionFolders -contains 'Binaries'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -contains 'DSCResources'" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
 
 
@@ -81,7 +95,8 @@ Creating First Function File
 ----------------------
 
         </message>
-        <templateFile source="Scaffold\New-PSNowModuleBase.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1" />
+        <templateFile source="Scaffold\New-PSNowModuleBase.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1"
+                      condition="$PLASTER_PARAM_FunctionFolders -contains 'Public'" />
 
         <message>
 
