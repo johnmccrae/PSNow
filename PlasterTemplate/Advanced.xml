@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <plasterManifest xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1" schemaVersion="1.0">
   <metadata>
     <name>ModuleTemplate</name>
@@ -45,32 +45,10 @@
                type="text"
                prompt="Enter the minimum PS version needed to run this module" />
 
-    <parameter name="FunctionFolders"
-               type="choice"
-               prompt="&#10;Select folder layout"
-               default="0">
-
-      <choice label="&amp;All folders"
-              value="All"
-              help="Creates Public, Internal, Classes, Private, Binaries, and DSCResources" />
-
-      <choice label="&amp;Standard  (Public + Private)"
-              value="Standard"
-              help="Creates Public and Private — the classic PS module layout" />
-
-      <choice label="&amp;Minimal   (Public only)"
-              value="Minimal"
-              help="Creates only the Public folder" />
-
-    </parameter>
-
-    <parameter name='Options' type='multichoice' prompt='&#10;&#10;Select tooling to include. Press Enter immediately to accept ALL options. To choose a subset: type one letter at a time (G N P A L), pressing Enter after each, then an empty Enter to finish' default='1,2,3,4,5' store='text' >
-      <choice label='&amp;None' help="No tooling options specified." value="None"/>
-      <choice label='Add &amp;Git .gitignore file' help="Adds a .gitignore file." value="Git"/>
-      <choice label='Add p&amp;sake build script' help="Adds psake build script that generates the module directory for publishing to the PowerShell Gallery." value="psake"/>
-      <choice label='Add &amp;Pester test support' help="Adds test directory and Pester test for the module manifest file." value="Pester"/>
-      <choice label='Add PSScript&amp;Analyzer support' help="Adds script analysis support using PSScriptAnalyzer." value="PSScriptAnalyzer"/>
-      <choice label='Add plat&amp;yPS help generation support' help="Adds help build support using platyPS." value="platyPS"/>
+    <parameter name='Options' type='choice' prompt='&#10;Select tooling' default='0' store='text' >
+      <choice label='&amp;All tooling'      value='All'      help='Git + psake + Pester + PSScriptAnalyzer + platyPS help generation' />
+      <choice label='&amp;Standard'         value='Standard' help='Git + psake + Pester + PSScriptAnalyzer (no help generation)' />
+      <choice label='&amp;None'             value='None'     help='No build tooling — bare module only' />
     </parameter>
 
   </parameters>
@@ -89,22 +67,21 @@ Setting up Your Project
 
         <message>Creating Base Folders for module: $PLASTER_PARAM_ModuleName</message>
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\"     condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\"      condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\"      condition="$PLASTER_PARAM_FunctionFolders -in @('All','Standard')" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\"     condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\DSCResources\" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
 
 
-        <message condition="$true">
+        <message>
 
 Creating First Function File
 ----------------------
 
         </message>
         <templateFile source="Scaffold\New-PSNowModuleBase.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Public\${PLASTER_PARAM_ModuleName}.ps1" />
-
 
         <message>
 
@@ -129,66 +106,66 @@ Staging Support Folders
         <file source="Scaffold\task.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\task.json" />
 
 
-        <message condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;">
+        <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 
 Setting up Support for Git
 --------------------------
 
         </message>
-        <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PLASTER_PARAM_Options -contains &quot;Git&quot;" />
+        <file source=".gitignore" destination="${PLASTER_PARAM_ModuleName}\.gitignore" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
 
-        <message condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;">
+        <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 
 Setting up Support for Psake Build Environment
 ----------------------------------------------
 
         </message>
-        <requireModule name="psake" minimumVersion="4.8.0" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Build\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="Build\build.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="Build\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <templateFile source="Scaffold\build.psake.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="Build\deploy.psdeploy.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Certs\" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
-        <templateFile source="Scaffold\openssl.cfg" destination="${PLASTER_PARAM_ModuleName}\Certs\openssl.cfg" condition="$PLASTER_PARAM_Options -contains &quot;psake&quot;" />
+        <requireModule name="psake" minimumVersion="4.8.0" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Build\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Build\build.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\build.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Build\build.depend.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\build.depend.psd1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <templateFile source="Scaffold\build.psake.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Build\build.psake.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Build\deploy.psdeploy.ps1" destination="${PLASTER_PARAM_ModuleName}\Build\deploy.psdeploy.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Certs\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <templateFile source="Scaffold\openssl.cfg" destination="${PLASTER_PARAM_ModuleName}\Certs\openssl.cfg" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
 
-        <message condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;">
+        <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 
 Setting up Support for Pester
 -----------------------------
 
         </message>
-        <requireModule name="Pester" minimumVersion="5.0.0" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\Analyzer.tests.ps1.example" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Analyzer.tests.ps1.example" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\Environment.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Acceptance\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
-        <file source="Tests\Unit\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" condition="$PLASTER_PARAM_Options -contains &quot;Pester&quot;" />
+        <requireModule name="Pester" minimumVersion="5.0.0" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Common\Analyzer.tests.ps1.example" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Analyzer.tests.ps1.example" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Common\Environment.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Acceptance\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="Tests\Unit\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
 
-        <message condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;">
+        <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 
 Setting up support for PS ScriptAnalyzer
 ----------------------------------------
 
         </message>
-        <file source="Build\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\PSScriptAnalyzerSettings.psd1" condition="$PLASTER_PARAM_Options -contains &quot;PSScriptAnalyzer&quot;" />
+        <file source="Build\PSScriptAnalyzerSettings.psd1" destination="${PLASTER_PARAM_ModuleName}\Build\PSScriptAnalyzerSettings.psd1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
 
-        <message condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;">
+        <message condition="$PLASTER_PARAM_Options -eq 'All'">
 
 Setting up Support for PlatyPS
 ------------------------------
 
         </message>
-        <requireModule name="Microsoft.PowerShell.PlatyPS" minimumVersion="1.0.0" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
-        <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
-        <file source="Scaffold\about_PSNow.help.md" destination="${PLASTER_PARAM_ModuleName}\Help\about_${PLASTER_PARAM_ModuleName}.help.md" condition="$PLASTER_PARAM_Options -contains &quot;platyPS&quot;" />
+        <requireModule name="Microsoft.PowerShell.PlatyPS" minimumVersion="1.0.0" condition="$PLASTER_PARAM_Options -eq 'All'" />
+        <file source="" destination="${PLASTER_PARAM_ModuleName}\Help" condition="$PLASTER_PARAM_Options -eq 'All'" />
+        <file source="Scaffold\about_PSNow.help.md" destination="${PLASTER_PARAM_ModuleName}\Help\about_${PLASTER_PARAM_ModuleName}.help.md" condition="$PLASTER_PARAM_Options -eq 'All'" />
 
         <message>
 
@@ -201,19 +178,19 @@ you correct those by running .\build\build.ps1 -ResolveDependency.
 
         </message>
 
-        <message condition="$PLASTER_PARAM_Options -contains 'Pester'">
+        <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 A Pester test has been executed to validate the module's manifest file.  Add additional tests to the test directory.
 You can run the Pester tests in your project by executing the 'test' task:  '.\build\build.ps1 -tasklist analyze, test'.
 
         </message>
 
-        <message condition="$PLASTER_PARAM_Options -contains 'psake'">
+        <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 You can build your project by executing the 'buildNuget' task: '.\build\build.ps1 -tasklist BuildNuget'.
 Then, publish your project to the PSGallery by typing '.\build\build.ps1 -tasklist publishpsgallery'.
 
         </message>
 
-        <message condition="($PLASTER_PARAM_Options -contains 'psake') -and ($PLASTER_PARAM_Options -contains 'platyPS')">
+        <message condition="($PLASTER_PARAM_Options -in @('All','Standard')) -and ($PLASTER_PARAM_Options -contains 'platyPS')">
 You can generate help and additional documentation using Microsoft.PowerShell.PlatyPS by running the 'build.ps1 -tasklist help' task.
 Add additional documentation written in markdown to the docs directory. You can update the help by
 running the 'build.ps1 -tasklist help' task again.

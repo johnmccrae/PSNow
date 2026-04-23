@@ -48,25 +48,6 @@
                prompt="Minimum PowerShell version required"
                default="5.1" />
 
-    <parameter name="FunctionFolders"
-               type="choice"
-               prompt="&#10;Select folder layout"
-               default="0">
-
-      <choice label="&amp;All folders"
-              value="All"
-              help="Creates Public, Internal, Classes, Private, and Binaries" />
-
-      <choice label="&amp;Standard  (Public + Private)"
-              value="Standard"
-              help="Creates Public and Private — the classic PS module layout" />
-
-      <choice label="&amp;Minimal   (Public only)"
-              value="Minimal"
-              help="Creates only the Public folder" />
-
-    </parameter>
-
   </parameters>
 
   <content>
@@ -96,17 +77,13 @@ Setting up Your Module
     <message>Creating folders for module: $PLASTER_PARAM_ModuleName</message>
 
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Public\" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\"
-          condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\"
-          condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\"
-          condition="$PLASTER_PARAM_FunctionFolders -in @('All','Standard')" />
-    <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\"
-          condition="$PLASTER_PARAM_FunctionFolders -eq 'All'" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Internal\" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Classes\" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Private\" />
+    <file source="" destination="${PLASTER_PARAM_ModuleName}\Binaries\" />
     <file source="" destination="${PLASTER_PARAM_ModuleName}\Documentation\" />
 
-    <message condition="$true">
+    <message>
 
 Creating starter function
 -------------------------
