@@ -6,11 +6,13 @@ function GetPSNowPsVersion {
 
 function GetPSNowOs {
     # Prior to v6, PowerShell was solely on Windows. In v6, the $IsWindows variable was introduced.
+    # Cache once so branch logic reads clearly and avoids repeated helper calls.
     $psVersionMajor = GetPSNowPsVersion
 
     if ($psVersionMajor -lt 6) {
         'Windows'
     }
+    # Order matters: Windows, then macOS, then Linux to match existing behavior and tests.
     elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
         'Windows'
     }
