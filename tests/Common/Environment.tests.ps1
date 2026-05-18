@@ -60,6 +60,8 @@ InModuleScope -ModuleName PSNow {
             }
 
             It "Uses Get-Variable to retrieve IsLinux" {
+                Mock Get-Variable -ParameterFilter { $Name -eq 'IsWindows' -and $ValueOnly } -MockWith { $false }
+                Mock Get-Variable -ParameterFilter { $Name -eq 'IsMacOS' -and $ValueOnly } -MockWith { $false }
                 Mock Get-Variable -ParameterFilter { $Name -eq 'IsLinux' -and $ValueOnly } -MockWith { $true }
                 Mock GetPSNowPsVersion { 6 }
 
@@ -80,7 +82,9 @@ InModuleScope -ModuleName PSNow {
             }
 
             It "Uses Get-Variable to retrieve IsMacOS" {
+                Mock Get-Variable -ParameterFilter { $Name -eq 'IsWindows' -and $ValueOnly } -MockWith { $false }
                 Mock Get-Variable -ParameterFilter { $Name -eq 'IsMacOS' -and $ValueOnly } -MockWith { $true }
+                Mock GetPSNowPsVersion { 6 }
 
                 $null = GetPSNowOs
 

@@ -6,7 +6,9 @@ function GetPSNowPsVersion {
 
 function GetPSNowOs {
     # Prior to v6, PowerShell was solely on Windows. In v6, the $IsWindows variable was introduced.
-    if ((GetPSNowPsVersion) -lt 6) {
+    $psVersionMajor = GetPSNowPsVersion
+
+    if ($psVersionMajor -lt 6) {
         'Windows'
     }
     elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
