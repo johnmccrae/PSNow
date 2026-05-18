@@ -89,7 +89,7 @@ InModuleScope -ModuleName PSNow {
         }
 
         Context "Unknown platform with PowerShell 6 and higher" {
-            It "Throws when no supported OS flags are set" {
+            It "Throws when no supported OS flags are set" -Tag 'Deterministic' {
                 Mock Get-Variable -ParameterFilter { $Name -eq 'IsWindows' -and $ValueOnly } -MockWith { $false }
                 Mock Get-Variable -ParameterFilter { $Name -eq 'IsLinux' -and $ValueOnly } -MockWith { $false }
                 Mock Get-Variable -ParameterFilter { $Name -eq 'IsMacOS' -and $ValueOnly } -MockWith { $false }

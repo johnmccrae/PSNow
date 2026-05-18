@@ -43,8 +43,8 @@ Run commands from the repository root (`C:\localrepo\PSNow`).
 Chosen module: `Private/Get-PSNowEnvironmentVariables.ps1`
 
 ```powershell
-./Build/Build.ps1 -TaskList init
-Invoke-Pester -Path ./tests/Common/Environment.tests.ps1 -Output Detailed
+Import-Module ./PSNow.psd1 -Force
+Invoke-Pester -Path ./tests/Common/Environment.tests.ps1 -Tag Deterministic -Output Detailed
 ```
 
 Deterministic assertion added:
