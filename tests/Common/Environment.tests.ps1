@@ -87,6 +87,17 @@ InModuleScope -ModuleName PSNow {
                 Should -Invoke Get-Variable -ParameterFilter { $Name -eq 'IsMacOS' -and $ValueOnly } -Exactly 1 -Scope It
             }
         }
+
+        Context "Unknown platform with PowerShell 6 and higher" {
+            It "Throws when no supported OS flags are set" {
+                Mock Get-Variable -ParameterFilter { $Name -eq 'IsWindows' -and $ValueOnly } -MockWith { $false }
+                Mock Get-Variable -ParameterFilter { $Name -eq 'IsLinux' -and $ValueOnly } -MockWith { $false }
+                Mock Get-Variable -ParameterFilter { $Name -eq 'IsMacOS' -and $ValueOnly } -MockWith { $false }
+                Mock GetPSNowPsVersion { 6 }
+
+                { GetPSNowOs } | Should -Throw 'Unsupported Operating system!'
+            }
+        }
     }
 
 
