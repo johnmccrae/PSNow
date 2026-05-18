@@ -9,3 +9,23 @@ Currentmodules.txt
 azure-pipelines.yml
 Staging/
 BuildOutput/
+
+# Secret & credential files — NEVER commit these
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+secrets.json
+appsettings.*.json
+.azure/
+.aws/
+.ssh/
+codesigning.pfx
+*.crt
+*.cer
+credentials.xml
+credentials.json
