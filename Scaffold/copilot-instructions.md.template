@@ -1,0 +1,74 @@
+# Copilot Instructions for <%= $PLASTER_PARAM_ModuleName %>
+
+## Project Overview
+
+`<%= $PLASTER_PARAM_ModuleName %>` is a PowerShell module that <!-- TODO: describe what this module does -->.
+
+## Build and Test Commands
+
+```powershell
+# Install dependencies (first run only)
+.\Build\build.ps1 -ResolveDependency
+
+# Run all default tasks
+.\Build\build.ps1
+
+# Run Pester tests
+.\Build\build.ps1 -TaskList Test
+
+# Lint with PSScriptAnalyzer
+.\Build\build.ps1 -TaskList Analyze
+
+# Generate markdown + MAML help
+.\Build\build.ps1 -TaskList Help
+
+# Build a .nupkg artifact
+.\Build\build.ps1 -TaskList BuildNuget
+```
+
+## Repository Layout
+
+```
+Public/          Exported functions — one .ps1 file per function
+Private/         Internal helper functions — not exported
+Tests/
+  Unit/          Pester 5 unit tests (*Tests.ps1)
+  Common/        Shared tests: manifest, help coverage, PSSA
+Build/           build.ps1 entry, build.psake.ps1 tasks, build.depend.psd1
+Documentation/   PlatyPS-generated markdown help
+en-US/           Compiled MAML help (Get-Help output)
+```
+
+## Key Conventions
+
+- One exported function per file; filename must match function name exactly
+- All exported functions require comment-based help (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`)
+- Use `[CmdletBinding()]` and `[OutputType()]` on all functions
+- Construct all paths with `Join-Path` or `$PSScriptRoot`; never hardcode or concatenate paths
+- Follow approved PowerShell verbs: https://learn.microsoft.com/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands
+- Target PowerShell 5.1+ compatibility unless documented otherwise
+
+## Testing
+
+Tests use **Pester 5** syntax: `Should -Be`, `Should -Not -BeNullOrEmpty`, `Should -Invoke`.
+
+```powershell
+# Run a single test file
+Invoke-Pester -Path .\Tests\Unit\<FunctionName>.Tests.ps1 -Output Detailed
+```
+
+New test files go in `Tests\Unit\` and must match the `*Tests.ps1` pattern.
+
+## Environment Variables (set by BuildHelpers)
+
+| Variable | Description |
+|---|---|
+| `$env:BHProjectName` | Module name |
+| `$env:BHProjectPath` | Repository root |
+| `$env:BHModulePath` | Module folder path |
+| `$env:BHPSModuleManifest` | Path to the `.psd1` manifest |
+| `$env:BHBuildCulture` | Locale for help files (e.g. `en-US`) |
+
+## Module-Specific Notes
+
+<!-- TODO: add anything Copilot should know about this module's domain, key functions, or special patterns -->

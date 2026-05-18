@@ -1,4 +1,4 @@
-$functionFolders = @('Public', 'Internal', 'Classes')
+$functionFolders = @('Public', 'Internal', 'Classes', 'Private')
 ForEach ($folder in $functionFolders)
 {
     $folderPath = Join-Path -Path $PSScriptRoot -ChildPath $folder
@@ -13,5 +13,5 @@ ForEach ($folder in $functionFolders)
         }
     }
 }
-$publicFunctions = (Get-ChildItem -Path "$PSScriptRoot\Public" -Filter '*.ps1').BaseName
+$publicFunctions = (Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Public') -Filter '*.ps1' -ErrorAction SilentlyContinue).BaseName
 Export-ModuleMember -Function $publicFunctions

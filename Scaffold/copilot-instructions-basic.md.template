@@ -1,0 +1,26 @@
+# Copilot Instructions for <%= $PLASTER_PARAM_ModuleName %>
+
+## Project Overview
+
+`<%= $PLASTER_PARAM_ModuleName %>` is a PowerShell module that <!-- TODO: describe what this module does -->.
+
+## Repository Layout
+
+```
+Public/          Exported functions — one .ps1 file per function
+Private/         Internal helper functions — not exported
+Documentation/   Help documentation
+```
+
+## Key Conventions
+
+- One exported function per file; filename must match function name exactly
+- All exported functions require comment-based help (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`)
+- Use `[CmdletBinding()]` and `[OutputType()]` on all functions
+- Construct all paths with `Join-Path` or `$PSScriptRoot`; never hardcode or concatenate paths
+- Follow approved PowerShell verbs: https://learn.microsoft.com/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands
+- Target PowerShell 5.1+ compatibility unless documented otherwise
+
+## Module-Specific Notes
+
+<!-- TODO: add anything Copilot should know about this module's domain, key functions, or special patterns -->

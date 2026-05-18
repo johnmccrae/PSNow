@@ -14,7 +14,7 @@ Describe -Name "New-PSNowModule Tests" {
     It 'It should accept 3 parameters'{
         Mock New-PSNowModule -ParameterFilter { $NewModuleName -eq 'Testing' -and $BaseManifest -eq 'Advanced' -and $ModuleRoot -eq 'c:\modules' } -MockWith { $true }
         $null = New-PSNowModule -NewModuleName 'testing' -BaseManifest 'Advanced' -ModuleRoot 'c:\modules'
-        Assert-MockCalled New-PSNowModule -ParameterFilter { $NewModuleName -eq 'Testing' -and $BaseManifest -eq 'Advanced' -and $ModuleRoot -eq 'c:\modules' } -Exactly 1 -Scope It
+        Should -Invoke New-PSNowModule -ParameterFilter { $NewModuleName -eq 'Testing' -and $BaseManifest -eq 'Advanced' -and $ModuleRoot -eq 'c:\modules' } -Exactly 1 -Scope It
     }
 
 }

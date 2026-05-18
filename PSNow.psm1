@@ -5,12 +5,6 @@ if (-not (Get-Module -Name 'Plaster' -ListAvailable)) {
     Install-Module -Name 'Plaster' -Scope 'CurrentUser' -Repository PSGALLERY -Force
 }
 
-if (-not (Test-Path -path .gitignore)){
-    New-Item -ItemType File -Name ".gitignore"
-    Add-Content -Path $($PSScriptRoot + $BHPathDivider + ".gitignore") -Value ".vscode/"
-    Add-Content -Path $($PSScriptRoot + $BHPathDivider + ".gitignore") -Value ".github/"
-}
-
 $Public = @( Get-ChildItem -Path $($PSScriptRoot + $BHPathDivider + "Public" + $BHPathDivider + "*.ps1") -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $($PSScriptRoot + $BHPathDivider + "Private" + $BHPathDivider + "*.ps1") -ErrorAction SilentlyContinue )
 

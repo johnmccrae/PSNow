@@ -1,0 +1,13 @@
+flowchart TD
+    A[User] --> B[New-PSNowModule]
+    B --> C{Template Choice}
+    C -->|Basic| D[Basic.xml]
+    C -->|Extended| E[Extended.xml]
+    C -->|Advanced| F[Advanced.xml]
+    D --> G[Invoke-Plaster]
+    E --> G
+    F --> G
+    G --> H[Generated Module Scaffold]
+
+    I[Build PSake Tasks] --> J[Test + Analyze + Stage]
+    H --> I
