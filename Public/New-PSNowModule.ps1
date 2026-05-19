@@ -49,6 +49,27 @@ function New-PSNowModule {
 
     begin {
         $ErrorActionPreference = 'Stop'
+
+        function Write-PSNowStructuredLog {
+            param (
+                [Parameter(Mandatory = $true)]
+                [string]$Operation,
+
+                [Parameter(Mandatory = $true)]
+                [string]$Status,
+
+                [Parameter(Mandatory = $true)]
+                [System.Collections.IDictionary]$Fields
+            )
+
+            $parts = @("op=$Operation", "status=$Status")
+
+            foreach ($entry in $Fields.GetEnumerator()) {
+                $parts += "$($entry.Key)=$($entry.Value)"
+            }
+
+            Write-Verbose -Message ("[{0}]" -f ($parts -join ', '))
+        }
     }
 
     process {
@@ -139,7 +160,40 @@ function New-PSNowModule {
             # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest.
         }
 
-        Invoke-Plaster @PlasterParams -Force -Verbose
+        $invokePlasterLogFields = [ordered]@{
+            elapsed_ms  = 0
+            module_name = $NewModuleName
+            manifest    = $BaseManifest
+            destination = $ModuleRoot
+        }
+        $invokePlasterStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+        Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'started' -Fields $invokePlasterLogFields
+
+        try {
+            Invoke-Plaster @PlasterParams -Force -Verbose
+            $invokePlasterStopwatch.Stop()
+
+            Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'completed' -Fields ([ordered]@{
+                elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
+                module_name = $NewModuleName
+                manifest    = $BaseManifest
+                destination = $ModuleRoot
+            })
+        }
+        catch {
+            $invokePlasterStopwatch.Stop()
+
+            Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'failed' -Fields ([ordered]@{
+                elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
+                module_name = $NewModuleName
+                manifest    = $BaseManifest
+                destination = $ModuleRoot
+                error       = $_.Exception.Message
+            })
+
+            throw
+        }
 
         $NewModuleName = $NewModuleName -replace '.ps1', ''
         $Path = $($ModuleRoot + $env:BHPathDivider + $NewModuleName)
