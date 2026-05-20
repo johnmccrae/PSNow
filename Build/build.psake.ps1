@@ -168,8 +168,16 @@ Task 'ImportStagingModule' -Depends 'Init' {
     if (Get-Module -Name $env:BHProjectName) {
         Remove-Module -Name $env:BHProjectName
     }
+
+    $moduleImportPath = if (Test-Path -Path $StagingModuleManifestPath) {
+        $StagingModuleManifestPath
+    }
+    else {
+        $StagingModulePath
+    }
+
     # Global scope used for Help creation (Microsoft.PowerShell.PlatyPS)
-    Import-Module -Name $StagingModulePath -ErrorAction 'Stop' -Force -Global
+    Import-Module -Name $moduleImportPath -ErrorAction 'Stop' -Force -Global
 }
 
 
