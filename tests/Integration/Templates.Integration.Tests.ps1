@@ -40,14 +40,23 @@ BeforeAll {
     # Unique per-run folder prevents collision on rapid reruns or parallel agents
     $script:TempBase  = Join-Path ([System.IO.Path]::GetTempPath()) "PSNowInteg_$([guid]::NewGuid().ToString('N').Substring(0,8))"
     New-Item -Path $script:TempBase -ItemType Directory -Force | Out-Null
+
+    # Preserve the original PlasterManifest.xml so it can be restored after tests
+    $mfOriginal = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+    $script:OriginalManifestContent = if (Test-Path $mfOriginal) { Get-Content $mfOriginal -Raw } else { $null }
 }
 
 AfterAll {
     if ($script:TempBase -and (Test-Path $script:TempBase)) {
         Remove-Item $script:TempBase -Recurse -Force -ErrorAction SilentlyContinue
     }
+    # Restore original PlasterManifest.xml rather than leaving it deleted
     $mf = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
-    if (Test-Path $mf) { Remove-Item $mf -Force -ErrorAction SilentlyContinue }
+    if ($null -ne $script:OriginalManifestContent) {
+        Set-Content -Path $mf -Value $script:OriginalManifestContent -NoNewline
+    } elseif (Test-Path $mf) {
+        Remove-Item $mf -Force -ErrorAction SilentlyContinue
+    }
 }
 
 

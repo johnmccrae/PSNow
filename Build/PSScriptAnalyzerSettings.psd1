@@ -17,7 +17,8 @@
     # For instance, the PSAvoidUsingCmdletAliases rule takes a whitelist for aliases you
     # want to allow.
     ExcludeRules = @(
-        'PSAvoidGlobalVars'
+        'PSAvoidGlobalVars',
+        'PSUseBOMForUnicodeEncodedFile'
     )
     # Use Severity when you want to limit the generated diagnostic records to a
     # subset of: Error, Warning and Information.

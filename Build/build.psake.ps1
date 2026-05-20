@@ -222,6 +222,16 @@ Task 'Test' -Depends 'ImportStagingModule' {
     #$lines
     Write-Output "Running Tests against the module`n"
 
+    # Ensure Pester's InModuleScope sees exactly one loaded module instance.
+    $loadedProjectModules = Get-Module -Name $env:BHProjectName -All
+    if ($loadedProjectModules.Count -gt 1) {
+        $loadedProjectModules | Remove-Module -Force -ErrorAction SilentlyContinue
+        $stagedManifestPath = Join-Path -Path $StagingModulePath -ChildPath ("{0}.psd1" -f $env:BHProjectName)
+        if (Test-Path -Path $stagedManifestPath) {
+            Import-Module -Name $stagedManifestPath -Force -ErrorAction Stop
+        }
+    }
+
     # Gather test results. Store them in a variable and file
     $TestFilePath = Join-Path -Path $StagingFolder -ChildPath $TestFile
     $TestResults = Invoke-Pester -Path $TestScripts -PassThru -OutputFormat 'NUnitXml' -OutputFile $TestFilePath

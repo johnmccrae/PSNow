@@ -149,7 +149,6 @@ function New-PSNowModule {
             ModuleName         = $NewModuleName
             #Description       = 'PowerShell Script Module Building Toolkit'
             #Version           = '1.0.0'
-            ModuleAuthor       = '<Your Full Name Goes Here>'
             #CompanyName       = 'ACME Corp'
             #FunctionFolders   = 'public', 'private'
             #Git               = 'Yes'

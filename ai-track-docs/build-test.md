@@ -2,6 +2,26 @@
 
 Run commands from the repository root (`C:\localrepo\PSNow`).
 
+## One-command validation (preferred)
+
+For repeatable local validation, use the wrapper scripts:
+
+```powershell
+./scripts/validate.ps1
+```
+
+```sh
+./scripts/validate.sh
+```
+
+Both scripts run the same steps in order:
+1. `./Build/build.ps1 -ResolveDependency -TaskList init`
+2. `./Build/build.ps1 -TaskList stage`
+3. `./Build/build.ps1 -TaskList analyze`
+4. `./Build/build.ps1 -TaskList test`
+
+CI uses the same two commands in `azure-pipelines.yml`.
+
 ## First-time setup
 ```powershell
 ./Build/Build.ps1 -ResolveDependency
@@ -31,7 +51,9 @@ Run commands from the repository root (`C:\localrepo\PSNow`).
 
 ## Lint + test
 ```powershell
-./Build/Build.ps1 -TaskList analyze,test
+./Build/build.ps1 -TaskList stage
+./Build/build.ps1 -TaskList analyze
+./Build/build.ps1 -TaskList test
 ```
 
 ## Stage output
