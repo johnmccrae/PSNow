@@ -4,8 +4,15 @@ trigger:
 pr:
 - main
 
+strategy:
+  matrix:
+    Windows:
+      vmImage: windows-latest
+    Ubuntu:
+      vmImage: ubuntu-latest
+
 pool:
-  vmImage: ubuntu-latest
+  vmImage: $(vmImage)
 
 steps:
 - task: PowerShell@2

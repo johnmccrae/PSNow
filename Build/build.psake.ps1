@@ -17,8 +17,8 @@ Properties {
 
     # Pester — unit/common/acceptance tests plus template integration tests
     $TestScripts = @(
-        Get-ChildItem "$ProjectRoot\tests\**Tests.ps1"
-        Get-ChildItem "$ProjectRoot\tests\Integration\*Integration.Tests.ps1" -ErrorAction SilentlyContinue
+        Get-ChildItem "$ProjectRoot\Tests\**Tests.ps1"
+        Get-ChildItem "$ProjectRoot\Tests\Integration\*Integration.Tests.ps1" -ErrorAction SilentlyContinue
     )
     $TestFile = "Test-Unit_$($TimeStamp).xml"
 
@@ -149,14 +149,30 @@ Task 'Stage' -Depends 'Clean' {
         Join-Path -Path $ProjectRoot -ChildPath 'Spec'
         Join-Path -Path $ProjectRoot -ChildPath 'Public'
         Join-Path -Path $ProjectRoot -ChildPath 'Private'
-        Join-Path -Path $ProjectRoot -ChildPath 'tests'
+        Join-Path -Path $ProjectRoot -ChildPath 'Tests'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.nuspec'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psm1'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psd1'
         Join-Path -Path $ProjectRoot -ChildPath 'readme.md'
         Join-Path -Path $ProjectRoot -ChildPath 'LICENSE.md'
     )
-    Copy-Item -Path $pathsToCopy -Destination $StagingModulePath -Recurse
+    # Exclude Staging and .git from being copied into itself
+    $pathsToCopy = $pathsToCopy | Where-Object { $_ -ne $StagingFolder -and $_ -notlike "*\.git" }
+    foreach ($path in $pathsToCopy) {
+        if (Test-Path $path) {
+            $items = Get-ChildItem -Path $path -Recurse -Force | Where-Object { $_.FullName -notmatch '\\([.]git|[.]svn|[.]hg|node_modules)(\\|$)' }
+            foreach ($item in $items) {
+                $dest = $item.FullName -replace [regex]::Escape($ProjectRoot), $StagingModulePath
+                if ($item.PSIsContainer) {
+                    if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
+                } else {
+                    $parent = Split-Path $dest -Parent
+                    if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+                    Copy-Item -Path $item.FullName -Destination $dest -Force
+                }
+            }
+        }
+    }
 }
 
 # Import new module
