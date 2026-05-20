@@ -36,6 +36,7 @@ function New-PSNowModule {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrWhiteSpace()]
         [string]$NewModuleName,
 
         [Parameter(Mandatory = $true)]
