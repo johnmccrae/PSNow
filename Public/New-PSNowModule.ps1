@@ -84,8 +84,13 @@ function New-PSNowModule {
                 Remove-Item -Path PlasterManifest.xml
             }
 
+            # Use the canonical filename expected by Plaster on case-sensitive file systems.
+            if (Test-Path $($templateroot + $env:BHPathDivider + "plasterManifest.xml") -PathType Leaf) {
+                Remove-Item -Path plasterManifest.xml
+            }
+
             $plasterdoc = Get-ChildItem $($templateroot + $env:BHPathDivider + "PlasterTemplate") -Filter "$BaseManifest.xml" | ForEach-Object { $_.FullName }
-            Copy-Item -Path $plasterdoc $($templateroot + $env:BHPathDivider + "PlasterManifest.xml")
+            Copy-Item -Path $plasterdoc $($templateroot + $env:BHPathDivider + "plasterManifest.xml")
         }
 
         Set-Item -Path env:\BHPSVersionNumber -Value $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
@@ -170,7 +175,35 @@ function New-PSNowModule {
         Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'started' -Fields $invokePlasterLogFields
 
         try {
-            Invoke-Plaster @PlasterParams -Force -Verbose
+            $invokePlasterParams = @{}
+            foreach ($entry in $PlasterParams.GetEnumerator()) {
+                $invokePlasterParams[$entry.Key] = $entry.Value
+            }
+
+            while ($true) {
+                try {
+                    Invoke-Plaster @invokePlasterParams -Force -Verbose
+                    break
+                }
+                catch [System.Management.Automation.ParameterBindingException] {
+                    # Retry after removing the missing dynamic parameter (if present in our splat).
+                    $missingParameter = [System.Text.RegularExpressions.Regex]::Match(
+                        $_.Exception.Message,
+                        "parameter name '([^']+)'",
+                        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+                    ).Groups[1].Value
+
+                    if ([string]::IsNullOrWhiteSpace($missingParameter) -or -not $invokePlasterParams.ContainsKey($missingParameter)) {
+                        throw
+                    }
+
+                    $invokePlasterParams.Remove($missingParameter) | Out-Null
+                }
+                catch {
+                    throw
+                }
+            }
+
             $invokePlasterStopwatch.Stop()
 
             Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'completed' -Fields ([ordered]@{

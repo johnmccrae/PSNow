@@ -71,7 +71,7 @@ Describe 'Basic template — generated module structure' -Skip:(-not $plasterAva
         New-Item -Path $outDir -ItemType Directory -Force | Out-Null
 
         Copy-Item (Join-Path $script:PSNowRoot 'PlasterTemplate' 'Basic.xml') `
-                  (Join-Path $script:PSNowRoot 'PlasterManifest.xml') -Force
+                  (Join-Path $script:PSNowRoot 'plasterManifest.xml') -Force
 
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
@@ -90,7 +90,9 @@ Describe 'Basic template — generated module structure' -Skip:(-not $plasterAva
     }
 
     AfterAll {
-        $mf = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+        $mfLegacy = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+        if (Test-Path $mfLegacy) { Remove-Item $mfLegacy -Force -ErrorAction SilentlyContinue }
+        $mf = Join-Path $script:PSNowRoot 'plasterManifest.xml'
         if (Test-Path $mf) { Remove-Item $mf -Force -ErrorAction SilentlyContinue }
     }
 
@@ -161,7 +163,7 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
         New-Item -Path $outDir -ItemType Directory -Force | Out-Null
 
         Copy-Item (Join-Path $script:PSNowRoot 'PlasterTemplate' 'Extended.xml') `
-                  (Join-Path $script:PSNowRoot 'PlasterManifest.xml') -Force
+                  (Join-Path $script:PSNowRoot 'plasterManifest.xml') -Force
 
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
@@ -181,7 +183,9 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
     }
 
     AfterAll {
-        $mf = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+        $mfLegacy = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+        if (Test-Path $mfLegacy) { Remove-Item $mfLegacy -Force -ErrorAction SilentlyContinue }
+        $mf = Join-Path $script:PSNowRoot 'plasterManifest.xml'
         if (Test-Path $mf) { Remove-Item $mf -Force -ErrorAction SilentlyContinue }
     }
 
@@ -284,7 +288,7 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
         New-Item -Path $outDir -ItemType Directory -Force | Out-Null
 
         Copy-Item (Join-Path $script:PSNowRoot 'PlasterTemplate' 'Advanced.xml') `
-                  (Join-Path $script:PSNowRoot 'PlasterManifest.xml') -Force
+                  (Join-Path $script:PSNowRoot 'plasterManifest.xml') -Force
 
         Invoke-Plaster `
             -TemplatePath      $script:PSNowRoot `
@@ -305,7 +309,9 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
     }
 
     AfterAll {
-        $mf = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+        $mfLegacy = Join-Path $script:PSNowRoot 'PlasterManifest.xml'
+        if (Test-Path $mfLegacy) { Remove-Item $mfLegacy -Force -ErrorAction SilentlyContinue }
+        $mf = Join-Path $script:PSNowRoot 'plasterManifest.xml'
         if (Test-Path $mf) { Remove-Item $mf -Force -ErrorAction SilentlyContinue }
     }
 

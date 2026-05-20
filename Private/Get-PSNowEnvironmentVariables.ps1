@@ -28,9 +28,14 @@ function GetPSNowOs {
 }
 
 function Get-PSNowTempDirectory {
-    if ((GetPSNowOs) -eq 'macOS') {
+    $currentOs = GetPSNowOs
+
+    if ($currentOs -eq 'macOS') {
         # Special case for macOS using the real path instead of /tmp which is a symlink to this path
         "/private/tmp"
+    }
+    elseif ($currentOs -eq 'Windows') {
+        [System.IO.Path]::GetTempPath()
     }
     else {
         [System.IO.Path]::GetTempPath().TrimEnd([System.IO.Path]::DirectorySeparatorChar)
