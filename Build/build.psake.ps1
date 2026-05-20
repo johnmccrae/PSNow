@@ -17,15 +17,15 @@ Properties {
 
     # Pester — unit/common/acceptance tests plus template integration tests
     $TestScripts = @(
-        Get-ChildItem "$ProjectRoot\Tests\**Tests.ps1"
-        Get-ChildItem "$ProjectRoot\Tests\Integration\*Integration.Tests.ps1" -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path $ProjectRoot 'tests' '**' '*Tests.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path $ProjectRoot 'tests' 'Integration' '*Integration.Tests.ps1') -ErrorAction SilentlyContinue
     )
     $TestFile = "Test-Unit_$($TimeStamp).xml"
 
     # Script Analyzer
     [ValidateSet('Error', 'Warning', 'Any', 'None')]
     $ScriptAnalysisFailBuildOnSeverityLevel = 'Error'
-    $ScriptAnalyzerSettingsPath = "$ProjectRoot\Build\PSScriptAnalyzerSettings.psd1"
+    $ScriptAnalyzerSettingsPath = Join-Path $ProjectRoot 'Build' 'PSScriptAnalyzerSettings.psd1'
 
     # Build
     $ArtifactFolder = Join-Path -Path $ProjectRoot -ChildPath 'BuildOutput'
@@ -149,7 +149,7 @@ Task 'Stage' -Depends 'Clean' {
         Join-Path -Path $ProjectRoot -ChildPath 'Spec'
         Join-Path -Path $ProjectRoot -ChildPath 'Public'
         Join-Path -Path $ProjectRoot -ChildPath 'Private'
-        Join-Path -Path $ProjectRoot -ChildPath 'Tests'
+        Join-Path -Path $ProjectRoot -ChildPath 'tests'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.nuspec'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psm1'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psd1'
