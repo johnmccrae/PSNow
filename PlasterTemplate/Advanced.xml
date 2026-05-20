@@ -114,8 +114,8 @@ Staging Support Folders
 
         </message>
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Spec\" />
-        <templateFile source="Scaffold\PSNow.feature.template" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.feature" />
-        <file source="Scaffold\PSNow.Steps.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.Steps.ps1" />
+        <templateFile source="Scaffold\psnow.feature.template" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.feature" />
+        <file source="Scaffold\psnow.steps.ps1.template" destination="${PLASTER_PARAM_ModuleName}\Spec\${PLASTER_PARAM_ModuleName}.Steps.ps1" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\.vscode" />
         <file source="Scaffold\settings.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\settings.json" />
         <file source="Scaffold\task.json.example" destination="${PLASTER_PARAM_ModuleName}\.vscode\task.json" />
@@ -155,14 +155,14 @@ Setting up Support for Pester
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
         <file source="" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Common\Analyzer.tests.ps1.example" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Analyzer.tests.ps1.example" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Common\Basic.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Common\Environment.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Common\Help.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Common\Manifest.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Acceptance\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
-        <file source="Tests\Unit\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Common\Analyzer.tests.ps1.example" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Analyzer.tests.ps1.example" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Common\Basic.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Common\Environment.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Common\help.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Common\manifest.tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Common\PSSA.Tests.wip.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Common\PSSA.Tests.wip.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Acceptance\Project.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Acceptance\Project.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
+        <file source="tests\Unit\Unit.Tests.ps1" destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" condition="$PLASTER_PARAM_Options -in @('All','Standard')" />
 
         <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
 

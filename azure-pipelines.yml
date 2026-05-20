@@ -1,19 +1,34 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- master
+- main
+
+pr:
+- main
+
+strategy:
+  matrix:
+    Windows:
+      vmImage: windows-latest
+    Ubuntu:
+      vmImage: ubuntu-latest
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: $(vmImage)
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: PowerShell@2
+  displayName: Resolve dependencies and init
+  inputs:
+    pwsh: true
+    targetType: inline
+    script: |
+      ./Build/build.ps1 -ResolveDependency -TaskList init
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: PowerShell@2
+  displayName: Stage, analyze, and test
+  inputs:
+    pwsh: true
+    targetType: inline
+    script: |
+      ./Build/build.ps1 -TaskList stage
+      ./Build/build.ps1 -TaskList analyze
+      ./Build/build.ps1 -TaskList test

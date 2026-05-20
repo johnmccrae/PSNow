@@ -114,11 +114,24 @@ if ($PSBoundParameters.Keys -contains 'ResolveDependency') {
         # Those modules are only needed for specific tasks (Help, UpdateRepo) and can be imported
         # on demand in a fresh session — a failed bootstrap import is non-fatal.
         try {
+            $old = $ErrorActionPreference
+            $ErrorActionPreference = 'Stop'
             Import-Module -Name $name -MinimumVersion $version -Force -ErrorAction Stop
         }
         catch {
+            $all = @(
+                $_.Exception.Message
+                $_.Exception.InnerException?.Message
+            ) -join "`n"
+
+            if ($all -match "YamlDotNet" -and $all -match "already loaded") {
+                Write-Warning "YamlDotNet load collision detected — safe to ignore."
+            }
             Write-Warning "Could not import $name $version into the current session: $_"
             Write-Warning "$name is installed and will be available for tasks that need it in a fresh session."
+        }
+        finally {
+            $ErrorActionPreference = $old
         }
     }
 
@@ -162,14 +175,30 @@ elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly 
 Set-Item -Path Env:BHBuildCulture -Value (get-culture).name
 Set-Item -Path Env:BHBuildSystem -Value "Azure Pipelines"
 
-$manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
-[version]$script:Version = $manifest.ModuleVersion
-Set-Item -Path Env:BHBuildNumber -Value $script:Version
+if (-not $env:BHPSModulePath) {
+    Set-Item -Path Env:BHPSModulePath -Value $env:BHProjectPath
+}
 
-$stagingfolder = (Get-item env:\BHPSModulePath).Value + $env:BHPathDivider + "Staging"
+if (-not $env:BHModulePath) {
+    Set-Item -Path Env:BHModulePath -Value $env:BHProjectPath
+}
+
+if (-not $env:BHProjectName) {
+    $projectManifest = Import-PowerShellDataFile (Get-Item env:\BHPSModuleManifest).Value
+    Set-Item -Path Env:BHProjectName -Value $projectManifest.RootModule.Replace('.psm1', '')
+}
+
+if(-not($env:BHBuildNumber))
+{
+    $manifest = Import-PowerShellDataFile (Get-item env:\BHPSModuleManifest).Value
+    [version]$script:BuildVersionInternal = $manifest.ModuleVersion
+    Set-Item -Path Env:BHBuildNumber -Value $script:BuildVersionInternal
+}
+
+$stagingfolder = Join-Path $ENV:BHProjectPath 'Staging'
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
 
-$publishfolder = $ENV:BHModulePath + $env:BHPathDivider + "Staging" + $env:BHPathDivider + $ENV:BHProjectName
+$publishfolder = Join-Path $ENV:BHProjectPath 'Staging' $ENV:BHProjectName
 Set-Item -Path env:\BHModulePath -Value $publishfolder
 #endregion
 

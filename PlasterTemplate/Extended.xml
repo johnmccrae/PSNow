@@ -161,11 +161,11 @@ Setting up Pester Tests
     <file source=""                                           destination="${PLASTER_PARAM_ModuleName}\Tests\" />
     <file source=""                                           destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\" />
     <file source=""                                           destination="${PLASTER_PARAM_ModuleName}\Tests\Common\" />
-    <file source="Tests\Unit\Unit.Tests.ps1"                 destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" />
-    <file source="Tests\Common\Basic.tests.ps1"              destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" />
-    <file source="Tests\Common\Environment.tests.ps1"        destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" />
-    <file source="Tests\Common\Help.Tests.ps1"               destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" />
-    <file source="Tests\Common\Manifest.Tests.ps1"           destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" />
+    <file source="tests\Unit\Unit.Tests.ps1"                 destination="${PLASTER_PARAM_ModuleName}\Tests\Unit\Unit.Tests.ps1" />
+    <file source="tests\Common\Basic.Tests.ps1"              destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Basic.tests.ps1" />
+    <file source="tests\Common\Environment.tests.ps1"        destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Environment.tests.ps1" />
+    <file source="tests\Common\help.tests.ps1"               destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Help.Tests.ps1" />
+    <file source="tests\Common\manifest.tests.ps1"           destination="${PLASTER_PARAM_ModuleName}\Tests\Common\Manifest.Tests.ps1" />
 
     <message>
 

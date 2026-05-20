@@ -17,15 +17,15 @@ Properties {
 
     # Pester — unit/common/acceptance tests plus template integration tests
     $TestScripts = @(
-        Get-ChildItem "$ProjectRoot\Tests\*\*Tests.ps1"
-        Get-ChildItem "$ProjectRoot\Tests\Integration\*Integration.Tests.ps1" -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path $ProjectRoot 'tests' '**' '*Tests.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path $ProjectRoot 'tests' 'Integration' '*Integration.Tests.ps1') -ErrorAction SilentlyContinue
     )
     $TestFile = "Test-Unit_$($TimeStamp).xml"
 
     # Script Analyzer
     [ValidateSet('Error', 'Warning', 'Any', 'None')]
     $ScriptAnalysisFailBuildOnSeverityLevel = 'Error'
-    $ScriptAnalyzerSettingsPath = "$ProjectRoot\Build\PSScriptAnalyzerSettings.psd1"
+    $ScriptAnalyzerSettingsPath = Join-Path $ProjectRoot 'Build' 'PSScriptAnalyzerSettings.psd1'
 
     # Build
     $ArtifactFolder = Join-Path -Path $ProjectRoot -ChildPath 'BuildOutput'
@@ -149,14 +149,30 @@ Task 'Stage' -Depends 'Clean' {
         Join-Path -Path $ProjectRoot -ChildPath 'Spec'
         Join-Path -Path $ProjectRoot -ChildPath 'Public'
         Join-Path -Path $ProjectRoot -ChildPath 'Private'
-        Join-Path -Path $ProjectRoot -ChildPath 'Tests'
+        Join-Path -Path $ProjectRoot -ChildPath 'tests'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.nuspec'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psm1'
         Join-Path -Path $ProjectRoot -ChildPath 'PSNow.psd1'
         Join-Path -Path $ProjectRoot -ChildPath 'readme.md'
         Join-Path -Path $ProjectRoot -ChildPath 'LICENSE.md'
     )
-    Copy-Item -Path $pathsToCopy -Destination $StagingModulePath -Recurse
+    # Exclude Staging and .git from being copied into itself
+    $pathsToCopy = $pathsToCopy | Where-Object { $_ -ne $StagingFolder -and $_ -notlike "*\.git" }
+    foreach ($path in $pathsToCopy) {
+        if (Test-Path $path) {
+            $items = Get-ChildItem -Path $path -Recurse -Force | Where-Object { $_.FullName -notmatch '\\([.]git|[.]svn|[.]hg|node_modules)(\\|$)' }
+            foreach ($item in $items) {
+                $dest = $item.FullName -replace [regex]::Escape($ProjectRoot), $StagingModulePath
+                if ($item.PSIsContainer) {
+                    if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
+                } else {
+                    $parent = Split-Path $dest -Parent
+                    if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+                    Copy-Item -Path $item.FullName -Destination $dest -Force
+                }
+            }
+        }
+    }
 }
 
 # Import new module
@@ -168,8 +184,16 @@ Task 'ImportStagingModule' -Depends 'Init' {
     if (Get-Module -Name $env:BHProjectName) {
         Remove-Module -Name $env:BHProjectName
     }
+
+    $moduleImportPath = if (Test-Path -Path $StagingModuleManifestPath) {
+        $StagingModuleManifestPath
+    }
+    else {
+        $StagingModulePath
+    }
+
     # Global scope used for Help creation (Microsoft.PowerShell.PlatyPS)
-    Import-Module -Name $StagingModulePath -ErrorAction 'Stop' -Force -Global
+    Import-Module -Name $moduleImportPath -ErrorAction 'Stop' -Force -Global
 }
 
 
@@ -221,6 +245,16 @@ Task 'Analyze' -Depends 'ImportStagingModule' {
 Task 'Test' -Depends 'ImportStagingModule' {
     #$lines
     Write-Output "Running Tests against the module`n"
+
+    # Ensure Pester's InModuleScope sees exactly one loaded module instance.
+    $loadedProjectModules = Get-Module -Name $env:BHProjectName -All
+    if ($loadedProjectModules.Count -gt 1) {
+        $loadedProjectModules | Remove-Module -Force -ErrorAction SilentlyContinue
+        $stagedManifestPath = Join-Path -Path $StagingModulePath -ChildPath ("{0}.psd1" -f $env:BHProjectName)
+        if (Test-Path -Path $stagedManifestPath) {
+            Import-Module -Name $stagedManifestPath -Force -ErrorAction Stop
+        }
+    }
 
     # Gather test results. Store them in a variable and file
     $TestFilePath = Join-Path -Path $StagingFolder -ChildPath $TestFile

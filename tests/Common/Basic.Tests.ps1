@@ -1,5 +1,15 @@
-$moduleName = $Env:BHProjectName
-$moduleroot = $Env:BHModulePath
+$repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$moduleName = if (-not [string]::IsNullOrWhiteSpace($Env:BHProjectName)) { $Env:BHProjectName } else { 'PSNow' }
+$resolvedModuleRoot = Join-Path $repoRoot ("Staging{0}{1}" -f [System.IO.Path]::DirectorySeparatorChar, $moduleName)
+$moduleRoot = if (-not [string]::IsNullOrWhiteSpace($Env:BHModulePath)) {
+    $Env:BHModulePath
+}
+elseif (Test-Path -Path $resolvedModuleRoot) {
+    $resolvedModuleRoot
+}
+else {
+    $repoRoot
+}
 
 Describe "General project validation: $moduleName" {
     Context "Are these valid PowerShell Scripts?"{
