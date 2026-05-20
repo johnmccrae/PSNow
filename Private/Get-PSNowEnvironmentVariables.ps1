@@ -33,7 +33,7 @@ function Get-PSNowTempDirectory {
         "/private/tmp"
     }
     else {
-        [System.IO.Path]::GetTempPath()
+        [System.IO.Path]::GetTempPath().TrimEnd([System.IO.Path]::DirectorySeparatorChar)
     }
 }
 

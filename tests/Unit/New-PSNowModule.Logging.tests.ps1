@@ -2,7 +2,7 @@ Set-StrictMode -Version Latest
 
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $moduleManifestCandidates = @(
-    (Join-Path $repoRoot 'Staging\PSNow\PSNow.psd1')
+    (Join-Path $repoRoot 'Staging' 'PSNow' 'PSNow.psd1')
     (Join-Path $repoRoot 'PSNow.psd1')
 )
 $moduleManifestPath = $moduleManifestCandidates | Where-Object { Test-Path -Path $_ } | Select-Object -First 1
@@ -15,7 +15,7 @@ if (-not [string]::IsNullOrWhiteSpace($moduleManifestPath)) {
 InModuleScope -ModuleName PSNow {
     Describe 'New-PSNowModule structured logging' {
         BeforeEach {
-            $env:BHPathDivider = '\'
+            $env:BHPathDivider = [System.IO.Path]::DirectorySeparatorChar
 
             Mock Get-Variable -ParameterFilter { $Name -eq 'PSVersionTable' -and $ValueOnly } -MockWith {
                 @{ PSVersion = [Version]'5.1.0' }
@@ -28,6 +28,7 @@ InModuleScope -ModuleName PSNow {
             Mock New-Item {}
             Mock Write-Output {}
             Mock Add-Content {}
+            Mock Copy-Item {}
             Mock Write-Verbose {}
             Mock Invoke-Plaster {
                 param(

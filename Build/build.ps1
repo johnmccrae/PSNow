@@ -195,10 +195,10 @@ if(-not($env:BHBuildNumber))
     Set-Item -Path Env:BHBuildNumber -Value $script:BuildVersionInternal
 }
 
-$stagingfolder = (Get-item env:\BHPSModulePath).Value + $env:BHPathDivider + "Staging"
+$stagingfolder = Join-Path $ENV:BHProjectPath 'Staging'
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
 
-$publishfolder = $ENV:BHModulePath + $env:BHPathDivider + "Staging" + $env:BHPathDivider + $ENV:BHProjectName
+$publishfolder = Join-Path $ENV:BHProjectPath 'Staging' $ENV:BHProjectName
 Set-Item -Path env:\BHModulePath -Value $publishfolder
 #endregion
 
