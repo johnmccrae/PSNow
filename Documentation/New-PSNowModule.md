@@ -55,6 +55,16 @@ New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot 
 This choice creates a fully fleshed out PowerShell module with full support for Pester, Git, PlatyPS and more.
 See the Advanced.xml file located in /PlasterTemplate
 
+### Resilience Improvements
+
+The `New-PSNowModule` function includes a retry mechanism for critical operations, such as file creation or Plaster invocation. This mechanism retries up to 3 times with exponential backoff in case of transient errors.
+
+#### Example
+```powershell
+New-PSNowModule -NewModuleName "MyModule" -BaseManifest "Advanced"
+```
+If a transient error occurs during module creation, the function will retry the operation before failing with an error message.
+
 ## PARAMETERS
 
 ### -NewModuleName
