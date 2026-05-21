@@ -230,7 +230,12 @@ function New-PSNowModule {
         $NewModuleName = $NewModuleName -replace '.ps1', ''
         $Path = $($ModuleRoot + $env:BHPathDivider + $NewModuleName)
         Set-Location -Path $Path
-        Write-Output "`nYour module was built at: [$Path]`n"
+        # Safe toggle: PSNOW_SAFE_MODE suppresses path output when set to a truthy value.
+        $safeModeValue = [string]$env:PSNOW_SAFE_MODE
+        $safeModeEnabled = $safeModeValue -match '^(1|true|yes|on)$'
+        if (-not $safeModeEnabled) {
+            Write-Output "`nYour module was built at: [$Path]`n"
+        }
 
         $doc = $($templateroot + $env:BHPathDivider + "currentmodules.txt")
         if (-not (Test-Path -Path $doc)) {
