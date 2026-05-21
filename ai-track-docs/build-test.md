@@ -49,6 +49,26 @@ CI uses the same two commands in `azure-pipelines.yml`.
 ./Build/Build.ps1 -TaskList analyze
 ```
 
+Current lint gate behavior:
+1. Analyzer settings file: `Build/PSScriptAnalyzerSettings.psd1`.
+2. Analyzer runs on staged module content (`Staging/PSNow`) to mirror packaged output.
+3. Severities evaluated: `Warning` and `Error`.
+4. Build fails on `Error` severity by default (`$ScriptAnalysisFailBuildOnSeverityLevel = 'Error'`).
+5. Intentional rule exceptions:
+	- `PSAvoidGlobalVars`
+	- `PSUseBOMForUnicodeEncodedFile`
+	- Alias whitelist for Gherkin keywords: `Given`, `When`, `Then`
+
+To tighten locally (without committing changes), run analyzer manually and fail on any warning:
+
+```powershell
+$settings = Join-Path (Get-Location) 'Build/PSScriptAnalyzerSettings.psd1'
+$path = Join-Path (Get-Location) 'Staging/PSNow'
+$results = Invoke-ScriptAnalyzer -Path $path -Recurse -Settings $settings
+$results | Where-Object { $_.Severity -in @('Warning','Error') } | Format-Table RuleName,Severity,ScriptName,Line,Message -AutoSize
+if (($results | Where-Object { $_.Severity -in @('Warning','Error') }).Count -gt 0) { throw 'Analyzer warnings/errors found.' }
+```
+
 ## Lint + test
 ```powershell
 ./Build/build.ps1 -TaskList stage

@@ -57,7 +57,7 @@ Task Init {
     if((Test-Path $($ProjectRoot + $env:BHPathDivider + ".gitignore")) -eq $true){
         #Add Folders to gitignore. You don't need these in your repo
         $file = Get-Content $($ProjectRoot + $env:BHPathDivider + ".gitignore")
-        $containsWord = $file | % { $_ -match "Staging|BuildOutput" }
+        $containsWord = $file | ForEach-Object { $_ -match "Staging|BuildOutput" }
         if ($containsWord -notcontains $true) {
             Add-Content -Path .gitignore -Value "Staging/"
             Add-Content -Path .gitignore -Value "BuildOutput/"
@@ -202,7 +202,7 @@ Task 'Analyze' -Depends 'ImportStagingModule' {
     #$lines
     Write-Output "Running PSScriptAnalyzer on path: [$StagingModulePath]`n"
 
-    $Results = Invoke-ScriptAnalyzer -Path $StagingFolder -Recurse -Settings $ScriptAnalyzerSettingsPath -Verbose:$VerbosePreference
+    $Results = Invoke-ScriptAnalyzer -Path $StagingModulePath -Recurse -Settings $ScriptAnalyzerSettingsPath -Verbose:$VerbosePreference
     #$Results | Select-Object 'RuleName', 'Severity', 'ScriptName', 'Line', 'Message' | Format-List
     $Results | Select-Object 'RuleName', 'Severity', 'ScriptName', 'Line', 'Message' | foreach {
         if($_.Severity -eq 'Error'){
@@ -233,7 +233,7 @@ Task 'Analyze' -Depends 'ImportStagingModule' {
                     }).Count -eq 0) -failureMessage 'One or more ScriptAnalyzer warnings were found. Build cannot continue!'
         }
         default {
-            Assert -conditionToCheck ($analysisResult.Count -eq 0) -failureMessage 'One or more ScriptAnalyzer issues were found. Build cannot continue!'
+            Assert -conditionToCheck ($Results.Count -eq 0) -failureMessage 'One or more ScriptAnalyzer issues were found. Build cannot continue!'
         }
     }
 }
