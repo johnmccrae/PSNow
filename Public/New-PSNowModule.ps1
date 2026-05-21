@@ -49,27 +49,6 @@ function New-PSNowModule {
 
     begin {
         $ErrorActionPreference = 'Stop'
-
-        function Write-PSNowStructuredLog {
-            param (
-                [Parameter(Mandatory = $true)]
-                [string]$Operation,
-
-                [Parameter(Mandatory = $true)]
-                [string]$Status,
-
-                [Parameter(Mandatory = $true)]
-                [System.Collections.IDictionary]$Fields
-            )
-
-            $parts = @("op=$Operation", "status=$Status")
-
-            foreach ($entry in $Fields.GetEnumerator()) {
-                $parts += "$($entry.Key)=$($entry.Value)"
-            }
-
-            Write-Verbose -Message ("[{0}]" -f ($parts -join ', '))
-        }
     }
 
     process {
@@ -80,22 +59,6 @@ function New-PSNowModule {
         $templateroot = Split-Path $PSScriptRoot -Parent
         Set-Location $templateroot
 
-        function Remove-OldPSNowManifest{
-
-            # check for old plastermanifest and delete it.
-            if (Test-Path $($templateroot + $env:BHPathDivider + "PlasterManifest.xml") -PathType Leaf) {
-                Remove-Item -Path PlasterManifest.xml
-            }
-
-            # Use the canonical filename expected by Plaster on case-sensitive file systems.
-            if (Test-Path $($templateroot + $env:BHPathDivider + "plasterManifest.xml") -PathType Leaf) {
-                Remove-Item -Path plasterManifest.xml
-            }
-
-            $plasterdoc = Get-ChildItem $($templateroot + $env:BHPathDivider + "PlasterTemplate") -Filter "$BaseManifest.xml" | ForEach-Object { $_.FullName }
-            Copy-Item -Path $plasterdoc $($templateroot + $env:BHPathDivider + "plasterManifest.xml")
-        }
-
         Set-Item -Path env:\BHPSVersionNumber -Value $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
 
         $currentOs = GetPSNowOs
@@ -103,7 +66,7 @@ function New-PSNowModule {
         Set-Item -Path env:\BHBuildOS      -Value $currentOs
         Set-Item -Path env:\BHPathDivider  -Value $pathDivider
         Set-Item -Path env:\BHTempDirectory -Value (Get-PSNowTempDirectory)
-        Remove-OldPSNowManifest
+        Remove-OldPSNowManifest -TemplateRoot $templateroot -BaseManifest $BaseManifest
 
         if (!$ModuleRoot) {
             $ModuleRoot = if ($currentOs -eq 'Windows') { 'c:\modules' } else { '~/modules' }
@@ -202,7 +165,7 @@ function New-PSNowModule {
             Write-Output "`nYour module was built at: [$Path]`n"
         }
 
-        $doc = $($templateroot + $env:BHPathDivider + "currentmodules.txt")
+        $doc = Join-Path -Path $templateroot -ChildPath 'currentmodules.txt'
         Add-Content -Path $doc -Value $Path
 
         }
