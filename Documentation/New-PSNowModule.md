@@ -23,6 +23,15 @@ It runs on PSCore and all supported platforms.
 
 ## EXAMPLES
 
+## Safe Mode Toggle
+
+You can control whether the module path output is shown after creation using the environment variable `PSNOW_SAFE_MODE`.
+
+- If `PSNOW_SAFE_MODE` is set to a truthy value (`1`, `true`, `yes`, or `on`), the output message with the module path is suppressed.
+- If it is not set, or set to a non-truthy value (for example `0`), the output message is shown as normal.
+
+This is a simple safety toggle to reduce risk in automation or scripting scenarios.
+
 ### EXAMPLE 1
 ```
 New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest basic
