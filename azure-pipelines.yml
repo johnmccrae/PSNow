@@ -15,6 +15,11 @@ pool:
   vmImage: $(vmImage)
 
 steps:
+- task: NodeTool@0
+  displayName: Use Node.js 20.x (for Mermaid validation)
+  inputs:
+    versionSpec: '20.x'
+
 - task: PowerShell@2
   displayName: Resolve dependencies and init
   inputs:
@@ -32,3 +37,11 @@ steps:
       ./Build/build.ps1 -TaskList stage
       ./Build/build.ps1 -TaskList analyze
       ./Build/build.ps1 -TaskList test
+
+- task: PowerShell@2
+  displayName: Validate architecture diagram render
+  inputs:
+    pwsh: true
+    targetType: inline
+    script: |
+      ./scripts/validate-architecture.ps1
