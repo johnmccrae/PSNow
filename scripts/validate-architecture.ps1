@@ -1,13 +1,18 @@
 [CmdletBinding()]
 param(
     [string]$InputFile = "./ai-track-docs/architecture.mmd",
-    [string]$OutputFile = "./BuildOutput/architecture.svg"
+    [string]$OutputFile = "./BuildOutput/architecture.svg",
+    [string]$PuppeteerConfigFile = "./scripts/mermaid-puppeteer-config.json"
 )
 
 $ErrorActionPreference = 'Stop'
 
 if (-not (Test-Path -Path $InputFile -PathType Leaf)) {
     throw "Architecture diagram source not found: $InputFile"
+}
+
+if (-not (Test-Path -Path $PuppeteerConfigFile -PathType Leaf)) {
+    throw "Puppeteer config not found: $PuppeteerConfigFile"
 }
 
 $outputDirectory = Split-Path -Path $OutputFile -Parent
@@ -24,6 +29,7 @@ $arguments = @(
     '@mermaid-js/mermaid-cli@10.9.1'
     '-i', $InputFile
     '-o', $OutputFile
+    '-p', $PuppeteerConfigFile
 )
 
 npx @arguments
