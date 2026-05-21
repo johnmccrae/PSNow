@@ -73,6 +73,9 @@ function New-PSNowModule {
     }
 
     process {
+        $originalLocation = Get-Location
+
+        try {
 
         $templateroot = Split-Path $PSScriptRoot -Parent
         Set-Location $templateroot
@@ -95,58 +98,20 @@ function New-PSNowModule {
 
         Set-Item -Path env:\BHPSVersionNumber -Value $((Get-Variable 'PSVersionTable' -ValueOnly).PSVersion.Major)
 
-        if ($env:BHPSVersionNumber -lt 6) {
-            Set-Item -Path env:\BHBuildOS -Value 'Windows'
-            Set-Item -Path env:\BHPathDivider -Value "\"
-            Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
-            Remove-OldPSNowManifest
-            if (!$ModuleRoot) {
-                $ModuleRoot = "c:\modules"
-            }
-            if (-not (Test-Path -path $ModuleRoot) ) {
-                New-Item -Path "$ModuleRoot" -ItemType Directory
-            }
-            Set-Location $ModuleRoot
+        $currentOs = GetPSNowOs
+        $pathDivider = if ($currentOs -eq 'Windows') { '\' } else { '/' }
+        Set-Item -Path env:\BHBuildOS      -Value $currentOs
+        Set-Item -Path env:\BHPathDivider  -Value $pathDivider
+        Set-Item -Path env:\BHTempDirectory -Value (Get-PSNowTempDirectory)
+        Remove-OldPSNowManifest
+
+        if (!$ModuleRoot) {
+            $ModuleRoot = if ($currentOs -eq 'Windows') { 'c:\modules' } else { '~/modules' }
         }
-        elseif (Get-Variable -Name 'IsWindows' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
-            Set-Item -Path env:\BHBuildOS -Value 'Windows'
-            Set-Item -Path env:\BHPathDivider -Value "\"
-            Set-Item -Path env:\BHTempDirectory -Value $([System.IO.Path]::GetTempPath())
-            Remove-OldPSNowManifest
-            if (!$ModuleRoot) {
-                $ModuleRoot = "c:\modules"
-            }
-            if (-not (Test-Path -path $ModuleRoot) ) {
-                New-Item -Path "$ModuleRoot" -ItemType Directory
-            }
-            Set-Location $ModuleRoot
+        if (-not (Test-Path -path $ModuleRoot)) {
+            New-Item -Path "$ModuleRoot" -ItemType Directory
         }
-        elseif (Get-Variable -Name 'IsMacOS' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
-            Set-Item -Path env:\BHBuildOS -Value 'macOS'
-            Set-Item -Path env:\BHPathDivider -Value "/"
-            Set-Item -Path env:\BHTempDirectory -Value "/private/tmp"
-            Remove-OldPSNowManifest
-            if (!$ModuleRoot) {
-                $ModuleRoot = "~/modules"
-            }
-            if (-not (Test-Path -path $ModuleRoot) ) {
-                New-Item -Path "$ModuleRoot" -ItemType Directory
-            }
-            Set-Location $ModuleRoot
-        }
-        elseif (Get-Variable -Name 'IsLinux' -ErrorAction 'SilentlyContinue' -ValueOnly ) {
-            Set-Item -Path env:\BHBuildOS -Value 'Linux'
-            Set-Item -Path env:\BHPathDivider -Value "/"
-            Set-Item -Path env:\BHTempDirectory -Value "/tmp"
-            Remove-OldPSNowManifest
-            if (!$ModuleRoot) {
-                $ModuleRoot = "~/modules"
-            }
-            if (-not (Test-Path -path $ModuleRoot) ) {
-                New-Item -Path "$ModuleRoot" -ItemType Directory
-            }
-            Set-Location $ModuleRoot
-        }
+        Set-Location $ModuleRoot
 
         $PlasterParams = @{
             TemplatePath       = $templateroot #where the plaster manifest xml file lives
@@ -227,7 +192,7 @@ function New-PSNowModule {
             throw
         }
 
-        $NewModuleName = $NewModuleName -replace '.ps1', ''
+        $NewModuleName = $NewModuleName -replace '\.ps1$', ''
         $Path = $($ModuleRoot + $env:BHPathDivider + $NewModuleName)
         Set-Location -Path $Path
         # Safe toggle: PSNOW_SAFE_MODE suppresses path output when set to a truthy value.
@@ -238,11 +203,11 @@ function New-PSNowModule {
         }
 
         $doc = $($templateroot + $env:BHPathDivider + "currentmodules.txt")
-        if (-not (Test-Path -Path $doc)) {
-            New-Item -ItemType "file" -Path $doc -Value $Path | Out-Null
+        Add-Content -Path $doc -Value $Path
+
         }
-        else{
-            Add-Content -path $doc -value "`r$Path" | Out-Null
+        finally {
+            Set-Location -Path $originalLocation
         }
     }
 

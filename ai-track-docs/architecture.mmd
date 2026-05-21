@@ -1,13 +1,46 @@
 flowchart TD
-    A[User] --> B[New-PSNowModule]
-    B --> C{Template Choice}
-    C -->|Basic| D[Basic.xml]
-    C -->|Extended| E[Extended.xml]
-    C -->|Advanced| F[Advanced.xml]
-    D --> G[Invoke-Plaster]
-    E --> G
-    F --> G
-    G --> H[Generated Module Scaffold]
+    %% Entry points
+    User[User or CI]
+    ModuleEntry[PSNow.psm1\npath: PSNow.psm1]
+    BuildEntry[Build entry\npath: Build/build.ps1]
+    ValidateScript[Architecture validation\npath: scripts/validate-architecture.ps1]
 
-    I[Build PSake Tasks] --> J[Test + Analyze + Stage]
-    H --> I
+    %% Public commands
+    NewCmd[New-PSNowModule\npath: Public/New-PSNowModule.ps1]
+    FindCmd[Find-PSNowModule\npath: Public/Find-PSNowModule.ps1]
+
+    %% Internal dependencies
+    EnvHelpers[Environment helpers\npath: Private/Get-PSNowEnvironmentVariables.ps1]
+    Templates[Plaster templates\npath: PlasterTemplate/Basic.xml\nPlasterTemplate/Extended.xml\nPlasterTemplate/Advanced.xml]
+    ModuleTracker[currentmodules.txt\npath: currentmodules.txt]
+
+    %% Build and verification
+    PsakeTasks[PSake tasks\npath: Build/build.psake.ps1]
+    ValidationScript[General validation\npath: scripts/validate.ps1]
+    Pipeline[Azure pipeline\npath: azure-pipelines.yml]
+    ArchDiagram[Architecture diagram source\npath: ai-track-docs/architecture.mmd]
+    RenderedDiagram[Rendered diagram artifact\npath: BuildOutput/architecture.svg]
+
+    %% Dependency flow: module import path
+    User --> ModuleEntry
+    ModuleEntry --> NewCmd
+    ModuleEntry --> FindCmd
+    NewCmd --> EnvHelpers
+    NewCmd --> Templates
+
+    %% Data flow: module generation and tracking
+    NewCmd -->|writes generated scaffold| GeneratedModule[Generated module files\npath: <ModuleRoot>/<NewModuleName>/...]
+    NewCmd -->|appends module path| ModuleTracker
+    FindCmd -->|reads module list| ModuleTracker
+
+    %% Build and CI dependency flow
+    User --> BuildEntry
+    BuildEntry --> PsakeTasks
+    ValidationScript --> BuildEntry
+    Pipeline --> BuildEntry
+
+    %% Diagram validation flow
+    User --> ValidateScript
+    Pipeline --> ValidateScript
+    ValidateScript --> ArchDiagram
+    ValidateScript -->|renders to verify syntax and layout| RenderedDiagram
