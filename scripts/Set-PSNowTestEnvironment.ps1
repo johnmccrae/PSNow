@@ -1,4 +1,5 @@
 function Set-PSNowTestEnvironment {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
