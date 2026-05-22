@@ -27,7 +27,7 @@ Invoke-Step -Name 'staging module for test consistency' -ScriptBlock {
 }
 
 . "$PSScriptRoot/Set-PSNowTestEnvironment.ps1"
-$testEnvironment = Set-PSNowTestEnvironment -RepoRoot $repoRoot -ProjectName 'PSNow'
+Set-PSNowTestEnvironment -RepoRoot $repoRoot -ProjectName 'PSNow'
 
 $coveragePaths = @(
     './Staging/PSNow/Public/*.ps1'
