@@ -87,6 +87,22 @@ You should check your code for defects and linting issues by running PS Script A
 ./Build/build.ps1 -tasklist analyze,test
 ```
 
+### Run test coverage locally
+
+PSNow uses Pester as the test runner. Coverage reporting is available through a local helper script that stages the module and runs the full test suite with Pester code coverage enabled.
+
+```powershell
+./scripts/run-coverage.ps1
+```
+
+The command prints a total coverage percentage and writes a summary file to:
+
+```text
+BuildOutput/coverage-summary.txt
+```
+
+Use the reported total coverage percentage in your pull request description.
+
 ### Sign your code with a self-signed certificate
 
 You can sign your code on a Windows device right now but not Linux or OSX. The PKI module support isn't there yet for PS Core on non-windows platforms. If you get an Unknown error it might be because your self-signed certificate isn't trusted in the Root Certificate store. While New-SelfSignedCertificate won't let you store in the Root store, you can do it with Export/Import-Certificate
