@@ -9,6 +9,11 @@ Follow the directions below to get started. The process will ask you some basic 
 
 The New-PSNowModule function uses Plaster to create a robust, fully built out, but empty, module structure. You'll then create your functions and use build.ps1 for everything else. Open build.ps1 and read the comments in the header. The comments will give you an idea of everything you can do with it. Individual build tasks are defined in build.psake.ps1. You can interrogate that file to add your own tweaks.
 
+## Contributing & Onboarding
+
+- [**CONTRIBUTING.md**](CONTRIBUTING.md) — branching strategy, PR expectations, and how to use Copilot with this project.
+- [**Walk Track Onboarding**](Documentation/onboarding-walk.md) — paste-ready Copilot Chat prompt and quick reference for Walk-track exercises.
+
 ## Getting Started
 
 ### Install from the PSGallery and Import the module
