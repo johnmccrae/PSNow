@@ -31,45 +31,42 @@ steps:
   displayName: Install gitleaks (Ubuntu)
   condition: eq(variables['Agent.OS'], 'Linux')
 
-- powershell: |
-    winget install gitleaks --accept-source-agreements --accept-package-agreements --silent
+- script: |
+    winget install --id gitleaks.gitleaks --version 8.30.1 --silent --accept-source-agreements --accept-package-agreements
     $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH','User')
     gitleaks version
   displayName: Install gitleaks (Windows)
   condition: eq(variables['Agent.OS'], 'Windows_NT')
 
-- script: gitleaks detect --source . --config .gitleaks.toml --no-banner
+- script: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
   displayName: Scan for secrets (gitleaks)
-  condition: eq(variables['Agent.OS'], 'Linux')
-
-- powershell: |
-    $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH','User')
-    gitleaks detect --source . --config .gitleaks.toml --no-banner
-  displayName: Scan for secrets (gitleaks)
-  condition: eq(variables['Agent.OS'], 'Windows_NT')
 
 - task: PowerShell@2
   displayName: Resolve dependencies and init
   inputs:
+    targetType: 'filePath'
+    filePath: ./Build/Build.ps1
+    arguments: '-ResolveDependency -TaskList Init'
+    errorActionPreference: 'stop'
+    failOnStderr: false
     pwsh: true
-    targetType: inline
-    script: |
-      ./Build/build.ps1 -ResolveDependency -TaskList init
 
 - task: PowerShell@2
-  displayName: Stage, analyze, and test
+  displayName: Analyze
   inputs:
+    targetType: 'filePath'
+    filePath: ./Build/Build.ps1
+    arguments: '-TaskList Analyze'
+    errorActionPreference: 'stop'
+    failOnStderr: false
     pwsh: true
-    targetType: inline
-    script: |
-      ./Build/build.ps1 -TaskList stage
-      ./Build/build.ps1 -TaskList analyze
-      ./Build/build.ps1 -TaskList test
 
 - task: PowerShell@2
-  displayName: Validate architecture diagram render
+  displayName: Test
   inputs:
+    targetType: 'filePath'
+    filePath: ./Build/Build.ps1
+    arguments: '-TaskList Test'
+    errorActionPreference: 'stop'
+    failOnStderr: false
     pwsh: true
-    targetType: inline
-    script: |
-      ./scripts/validate-architecture.ps1
