@@ -107,34 +107,42 @@ function New-PSNowModule {
             $invokePlasterParams = $PlasterParams.Clone()
             $paramRetryCount = 0
 
-            while ($true) {
-                try {
-                    Invoke-Plaster @invokePlasterParams -Force -Verbose
-                    break
-                }
-                catch [System.Management.Automation.ParameterBindingException] {
-                    # Retry after removing the missing dynamic parameter (if present in our splat).
-                    $missingParameter = [System.Text.RegularExpressions.Regex]::Match(
-                        $_.Exception.Message,
-                        "parameter name '([^']+)'",
-                        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
-                    ).Groups[1].Value
+            # Feature flag: PSNOW_DISABLE_RETRY bypasses the retry loop for fast-fail behaviour.
+            $disableRetry = [string]$env:PSNOW_DISABLE_RETRY -match '^(1|true|yes|on)$'
 
-                    if ([string]::IsNullOrWhiteSpace($missingParameter) -or -not $invokePlasterParams.ContainsKey($missingParameter)) {
+            if ($disableRetry) {
+                Invoke-Plaster @invokePlasterParams -Force -Verbose
+            }
+            else {
+                while ($true) {
+                    try {
+                        Invoke-Plaster @invokePlasterParams -Force -Verbose
+                        break
+                    }
+                    catch [System.Management.Automation.ParameterBindingException] {
+                        # Retry after removing the missing dynamic parameter (if present in our splat).
+                        $missingParameter = [System.Text.RegularExpressions.Regex]::Match(
+                            $_.Exception.Message,
+                            "parameter name '([^']+)'",
+                            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+                        ).Groups[1].Value
+
+                        if ([string]::IsNullOrWhiteSpace($missingParameter) -or -not $invokePlasterParams.ContainsKey($missingParameter)) {
+                            throw
+                        }
+
+                        $paramRetryCount++
+                        Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'retrying' -Fields ([ordered]@{
+                            retry           = $paramRetryCount
+                            removed_param   = $missingParameter
+                            module_name     = $NewModuleName
+                            manifest        = $BaseManifest
+                        })
+                        $invokePlasterParams.Remove($missingParameter) | Out-Null
+                    }
+                    catch {
                         throw
                     }
-
-                    $paramRetryCount++
-                    Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'retrying' -Fields ([ordered]@{
-                        retry           = $paramRetryCount
-                        removed_param   = $missingParameter
-                        module_name     = $NewModuleName
-                        manifest        = $BaseManifest
-                    })
-                    $invokePlasterParams.Remove($missingParameter) | Out-Null
-                }
-                catch {
-                    throw
                 }
             }
 
