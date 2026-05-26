@@ -16,10 +16,10 @@ pool:
   vmImage: $(vmImage)
 
 steps:
-- task: UseNodeV1@1
+- task: UseNode@1
   displayName: Use Node.js 20.x (for Mermaid validation)
   inputs:
-    versionSpec: '20.x'
+    version: '20.x'
 
 - script: |
     GITLEAKS_VERSION=8.30.1
@@ -45,7 +45,7 @@ steps:
   displayName: Resolve dependencies and init
   inputs:
     targetType: 'filePath'
-    filePath: ./Build/Build.ps1
+    filePath: ./Build/build.ps1
     arguments: '-ResolveDependency -TaskList Init'
     errorActionPreference: 'stop'
     failOnStderr: false
@@ -55,7 +55,7 @@ steps:
   displayName: Analyze
   inputs:
     targetType: 'filePath'
-    filePath: ./Build/Build.ps1
+    filePath: ./Build/build.ps1
     arguments: '-TaskList Analyze'
     errorActionPreference: 'stop'
     failOnStderr: false
@@ -65,7 +65,7 @@ steps:
   displayName: Test
   inputs:
     targetType: 'filePath'
-    filePath: ./Build/Build.ps1
+    filePath: ./Build/build.ps1
     arguments: '-TaskList Test'
     errorActionPreference: 'stop'
     failOnStderr: false
