@@ -1,0 +1,18 @@
+# gitleaks configuration for PSNow
+# https://github.com/gitleaks/gitleaks#configuration
+title = "PSNow gitleaks config"
+
+[extend]
+# Use the default ruleset as the base
+useDefault = true
+
+[allowlist]
+description = "Historical commits containing a placeholder/example PAT that was removed from the working tree"
+# The two commits where Scaffold/Publish-MyPSModule.ps1 and Public/Publish-MyPSModule.ps1
+# contained a hardcoded PAT token (kozxlixxi...).  Those files have since been deleted.
+# The token has been treated as compromised and rotated.  These commits are allowlisted
+# so the CI scan does not block on unreachable historical findings.
+commits = [
+    "e316d996ba2fdb95387c970de9e7b1c41b5933fb",
+    "b4c4f8ff732aefd96a808ed0c33499efab96ce34",
+]
