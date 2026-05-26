@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 InModuleScope -ModuleName PSNow {
     Describe 'GetPSNowPsVersion' {
         It 'Returns value of $PSVersionTable.PsVersion.Major' {
-            Mock Get-Variable -ParameterFilter { $Name -eq 'PSVersionTable' -and $ValueOnly } -MockWIth {
+            Mock Get-Variable -ParameterFilter { $Name -eq 'PSVersionTable' -and $ValueOnly } -MockWith {
                 @{ PSVersion = [Version]'5.0.0' }
             }
 
@@ -131,18 +131,18 @@ InModuleScope -ModuleName PSNow {
         }
     }
 
-    if ('Windows' -eq (GetPSNowOs)) {
-        Describe 'Get-PSNowTempRegistry' {
+    Describe 'Get-PSNowTempRegistry' {
+        BeforeEach {
             Mock 'GetPSNowOs' {
                 return 'Windows'
             }
+        }
 
-            It 'return the corret temp registry for Windows' {
+        It 'return the corret temp registry for Windows' -Skip:('Windows' -ne (GetPSNowOs)) {
 
-                $expected = 'Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software\PSNow'
-                $tempPath = Get-PSNowTempRegistry
-                $tempPath | Should -Be $expected
-            }
+            $expected = 'Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software\PSNow'
+            $tempPath = Get-PSNowTempRegistry
+            $tempPath | Should -Be $expected
         }
     }
 }
