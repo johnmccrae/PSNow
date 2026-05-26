@@ -9,6 +9,7 @@ Currentmodules.txt
 azure-pipelines.yml
 Staging/
 BuildOutput/
+coverage.xml
 
 # Secret & credential files — NEVER commit these
 .env
