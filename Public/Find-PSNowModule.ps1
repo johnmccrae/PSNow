@@ -24,15 +24,31 @@ function Find-PSNowModule {
     }
 
     process{
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
         $scriptPath = Split-Path $PSScriptRoot -Parent
         $thefile = Join-Path -Path $scriptPath -ChildPath "currentmodules.txt"
 
         if (-not (Test-Path -Path $thefile)) {
+            $sw.Stop()
+            Write-PSNowStructuredLog -Operation 'find-modules' -Status 'completed' -Fields ([ordered]@{
+                elapsed_ms   = $sw.ElapsedMilliseconds
+                module_count = 0
+                source       = $thefile
+            })
             Write-Output "No modules have been created with PSNow yet."
             return
         }
 
         $modules = Get-Content -Path $thefile
+        $moduleCount = @($modules | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count
+        $sw.Stop()
+
+        Write-PSNowStructuredLog -Operation 'find-modules' -Status 'completed' -Fields ([ordered]@{
+            elapsed_ms   = $sw.ElapsedMilliseconds
+            module_count = $moduleCount
+            source       = $thefile
+        })
+
         Write-Output "`n"
         Write-Output "Here's your list of PSNow Modules"
         Write-Output "---------------------------------"

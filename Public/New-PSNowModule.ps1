@@ -105,6 +105,7 @@ function New-PSNowModule {
         try {
             # .Clone() copies all entries in a single BCL call; faster than iterating key-by-key.
             $invokePlasterParams = $PlasterParams.Clone()
+            $paramRetryCount = 0
 
             while ($true) {
                 try {
@@ -123,6 +124,13 @@ function New-PSNowModule {
                         throw
                     }
 
+                    $paramRetryCount++
+                    Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'retrying' -Fields ([ordered]@{
+                        retry           = $paramRetryCount
+                        removed_param   = $missingParameter
+                        module_name     = $NewModuleName
+                        manifest        = $BaseManifest
+                    })
                     $invokePlasterParams.Remove($missingParameter) | Out-Null
                 }
                 catch {
@@ -133,21 +141,23 @@ function New-PSNowModule {
             $invokePlasterStopwatch.Stop()
 
             Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'completed' -Fields ([ordered]@{
-                elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
-                module_name = $NewModuleName
-                manifest    = $BaseManifest
-                destination = $ModuleRoot
+                elapsed_ms   = $invokePlasterStopwatch.ElapsedMilliseconds
+                module_name  = $NewModuleName
+                manifest     = $BaseManifest
+                destination  = $ModuleRoot
+                param_retries = $paramRetryCount
             })
         }
         catch {
             $invokePlasterStopwatch.Stop()
 
             Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'failed' -Fields ([ordered]@{
-                elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
-                module_name = $NewModuleName
-                manifest    = $BaseManifest
-                destination = $ModuleRoot
-                error       = $_.Exception.Message
+                elapsed_ms   = $invokePlasterStopwatch.ElapsedMilliseconds
+                module_name  = $NewModuleName
+                manifest     = $BaseManifest
+                destination  = $ModuleRoot
+                param_retries = $paramRetryCount
+                error        = $_.Exception.Message
             })
 
             throw
