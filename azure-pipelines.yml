@@ -31,7 +31,7 @@ steps:
   displayName: Install gitleaks (Ubuntu)
   condition: eq(variables['Agent.OS'], 'Linux')
 
-- script: |
+- pwsh: |
     winget install --id gitleaks.gitleaks --version 8.30.1 --silent --accept-source-agreements --accept-package-agreements
     $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH','User')
     gitleaks version
