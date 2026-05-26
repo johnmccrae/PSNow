@@ -38,7 +38,7 @@ steps:
   displayName: Install gitleaks (Windows)
   condition: eq(variables['Agent.OS'], 'Windows_NT')
 
-- script: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
+- pwsh: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
   displayName: Scan for secrets (gitleaks)
 
 - task: PowerShell@2
@@ -47,6 +47,16 @@ steps:
     targetType: 'filePath'
     filePath: ./Build/build.ps1
     arguments: '-ResolveDependency -TaskList Init'
+    errorActionPreference: 'stop'
+    failOnStderr: false
+    pwsh: true
+
+- task: PowerShell@2
+  displayName: Stage module
+  inputs:
+    targetType: 'filePath'
+    filePath: ./Build/build.ps1
+    arguments: '-TaskList Stage'
     errorActionPreference: 'stop'
     failOnStderr: false
     pwsh: true
