@@ -31,7 +31,7 @@ steps:
   displayName: Install gitleaks (Ubuntu)
   condition: eq(variables['Agent.OS'], 'Linux')
 
-- script: |
+- pwsh: |
     winget install --id gitleaks.gitleaks --version 8.30.1 --silent --accept-source-agreements --accept-package-agreements
     $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH','User')
     gitleaks version
@@ -45,7 +45,7 @@ steps:
   displayName: Resolve dependencies and init
   inputs:
     targetType: 'filePath'
-    filePath: ./Build/Build.ps1
+    filePath: ./Build/build.ps1
     arguments: '-ResolveDependency -TaskList Init'
     errorActionPreference: 'stop'
     failOnStderr: false
@@ -55,7 +55,7 @@ steps:
   displayName: Analyze
   inputs:
     targetType: 'filePath'
-    filePath: ./Build/Build.ps1
+    filePath: ./Build/build.ps1
     arguments: '-TaskList Analyze'
     errorActionPreference: 'stop'
     failOnStderr: false
@@ -65,7 +65,7 @@ steps:
   displayName: Test
   inputs:
     targetType: 'filePath'
-    filePath: ./Build/Build.ps1
+    filePath: ./Build/build.ps1
     arguments: '-TaskList Test'
     errorActionPreference: 'stop'
     failOnStderr: false
