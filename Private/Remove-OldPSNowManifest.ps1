@@ -20,7 +20,10 @@ function Remove-OldPSNowManifest {
         Remove-Item -Path $lowerManifest
     }
 
-    $plasterdoc = Get-ChildItem (Join-Path -Path $TemplateRoot -ChildPath 'PlasterTemplate') -Filter "$BaseManifest.xml" |
-        ForEach-Object { $_.FullName }
+    # Direct path construction avoids Get-ChildItem + pipeline overhead for a known filename.
+    $plasterdoc = Join-Path -Path $TemplateRoot -ChildPath "PlasterTemplate\$BaseManifest.xml"
+    if (-not (Test-Path $plasterdoc -PathType Leaf)) {
+        throw "Plaster manifest not found: $plasterdoc"
+    }
     Copy-Item -Path $plasterdoc -Destination $lowerManifest
 }
