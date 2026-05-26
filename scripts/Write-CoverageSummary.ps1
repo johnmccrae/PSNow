@@ -7,20 +7,24 @@ to the Azure Pipelines job summary (##vso[task.uploadsummary]).
 This script is intentionally non-blocking: any failure exits with code 0
 so it cannot prevent a merge.
 #>
+# PSUseBOMForUnicodeEncodedFile: this file contains only ASCII characters; a UTF-8 BOM
+# is not required and would unnecessarily alter the byte-order mark for downstream consumers.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseBOMForUnicodeEncodedFile', '',
+    Justification = 'File contains only ASCII characters; UTF-8 BOM is not required.')]
 [CmdletBinding()]
 param(
     [string]$ProjectRoot = $env:BHProjectPath,
-    [string]$StagingPath = (Join-Path $env:BHProjectPath 'Staging' $env:BHProjectName)
+    [string]$StagingPath = (Join-Path -Path $env:BHProjectPath -ChildPath 'Staging' -AdditionalChildPath $env:BHProjectName)
 )
 
 try {
     $testScripts = @(
-        Get-ChildItem (Join-Path $ProjectRoot 'tests' '**' '*Tests.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path -Path $ProjectRoot -ChildPath 'tests' -AdditionalChildPath '**', '*Tests.ps1') -ErrorAction SilentlyContinue
     )
 
     $sourceFiles = @(
-        Get-ChildItem (Join-Path $StagingPath 'Public'  '*.ps1') -ErrorAction SilentlyContinue
-        Get-ChildItem (Join-Path $StagingPath 'Private' '*.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path -Path $StagingPath -ChildPath 'Public'  -AdditionalChildPath '*.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path -Path $StagingPath -ChildPath 'Private' -AdditionalChildPath '*.ps1') -ErrorAction SilentlyContinue
     )
 
     if ($testScripts.Count -eq 0 -or $sourceFiles.Count -eq 0) {

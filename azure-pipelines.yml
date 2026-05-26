@@ -93,3 +93,22 @@ steps:
     errorActionPreference: 'continue'
     failOnStderr: false
     pwsh: true
+
+- task: PowerShell@2
+  displayName: Strict-PSSA scripts/ (blocking)
+  continueOnError: false
+  inputs:
+    targetType: inline
+    pwsh: true
+    script: |
+      $findings = Invoke-ScriptAnalyzer `
+          -Path scripts/ `
+          -Settings Build/PSScriptAnalyzerSettings.Strict.psd1 `
+          -Severity Warning,Error,Information
+      if ($findings.Count -gt 0) {
+          $findings | ForEach-Object {
+              Write-Host "##[error][$($_.Severity)] $($_.RuleName) at $($_.ScriptName):$($_.Line) — $($_.Message)"
+          }
+          throw "$($findings.Count) strict-PSSA finding(s) in scripts/. Fix or add an inline suppression with Justification."
+      }
+      Write-Host "Strict-PSSA: scripts/ is clean."
