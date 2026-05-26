@@ -33,13 +33,16 @@ steps:
 
 - pwsh: |
     winget install --id gitleaks.gitleaks --version 8.30.1 --silent --accept-source-agreements --accept-package-agreements
+    # Refresh PATH in this session
     $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH','User')
-    gitleaks version
-  displayName: Install gitleaks (Windows)
+    # Run scan in same session where PATH is updated
+    gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
+  displayName: Install gitleaks and scan (Windows)
   condition: eq(variables['Agent.OS'], 'Windows_NT')
 
-- pwsh: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
-  displayName: Scan for secrets (gitleaks)
+- script: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
+  displayName: Scan for secrets (Ubuntu)
+  condition: eq(variables['Agent.OS'], 'Linux')
 
 - task: PowerShell@2
   displayName: Resolve dependencies and init
