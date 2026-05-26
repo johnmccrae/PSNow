@@ -16,7 +16,7 @@ pool:
   vmImage: $(vmImage)
 
 steps:
-- task: NodeTool@0
+- task: UseNodeV1@1
   displayName: Use Node.js 20.x (for Mermaid validation)
   inputs:
     versionSpec: '20.x'
