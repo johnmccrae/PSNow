@@ -3,7 +3,7 @@
 # psake and Plaster are pinned to tested versions; bump only after validation.
 @{
     BuildHelpers                   = '2.0.16'
-    Plaster                        = '1.1.3'
+    Plaster                        = '1.1.4'
     Pester                         = '5.7.1'
     'Microsoft.PowerShell.PlatyPS' = '1.0.1'
     PSake                          = '4.9.0'
