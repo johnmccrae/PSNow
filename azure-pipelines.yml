@@ -83,3 +83,13 @@ steps:
     errorActionPreference: 'stop'
     failOnStderr: false
     pwsh: true
+
+- task: PowerShell@2
+  displayName: Coverage summary (advisory)
+  continueOnError: true
+  inputs:
+    targetType: 'filePath'
+    filePath: ./scripts/Write-CoverageSummary.ps1
+    errorActionPreference: 'continue'
+    failOnStderr: false
+    pwsh: true
