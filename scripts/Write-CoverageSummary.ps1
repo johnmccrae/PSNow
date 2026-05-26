@@ -79,9 +79,9 @@ try {
     $md | Out-File -FilePath $summaryFile -Encoding utf8 -Force
 
     # Upload to Azure Pipelines job summary
-    Write-Host "##vso[task.uploadsummary]$summaryFile"
+    Write-Output "##vso[task.uploadsummary]$summaryFile"
 
-    Write-Host "`nCoverage summary written: $pct% ($passed/$total tests passed)"
+    Write-Output "`nCoverage summary written: $pct% ($passed/$total tests passed)"
 }
 catch {
     Write-Warning "Coverage summary step encountered an error: $_"
