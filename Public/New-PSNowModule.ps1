@@ -103,10 +103,8 @@ function New-PSNowModule {
         Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'started' -Fields $invokePlasterLogFields
 
         try {
-            $invokePlasterParams = @{}
-            foreach ($entry in $PlasterParams.GetEnumerator()) {
-                $invokePlasterParams[$entry.Key] = $entry.Value
-            }
+            # .Clone() copies all entries in a single BCL call; faster than iterating key-by-key.
+            $invokePlasterParams = $PlasterParams.Clone()
 
             while ($true) {
                 try {
