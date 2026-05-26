@@ -60,7 +60,7 @@ InModuleScope -ModuleName PSNow {
             } -Exactly 1 -Scope It
 
             Should -Invoke Write-Verbose -ParameterFilter {
-                $Message -match '^\[op=invoke-plaster, status=completed, elapsed_ms=\d+, module_name=LoggingDemo, manifest=Basic, destination=c:\\modules\]$'
+                $Message -match '^\[op=invoke-plaster, status=completed, elapsed_ms=\d+, module_name=LoggingDemo, manifest=Basic, destination=c:\\modules, param_retries=\d+\]$'
             } -Exactly 1 -Scope It
         }
 
@@ -93,7 +93,7 @@ InModuleScope -ModuleName PSNow {
             } | Should -Throw 'plaster failed'
 
             Should -Invoke Write-Verbose -ParameterFilter {
-                $Message -match '^\[op=invoke-plaster, status=failed, elapsed_ms=\d+, module_name=LoggingDemo, manifest=Basic, destination=c:\\modules, error=plaster failed\]$'
+                $Message -match '^\[op=invoke-plaster, status=failed, elapsed_ms=\d+, module_name=LoggingDemo, manifest=Basic, destination=c:\\modules, param_retries=\d+, error=plaster failed\]$'
             } -Exactly 1 -Scope It
         }
     }
