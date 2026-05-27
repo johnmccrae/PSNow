@@ -3,12 +3,25 @@
 Finds your PSNow created modules
 
 .DESCRIPTION
-When you use PSNow to create a module, it adds the name and location to a file called Currentmodules.txt. That list is returned to you here.
+When you use PSNow to create a module, it adds the name and location to a file called
+Currentmodules.txt. That list is returned to you here.
+
+Blank lines in the tracker file are silently filtered out. Use -Validate to flag
+paths that no longer exist on disk.
+
+.PARAMETER Validate
+When specified, each listed path is tested for existence. Paths that no longer
+exist on disk are marked with [STALE] in the output.
 
 .EXAMPLE
 Find-PSNowModule
 
-There are no parameters to add here, you're just getting a list of modules returned to you.
+Returns the list of all modules created with PSNow.
+
+.EXAMPLE
+Find-PSNowModule -Validate
+
+Returns the list with [STALE] appended to any path that no longer exists on disk.
 
 .NOTES
 General Notes
@@ -16,7 +29,10 @@ General Notes
 #>
 function Find-PSNowModule {
     [CmdletBinding()]
+    [OutputType([string[]])]
     param (
+        [Parameter()]
+        [switch]$Validate
     )
 
     begin {
@@ -39,7 +55,10 @@ function Find-PSNowModule {
             return
         }
 
-        $modules = Get-Content -Path $thefile
+        # Blank lines accumulate when entries are appended across runs.
+        # Filter them on read to keep output clean without modifying the file.
+        $modules = Get-Content -Path $thefile | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+
         Write-PSNowStructuredLog -Operation 'find-modules' -Status 'completed' -Fields ([ordered]@{
             count = $modules.Count
             path  = $thefile
@@ -48,8 +67,13 @@ function Find-PSNowModule {
         Write-Output "`n"
         Write-Output "Here's your list of PSNow Modules"
         Write-Output "---------------------------------"
-        foreach($module in $modules){
-            Write-Output $module
+        foreach ($module in $modules) {
+            if ($Validate -and -not (Test-Path -Path $module -PathType Container)) {
+                Write-Output "$module [STALE]"
+            }
+            else {
+                Write-Output $module
+            }
         }
         Write-Output "`n"
 
