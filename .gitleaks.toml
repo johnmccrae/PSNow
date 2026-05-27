@@ -1,0 +1,12 @@
+[extend]
+# Use the default gitleaks ruleset as a base
+useDefault = true
+
+[allowlist]
+description = "PSNow repo-level allowlist"
+paths = [
+    # Pester coverage output (may contain path strings that look like secrets)
+    "coverage.xml",
+    # Placeholder credential strings used in Plaster template scaffolds
+    '''PlasterTemplate[\\/].*\.xml''',
+]

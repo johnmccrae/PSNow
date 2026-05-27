@@ -32,9 +32,13 @@ steps:
   condition: eq(variables['Agent.OS'], 'Linux')
 
 - pwsh: |
-    winget install --id gitleaks.gitleaks --version 8.30.1 --silent --accept-source-agreements --accept-package-agreements
-    $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH','User')
-    gitleaks version
+    $version = "8.30.1"
+    $gitleaksDir = "C:\tools\gitleaks"
+    New-Item -ItemType Directory -Force -Path $gitleaksDir | Out-Null
+    Invoke-WebRequest -Uri "https://github.com/gitleaks/gitleaks/releases/download/v$version/gitleaks_${version}_windows_x64.zip" -OutFile "$env:TEMP\gitleaks.zip"
+    Expand-Archive -Path "$env:TEMP\gitleaks.zip" -DestinationPath $gitleaksDir -Force
+    Write-Host "##vso[task.prependpath]$gitleaksDir"
+    & "$gitleaksDir\gitleaks.exe" version
   displayName: Install gitleaks (Windows)
   condition: eq(variables['Agent.OS'], 'Windows_NT')
 
