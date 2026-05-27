@@ -103,34 +103,7 @@ function New-PSNowModule {
         Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'started' -Fields $invokePlasterLogFields
 
         try {
-            $invokePlasterParams = @{}
-            foreach ($entry in $PlasterParams.GetEnumerator()) {
-                $invokePlasterParams[$entry.Key] = $entry.Value
-            }
-
-            while ($true) {
-                try {
-                    Invoke-Plaster @invokePlasterParams -Force -Verbose
-                    break
-                }
-                catch [System.Management.Automation.ParameterBindingException] {
-                    # Retry after removing the missing dynamic parameter (if present in our splat).
-                    $missingParameter = [System.Text.RegularExpressions.Regex]::Match(
-                        $_.Exception.Message,
-                        "parameter name '([^']+)'",
-                        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
-                    ).Groups[1].Value
-
-                    if ([string]::IsNullOrWhiteSpace($missingParameter) -or -not $invokePlasterParams.ContainsKey($missingParameter)) {
-                        throw
-                    }
-
-                    $invokePlasterParams.Remove($missingParameter) | Out-Null
-                }
-                catch {
-                    throw
-                }
-            }
+            Invoke-PSNowPlasterSafely -PlasterParams $PlasterParams
 
             $invokePlasterStopwatch.Stop()
 
