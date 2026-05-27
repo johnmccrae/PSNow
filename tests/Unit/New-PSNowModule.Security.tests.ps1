@@ -136,29 +136,39 @@ InModuleScope -ModuleName PSNow {
         }
 
         It 'collapses dotdot sequences in a user-supplied ModuleRoot' {
-            # C:\legitimate\..\Windows\System32 canonicalizes to C:\Windows\System32.
-            # After GetFullPath the resolved path must NOT contain '..'
+            # Use an OS-native absolute path so GetFullPath can canonicalize it.
+            # GetFullPath only fires when IsPathRooted is true on the current OS.
+            $traversalPath = if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
+                'C:\legitimate\..\safe'
+            } else {
+                '/tmp/PSNow-legitimate/../safe'
+            }
             $script:capturedDest = $null
             Mock Invoke-PSNowPlasterSafely {
                 param([hashtable]$PlasterParams)
                 $script:capturedDest = $PlasterParams.Destination
             }
 
-            New-PSNowModule -NewModuleName 'TraversalTest' -BaseManifest 'Basic' -ModuleRoot 'C:\legitimate\..\safe'
+            New-PSNowModule -NewModuleName 'TraversalTest' -BaseManifest 'Basic' -ModuleRoot $traversalPath
 
             $script:capturedDest | Should -Not -Match '\.\.'
         }
 
         It 'accepts a straight absolute path unchanged' {
+            $straightPath = if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
+                'C:\modules'
+            } else {
+                '/tmp/PSNow-modules'
+            }
             $script:capturedDest = $null
             Mock Invoke-PSNowPlasterSafely {
                 param([hashtable]$PlasterParams)
                 $script:capturedDest = $PlasterParams.Destination
             }
 
-            New-PSNowModule -NewModuleName 'StraightPath' -BaseManifest 'Basic' -ModuleRoot 'C:\modules'
+            New-PSNowModule -NewModuleName 'StraightPath' -BaseManifest 'Basic' -ModuleRoot $straightPath
 
-            $script:capturedDest | Should -Be 'C:\modules'
+            $script:capturedDest | Should -Be $straightPath
         }
     }
 }

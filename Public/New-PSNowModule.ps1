@@ -73,11 +73,17 @@ function New-PSNowModule {
             $ModuleRoot = if ($currentOs -eq 'Windows') { 'c:\modules' } else { '~/modules' }
         }
         else {
-            # Canonicalize user-supplied path to prevent directory traversal via '..' sequences
+            # Canonicalize user-supplied path to prevent directory traversal via '..' sequences.
+            # Tilde must be expanded first because GetFullPath does not understand it.
             if ($ModuleRoot -match '^~') {
                 $ModuleRoot = $ModuleRoot -replace '^~', $HOME
             }
-            $ModuleRoot = [System.IO.Path]::GetFullPath($ModuleRoot)
+            # Only call GetFullPath on paths that are absolute on the current OS.
+            # On Linux, Windows-style paths (C:\foo) are not rooted and GetFullPath
+            # would incorrectly prepend the working directory.
+            if ([System.IO.Path]::IsPathRooted($ModuleRoot)) {
+                $ModuleRoot = [System.IO.Path]::GetFullPath($ModuleRoot)
+            }
         }
 
         if ($PSCmdlet.ShouldProcess($ModuleRoot, "Create new PS module '$NewModuleName'")) {
