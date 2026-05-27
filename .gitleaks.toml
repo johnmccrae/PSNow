@@ -4,6 +4,16 @@ useDefault = true
 
 [allowlist]
 description = "PSNow repo-level allowlist"
+
+# These two commits contain a placeholder PAT token in scaffold/publish helper scripts
+# that were subsequently deleted from the repo. The token is an example value, not a
+# live credential, but it matches the generic-api-key rule in git history.
+# Commits are allowlisted here rather than rewriting history on a shared branch.
+commits = [
+    "e316d996ba2fdb95387c970de9e7b1c41b5933fb",
+    "b4c4f8ff732aefd96a808ed0c33499efab96ce34",
+]
+
 paths = [
     # Pester coverage output (may contain path strings that look like secrets)
     "coverage.xml",
