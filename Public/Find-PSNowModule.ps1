@@ -39,7 +39,11 @@ function Find-PSNowModule {
             return
         }
 
-        $modules = Get-Content -Path $thefile
+        # Wrap file read with retry: currentmodules.txt may be briefly locked
+        # (e.g. antivirus scan, concurrent write) on first access.
+        $modules = Invoke-PSNowWithRetry -Operation { Get-Content -Path $thefile } `
+            -MaxRetries 3 -InitialDelayMs 200 `
+            -RetryOnExceptionType @([System.IO.IOException], [System.UnauthorizedAccessException])
         $moduleCount = @($modules | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count
         $sw.Stop()
 
