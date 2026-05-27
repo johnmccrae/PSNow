@@ -33,10 +33,11 @@ This choice creates a fully fleshed out PowerShell module with full support for 
 General Notes
 #>
 function New-PSNowModule {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrWhiteSpace()]
+        [ValidatePattern('^[a-zA-Z][a-zA-Z0-9._-]{0,63}$')]
         [string]$NewModuleName,
 
         [Parameter(Mandatory = $true)]
@@ -71,75 +72,85 @@ function New-PSNowModule {
         if (!$ModuleRoot) {
             $ModuleRoot = if ($currentOs -eq 'Windows') { 'c:\modules' } else { '~/modules' }
         }
-        if (-not (Test-Path -path $ModuleRoot)) {
-            New-Item -Path "$ModuleRoot" -ItemType Directory
-        }
-        Set-Location $ModuleRoot
-
-        $PlasterParams = @{
-            TemplatePath       = $templateroot #where the plaster manifest xml file lives
-            Destination        = $ModuleRoot #where my new module is going to live
-            ModuleName         = $NewModuleName
-            #Description       = 'PowerShell Script Module Building Toolkit'
-            #Version           = '1.0.0'
-            #CompanyName       = 'ACME Corp'
-            #FunctionFolders   = 'public', 'private'
-            #Git               = 'Yes'
-            GitHubUserName	   = $env:BHGitHubUser
-            #GitHubRepo        = 'ModuleBuildTools'
-            #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
-            PowerShellVersion  = '5.0' #minimum PS version
-            # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest.
+        else {
+            # Canonicalize user-supplied path to prevent directory traversal via '..' sequences
+            if ($ModuleRoot -match '^~') {
+                $ModuleRoot = $ModuleRoot -replace '^~', $HOME
+            }
+            $ModuleRoot = [System.IO.Path]::GetFullPath($ModuleRoot)
         }
 
-        $invokePlasterLogFields = [ordered]@{
-            elapsed_ms  = 0
-            module_name = $NewModuleName
-            manifest    = $BaseManifest
-            destination = $ModuleRoot
-        }
-        $invokePlasterStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        if ($PSCmdlet.ShouldProcess($ModuleRoot, "Create new PS module '$NewModuleName'")) {
+            if (-not (Test-Path -path $ModuleRoot)) {
+                New-Item -Path "$ModuleRoot" -ItemType Directory
+            }
+            Set-Location $ModuleRoot
 
-        Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'started' -Fields $invokePlasterLogFields
+            $PlasterParams = @{
+                TemplatePath       = $templateroot #where the plaster manifest xml file lives
+                Destination        = $ModuleRoot #where my new module is going to live
+                ModuleName         = $NewModuleName
+                #Description       = 'PowerShell Script Module Building Toolkit'
+                #Version           = '1.0.0'
+                #CompanyName       = 'ACME Corp'
+                #FunctionFolders   = 'public', 'private'
+                #Git               = 'Yes'
+                GitHubUserName	   = $env:BHGitHubUser
+                #GitHubRepo        = 'ModuleBuildTools'
+                #Options           = ('License', 'Readme', 'GitIgnore', 'GitAttributes')
+                PowerShellVersion  = '5.0' #minimum PS version
+                # Apart from Templatepath and Destination, these parameters need to match what's in the <parameters> section of the manifest.
+            }
 
-        try {
-            Invoke-PSNowPlasterSafely -PlasterParams $PlasterParams
-
-            $invokePlasterStopwatch.Stop()
-
-            Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'completed' -Fields ([ordered]@{
-                elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
+            $invokePlasterLogFields = [ordered]@{
+                elapsed_ms  = 0
                 module_name = $NewModuleName
                 manifest    = $BaseManifest
                 destination = $ModuleRoot
-            })
+            }
+            $invokePlasterStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+            Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'started' -Fields $invokePlasterLogFields
+
+            try {
+                Invoke-PSNowPlasterSafely -PlasterParams $PlasterParams
+
+                $invokePlasterStopwatch.Stop()
+
+                Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'completed' -Fields ([ordered]@{
+                    elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
+                    module_name = $NewModuleName
+                    manifest    = $BaseManifest
+                    destination = $ModuleRoot
+                })
+            }
+            catch {
+                $invokePlasterStopwatch.Stop()
+
+                Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'failed' -Fields ([ordered]@{
+                    elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
+                    module_name = $NewModuleName
+                    manifest    = $BaseManifest
+                    destination = $ModuleRoot
+                    error       = $_.Exception.Message
+                })
+
+                throw
+            }
+
+            $NewModuleName = $NewModuleName -replace '\.ps1$', ''
+            $Path = $($ModuleRoot + $env:BHPathDivider + $NewModuleName)
+            Set-Location -Path $Path
+            # Safe toggle: PSNOW_SAFE_MODE suppresses path output when set to a truthy value.
+            $safeModeValue = [string]$env:PSNOW_SAFE_MODE
+            $safeModeEnabled = $safeModeValue -match '^(1|true|yes|on)$'
+            if (-not $safeModeEnabled) {
+                Write-Output "`nYour module was built at: [$Path]`n"
+            }
+
+            $doc = Join-Path -Path $templateroot -ChildPath 'currentmodules.txt'
+            Add-Content -Path $doc -Value $Path
         }
-        catch {
-            $invokePlasterStopwatch.Stop()
-
-            Write-PSNowStructuredLog -Operation 'invoke-plaster' -Status 'failed' -Fields ([ordered]@{
-                elapsed_ms  = $invokePlasterStopwatch.ElapsedMilliseconds
-                module_name = $NewModuleName
-                manifest    = $BaseManifest
-                destination = $ModuleRoot
-                error       = $_.Exception.Message
-            })
-
-            throw
-        }
-
-        $NewModuleName = $NewModuleName -replace '\.ps1$', ''
-        $Path = $($ModuleRoot + $env:BHPathDivider + $NewModuleName)
-        Set-Location -Path $Path
-        # Safe toggle: PSNOW_SAFE_MODE suppresses path output when set to a truthy value.
-        $safeModeValue = [string]$env:PSNOW_SAFE_MODE
-        $safeModeEnabled = $safeModeValue -match '^(1|true|yes|on)$'
-        if (-not $safeModeEnabled) {
-            Write-Output "`nYour module was built at: [$Path]`n"
-        }
-
-        $doc = Join-Path -Path $templateroot -ChildPath 'currentmodules.txt'
-        Add-Content -Path $doc -Value $Path
 
         }
         finally {
