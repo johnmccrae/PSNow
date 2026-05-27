@@ -3,17 +3,23 @@ trigger:
 
 pr:
 - main
-- walk-ex*
+- run-ex*
 
 strategy:
   matrix:
     Windows:
       vmImage: windows-latest
+      PSMODULE_CACHE_PATH: $(UserProfile)\Documents\PowerShell\Modules
     Ubuntu:
       vmImage: ubuntu-latest
+      PSMODULE_CACHE_PATH: $(HOME)/.local/share/powershell/Modules
 
 pool:
   vmImage: $(vmImage)
+
+# Safety net: abort a stuck run before it consumes the full pipeline quota.
+# 20 minutes is generous for a run that normally completes in ~5-7 minutes.
+timeoutInMinutes: 20
 
 steps:
 - task: UseNode@1
@@ -44,6 +50,17 @@ steps:
 
 - pwsh: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
   displayName: Scan for secrets (gitleaks)
+
+# Cache PowerShell modules keyed on the dependency manifest + OS.
+# A cache hit skips all PSGallery downloads, saving ~2-3 min per matrix leg.
+# The cache key uses "v2" so a manual bust is possible by incrementing the prefix.
+- task: Cache@2
+  displayName: Cache PowerShell module dependencies
+  inputs:
+    key: '"psdeps-v2" | "$(Agent.OS)" | Build/build.depend.psd1'
+    restoreKeys: |
+      "psdeps-v2" | "$(Agent.OS)"
+    path: $(PSMODULE_CACHE_PATH)
 
 - task: PowerShell@2
   displayName: Resolve dependencies and init
