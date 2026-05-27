@@ -1,50 +1,23 @@
 Describe "New-PSNowModule Resilience Tests" {
     BeforeAll {
-        function Invoke-WithRetry {
-            param (
-                [Parameter(Mandatory = $true)]
-                [scriptblock]$Operation,
-
-                [int]$MaxRetries = 3,
-
-                [int]$InitialDelaySeconds = 2
-            )
-
-            $attempt = 0
-            while ($attempt -lt $MaxRetries) {
-                try {
-                    & $Operation
-                    return
-                } catch {
-                    $attempt++
-                    if ($attempt -ge $MaxRetries) {
-                        throw "Operation failed after $MaxRetries attempts: $_"
-                    }
-                    Start-Sleep -Seconds ($InitialDelaySeconds * [math]::Pow(2, $attempt - 1))
-                }
-            }
-        }
+        # Load the real Private helper so tests exercise production code.
+        $privatePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Private\Invoke-PSNowWithRetry.ps1'
+        . (Resolve-Path -Path $privatePath)
     }
 
-    It "Retries on transient failure and succeeds" {
-        # Mock the operation to fail twice before succeeding
-        $attempt = 0
-        $mockOperation = {
-            $attempt++
-            if ($attempt -lt 3) {
-                throw "Transient error"
-            }
-        }
+    It "Retries on transient failure and eventually succeeds" {
+        $state = @{ callCount = 0 }
+        $op = { $state.callCount++; if ($state.callCount -lt 3) { throw "Transient error" } }
 
-        # Test the retry mechanism
-        { Invoke-WithRetry -Operation $mockOperation -MaxRetries 3 -InitialDelaySeconds 1 } | Should -Not -Throw
+        # MaxRetries=3, InitialDelayMs=0 to avoid wall-clock delay in tests.
+        { Invoke-PSNowWithRetry -Operation $op -MaxRetries 3 -InitialDelayMs 0 } | Should -Not -Throw
+        $state.callCount | Should -Be 3
     }
 
-    It "Fails after maximum retries" {
-        # Mock the operation to always fail
-        $mockOperation = { throw "Persistent error" }
+    It "Throws after all attempts are exhausted" {
+        $op = { throw "Persistent error" }
 
-        # Test the retry mechanism
-        { Invoke-WithRetry -Operation $mockOperation -MaxRetries 3 -InitialDelaySeconds 1 } | Should -Throw -ExpectedMessage "Operation failed after 3 attempts: Persistent error"
+        { Invoke-PSNowWithRetry -Operation $op -MaxRetries 3 -InitialDelayMs 0 } |
+            Should -Throw -ExpectedMessage "*Operation failed after 3 attempt(s)*"
     }
 }
