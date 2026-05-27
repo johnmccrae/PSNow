@@ -55,15 +55,32 @@ New-PSNowModule -NewModuleName "MyFabModule" -BaseManifest Advanced -ModuleRoot 
 This choice creates a fully fleshed out PowerShell module with full support for Pester, Git, PlatyPS and more.
 See the Advanced.xml file located in /PlasterTemplate
 
-### Resilience Improvements
+### Resilience — Plaster Parameter Stripping
 
-The `New-PSNowModule` function includes a retry mechanism for critical operations, such as file creation or Plaster invocation. This mechanism retries up to 3 times with exponential backoff in case of transient errors.
+`New-PSNowModule` delegates Plaster invocation to the private helper  
+`Private/Invoke-PSNowPlasterSafely.ps1`.
+
+When `Invoke-Plaster` raises a `ParameterBindingException` for an unrecognised  
+parameter (e.g. a template-specific dynamic parameter that the selected manifest  
+does not declare), the helper:
+
+1. Extracts the offending parameter name from the exception message.  
+2. Removes it from the splat.  
+3. Retries `Invoke-Plaster` with the reduced parameter set.  
+4. Repeats until the call succeeds or until no further named parameter can be  
+   stripped — at which point the exception is rethrown.
+
+There is **no fixed retry cap** and **no backoff delay**.  
+This mechanism handles only `ParameterBindingException`; all other exception  
+types are rethrown immediately.
+
+> **Note:** File-system operations (e.g. creating `$ModuleRoot`) do **not** have  
+> a retry wrapper. Only Plaster invocation is protected.
 
 #### Example
 ```powershell
 New-PSNowModule -NewModuleName "MyModule" -BaseManifest "Advanced"
 ```
-If a transient error occurs during module creation, the function will retry the operation before failing with an error message.
 
 ## PARAMETERS
 
@@ -121,6 +138,69 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
-General Notes
+
+### Structured Logging
+
+Every call to `Invoke-Plaster` is bracketed by two structured log entries written  
+by `Private/Write-PSNowStructuredLog.ps1`:
+
+| Event | Fields logged |
+|---|---|
+| `invoke-plaster / started` | `module_name`, `manifest`, `destination`, `elapsed_ms = 0` |
+| `invoke-plaster / completed` | same fields plus actual `elapsed_ms` |
+| `invoke-plaster / failed` | same fields plus `error` (exception message) |
+
+Log output goes to the PowerShell information stream (visible with `-Verbose`).
+
+### Key File Paths
+
+| Path | Purpose |
+|---|---|
+| `Public/New-PSNowModule.ps1` | This function |
+| `Private/Invoke-PSNowPlasterSafely.ps1` | Plaster invocation + parameter-stripping retry |
+| `Private/Write-PSNowStructuredLog.ps1` | Structured log emitter |
+| `Private/Remove-OldPSNowManifest.ps1` | Cleans up stale `PlasterManifest.xml` before each run |
+| `PlasterTemplate/Basic.xml` | Minimal module scaffold |
+| `PlasterTemplate/Extended.xml` | Module with tests and build helpers |
+| `PlasterTemplate/Advanced.xml` | Full module with Pester, PlatyPS, Git support |
+| `currentmodules.txt` | Append-only registry of created module paths (repo root) |
+
+### Environment Variables
+
+| Variable | Effect |
+|---|---|
+| `PSNOW_SAFE_MODE` | Set to `1`, `true`, `yes`, or `on` to suppress the output path message |
+| `BHGitHubUser` | Passed to Plaster as `GitHubUserName`; set in your PowerShell profile |
+
+### Extension Guidance
+
+**Adding a new Plaster manifest:**
+
+1. Create `PlasterTemplate/<Name>.xml` following the Plaster schema.
+2. Add `"<Name>"` to the `[ValidateSet]` on `-BaseManifest` in  
+   `Public/New-PSNowModule.ps1`.
+3. Add a test case in `tests/Integration/` that calls  
+   `New-PSNowModule -BaseManifest <Name>` against a temp directory.
+4. Run `./Build/Build.ps1 -TaskList stage,analyze,test` to validate.
+
+**Adding a new parameter to pass through to Plaster:**
+
+Add the key/value pair to the `$PlasterParams` hashtable in `New-PSNowModule.ps1`.  
+If the selected manifest does not declare the parameter, `Invoke-PSNowPlasterSafely`  
+will silently strip it on the first `ParameterBindingException` and retry — no  
+additional guard code is needed.
+
+### Risks
+
+| Risk | Mitigation |
+|---|---|
+| `PSNOW_SAFE_MODE` set unexpectedly in CI | The path output is suppressed but the module is still created normally. CI should not depend on the output message. |
+| `BHGitHubUser` not set | `GitHubUserName` will be `$null`; Plaster strips it via the retry mechanism. The generated module will have no GitHub user pre-filled. |
+| `currentmodules.txt` growing without bound | `Add-Content` appends one line per call. Prune manually or via `Find-PSNowModule` review. |
+| Wrong `$ModuleRoot` path on Linux | Paths default to `~/modules` on non-Windows. Ensure the `~` expansion resolves correctly under the CI agent user. |
 
 ## RELATED LINKS
+
+- [`Find-PSNowModule`](./Find-PSNowModule.md)
+- [`Private/Invoke-PSNowPlasterSafely.ps1`](../Private/Invoke-PSNowPlasterSafely.ps1)
+- [`PlasterTemplate/`](../PlasterTemplate/)
