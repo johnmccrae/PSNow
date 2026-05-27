@@ -27,12 +27,24 @@ function Find-PSNowModule {
         $scriptPath = Split-Path $PSScriptRoot -Parent
         $thefile = Join-Path -Path $scriptPath -ChildPath "currentmodules.txt"
 
+        Write-PSNowStructuredLog -Operation 'find-modules' -Status 'started' -Fields ([ordered]@{
+            path = $thefile
+        })
+
         if (-not (Test-Path -Path $thefile)) {
+            Write-PSNowStructuredLog -Operation 'find-modules' -Status 'not-found' -Fields ([ordered]@{
+                path = $thefile
+            })
             Write-Output "No modules have been created with PSNow yet."
             return
         }
 
         $modules = Get-Content -Path $thefile
+        Write-PSNowStructuredLog -Operation 'find-modules' -Status 'completed' -Fields ([ordered]@{
+            count = $modules.Count
+            path  = $thefile
+        })
+
         Write-Output "`n"
         Write-Output "Here's your list of PSNow Modules"
         Write-Output "---------------------------------"

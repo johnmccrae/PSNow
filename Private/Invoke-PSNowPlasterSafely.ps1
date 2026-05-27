@@ -11,10 +11,15 @@ function Invoke-PSNowPlasterSafely {
     )
 
     $params = $PlasterParams.Clone()
+    $attempt = 0
 
     while ($true) {
+        $attempt++
         try {
             Invoke-Plaster @params -Force -Verbose
+            Write-PSNowStructuredLog -Operation 'invoke-plaster-safely' -Status 'completed' -Fields ([ordered]@{
+                attempts = $attempt
+            })
             return
         }
         catch [System.Management.Automation.ParameterBindingException] {
@@ -25,12 +30,24 @@ function Invoke-PSNowPlasterSafely {
             ).Groups[1].Value
 
             if ([string]::IsNullOrWhiteSpace($missingParameter) -or -not $params.ContainsKey($missingParameter)) {
+                Write-PSNowStructuredLog -Operation 'invoke-plaster-safely' -Status 'failed' -Fields ([ordered]@{
+                    attempts = $attempt
+                    error    = $_.Exception.Message
+                })
                 throw
             }
 
+            Write-PSNowStructuredLog -Operation 'invoke-plaster-safely' -Status 'retry' -Fields ([ordered]@{
+                attempt       = $attempt
+                removed_param = $missingParameter
+            })
             $params.Remove($missingParameter) | Out-Null
         }
         catch {
+            Write-PSNowStructuredLog -Operation 'invoke-plaster-safely' -Status 'failed' -Fields ([ordered]@{
+                attempts = $attempt
+                error    = $_.Exception.Message
+            })
             throw
         }
     }
