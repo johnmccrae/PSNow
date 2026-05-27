@@ -14,6 +14,11 @@ if (-not [string]::IsNullOrWhiteSpace($moduleManifestPath)) {
 
 InModuleScope -ModuleName PSNow {
     Describe 'Remove-OldPSNowManifest structured logging' {
+        BeforeAll {
+            # Forward-slash absolute path — valid on Linux and accepted by Windows
+            # PowerShell without touching a PSDrive (all IO is mocked anyway).
+            $script:templateRoot = '/psnow-test-repo'
+        }
         BeforeEach {
             Mock Remove-Item {}
             Mock Copy-Item {}
@@ -23,7 +28,7 @@ InModuleScope -ModuleName PSNow {
         It 'emits a started log at the beginning of manifest setup' {
             Mock Test-Path { $false }
 
-            Remove-OldPSNowManifest -TemplateRoot 'C:\repo' -BaseManifest 'Basic'
+            Remove-OldPSNowManifest -TemplateRoot $script:templateRoot -BaseManifest 'Basic'
 
             Should -Invoke Write-Verbose -ParameterFilter {
                 $Message -match '^\[op=manifest-setup, status=started, manifest=Basic\]$'
@@ -33,7 +38,7 @@ InModuleScope -ModuleName PSNow {
         It 'emits a completed log after copying the manifest' {
             Mock Test-Path { $false }
 
-            Remove-OldPSNowManifest -TemplateRoot 'C:\repo' -BaseManifest 'Extended'
+            Remove-OldPSNowManifest -TemplateRoot $script:templateRoot -BaseManifest 'Extended'
 
             Should -Invoke Write-Verbose -ParameterFilter {
                 $Message -match 'op=manifest-setup, status=completed, manifest=Extended'
@@ -47,7 +52,7 @@ InModuleScope -ModuleName PSNow {
                 $Path -clike '*PlasterManifest.xml'
             }
 
-            Remove-OldPSNowManifest -TemplateRoot 'C:\repo' -BaseManifest 'Basic'
+            Remove-OldPSNowManifest -TemplateRoot $script:templateRoot -BaseManifest 'Basic'
 
             Should -Invoke Write-Verbose -ParameterFilter {
                 $Message -match 'op=manifest-setup, status=removed' -and $Message -match 'PlasterManifest\.xml'
@@ -61,7 +66,7 @@ InModuleScope -ModuleName PSNow {
                 $Path -clike '*plasterManifest.xml'
             }
 
-            Remove-OldPSNowManifest -TemplateRoot 'C:\repo' -BaseManifest 'Basic'
+            Remove-OldPSNowManifest -TemplateRoot $script:templateRoot -BaseManifest 'Basic'
 
             Should -Invoke Write-Verbose -ParameterFilter {
                 $Message -match 'op=manifest-setup, status=removed' -and $Message -match 'plasterManifest\.xml'
