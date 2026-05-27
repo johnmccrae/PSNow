@@ -17,6 +17,9 @@ This document maps conceptual components to concrete files in this repository.
 | Public command: `New-PSNowModule` | Creates a module scaffold via Plaster | `Public/New-PSNowModule.ps1` |
 | Public command: `Find-PSNowModule` | Lists generated modules from tracker file | `Public/Find-PSNowModule.ps1` |
 | Environment helpers | OS and temp-path helpers consumed by public commands | `Private/Get-PSNowEnvironmentVariables.ps1` |
+| Manifest switcher | Removes stale `PlasterManifest.xml` and copies selected template | `Private/Remove-OldPSNowManifest.ps1` |
+| Structured logger | Emits key=value log lines via `Write-Verbose` | `Private/Write-PSNowStructuredLog.ps1` |
+| Whitespace normalizer | Trims trailing whitespace from all module `.ps1`/`.psm1`/`.psd1` files | `Private/Write-PSNowScriptNoWhitespace.ps1` |
 | Template manifests | Manifest variants consumed by Plaster | `PlasterTemplate/Basic.xml`, `PlasterTemplate/Extended.xml`, `PlasterTemplate/Advanced.xml` |
 | Build orchestration | Dependency resolution and PSake invocation | `Build/build.ps1` |
 | Build tasks | Stage, analyze, test, publish tasks | `Build/build.psake.ps1` |
@@ -26,7 +29,11 @@ This document maps conceptual components to concrete files in this repository.
 ## Dependency Flow
 
 1. `PSNow.psm1` imports scripts from `Public/*.ps1` and `Private/*.ps1`.
-2. `Public/New-PSNowModule.ps1` depends on `Private/Get-PSNowEnvironmentVariables.ps1` and templates in `PlasterTemplate/*.xml`.
+2. `Public/New-PSNowModule.ps1` depends on:
+   - `Private/Get-PSNowEnvironmentVariables.ps1` — OS detection and temp path.
+   - `Private/Remove-OldPSNowManifest.ps1` — selects and copies the correct template manifest before `Invoke-Plaster`.
+   - `Private/Write-PSNowStructuredLog.ps1` — emits structured verbose log entries around `Invoke-Plaster`.
+   - `PlasterTemplate/*.xml` — the three scaffold manifests.
 3. `Build/build.ps1` invokes PSake tasks from `Build/build.psake.ps1`.
 4. `azure-pipelines.yml` invokes `Build/build.ps1` and the architecture validation script.
 
