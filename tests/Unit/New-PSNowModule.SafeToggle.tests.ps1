@@ -63,10 +63,34 @@ InModuleScope -ModuleName PSNow {
             Should -Invoke Write-Output -ParameterFilter { $InputObject -match 'Your module was built at:' } -Exactly 1 -Scope It
         }
 
-        It 'suppresses module path output when safe mode is ON' {
+        It 'suppresses module path output when safe mode is ON (value: 1)' {
             $env:PSNOW_SAFE_MODE = '1'
 
             $null = New-PSNowModule -NewModuleName 'SafeOn' -BaseManifest 'Basic' -ModuleRoot 'c:\modules'
+
+            Should -Invoke Write-Output -ParameterFilter { $InputObject -match 'Your module was built at:' } -Exactly 0 -Scope It
+        }
+
+        It 'suppresses module path output when safe mode is "true"' {
+            $env:PSNOW_SAFE_MODE = 'true'
+
+            $null = New-PSNowModule -NewModuleName 'SafeTrue' -BaseManifest 'Basic' -ModuleRoot 'c:\modules'
+
+            Should -Invoke Write-Output -ParameterFilter { $InputObject -match 'Your module was built at:' } -Exactly 0 -Scope It
+        }
+
+        It 'suppresses module path output when safe mode is "yes"' {
+            $env:PSNOW_SAFE_MODE = 'yes'
+
+            $null = New-PSNowModule -NewModuleName 'SafeYes' -BaseManifest 'Basic' -ModuleRoot 'c:\modules'
+
+            Should -Invoke Write-Output -ParameterFilter { $InputObject -match 'Your module was built at:' } -Exactly 0 -Scope It
+        }
+
+        It 'suppresses module path output when safe mode is "on"' {
+            $env:PSNOW_SAFE_MODE = 'on'
+
+            $null = New-PSNowModule -NewModuleName 'SafeOnStr' -BaseManifest 'Basic' -ModuleRoot 'c:\modules'
 
             Should -Invoke Write-Output -ParameterFilter { $InputObject -match 'Your module was built at:' } -Exactly 0 -Scope It
         }
