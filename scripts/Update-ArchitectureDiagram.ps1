@@ -60,11 +60,6 @@ $moduleEntryToPublic = $publicFiles | ForEach-Object {
     "    ModuleEntry --> $(Get-NodeId $_.BaseName)"
 }
 
-# Static known edges for private helpers consumed by New-PSNowModule
-$knownEdges = @(
-    "    NewPSNowModule --> EnvHelpers[$(($privateFiles | Where-Object BaseName -eq 'Get-PSNowEnvironmentVariables') -ne $null ? 'Environment helpers\npath: Private/Get-PSNowEnvironmentVariables.ps1' : 'Get-PSNowEnvironmentVariables')]"
-)
-
 # Generic: every private helper is reachable from the module entry
 $privateEdges = $privateFiles | ForEach-Object {
     "    ModuleEntry --> $(Get-NodeId $_.BaseName)"
