@@ -20,7 +20,9 @@ function Remove-OldPSNowManifest {
         Remove-Item -Path $lowerManifest
     }
 
-    $plasterdoc = Get-ChildItem (Join-Path -Path $TemplateRoot -ChildPath 'PlasterTemplate') -Filter "$BaseManifest.xml" |
-        ForEach-Object { $_.FullName }
+    # Build the source path directly — the filename is always "$BaseManifest.xml" and
+    # the directory is always PlasterTemplate/. This avoids a Get-ChildItem directory
+    # scan on every New-PSNowModule call.
+    $plasterdoc = Join-Path -Path $TemplateRoot -ChildPath 'PlasterTemplate' -AdditionalChildPath "$BaseManifest.xml"
     Copy-Item -Path $plasterdoc -Destination $lowerManifest
 }
