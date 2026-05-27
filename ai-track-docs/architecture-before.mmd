@@ -11,9 +11,6 @@ flowchart TD
 
     %% Internal dependencies
     EnvHelpers[Environment helpers\npath: Private/Get-PSNowEnvironmentVariables.ps1]
-    ManifestHelper[Manifest switcher\npath: Private/Remove-OldPSNowManifest.ps1]
-    LogHelper[Structured logger\npath: Private/Write-PSNowStructuredLog.ps1]
-    WhitespaceHelper[Whitespace normalizer\npath: Private/Write-PSNowScriptNoWhitespace.ps1]
     Templates[Plaster templates\npath: PlasterTemplate/Basic.xml\nPlasterTemplate/Extended.xml\nPlasterTemplate/Advanced.xml]
     ModuleTracker[currentmodules.txt\npath: currentmodules.txt]
 
@@ -30,8 +27,6 @@ flowchart TD
     ModuleEntry --> FindCmd
     NewCmd --> EnvHelpers
     NewCmd --> Templates
-    NewCmd --> ManifestHelper
-    NewCmd -->|logs via| LogHelper
 
     %% Data flow: module generation and tracking
     NewCmd -->|writes generated scaffold| GeneratedModule[Generated module files\npath: <ModuleRoot>/<NewModuleName>/...]
