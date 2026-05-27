@@ -6,7 +6,7 @@
     Plaster                        = '1.1.3'
     Pester                         = '5.7.1'
     'Microsoft.PowerShell.PlatyPS' = '1.0.1'
-    PSake                          = '4.9.0'
+    PSake                          = '5.0.4'
     PSDeploy                       = '1.0.5'
     PSScriptAnalyzer               = '1.25.0'
     'posh-git'                     = '1.1.0'
