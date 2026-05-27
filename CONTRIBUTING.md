@@ -72,34 +72,35 @@ git checkout -b walk-ex5
 
 ## PR Expectations
 
-Every PR must include the following sections. Use the template below as your PR body:
+Every PR must follow the template at `.github/PULL_REQUEST_TEMPLATE.md`.  
+The required sections are:
 
 ```
+## Title: GHCP -- Run: <ex#> <name>
+
 ## Summary
 - What changed and why
-- Plan: <inline summary or link>
-- Files/paths touched
+- Patch plan reference (if applicable)
+- Files/paths/folders touched
 
 ## Evidence
+- Before/after metrics or screenshots: <data>
 - Tests/logs/metrics: <commands + output summary>
-- Coverage: <percentage or contract evidence>
+- Delegation checklist completed: yes/no
 
 ## Risk & Rollback
-- Risk: low/medium/high
+- Risk: low/medium
 - Rollback: revert <commit SHA> or toggle <flag>
-
-## Review Focus
-- Key areas for reviewer attention
-- Verification steps the reviewer can run
+- Rollback commands: <exact commands if applicable>
 
 ## Track
-- Level: Walk
-- Exercise: ex<N>
+- Level: Run
+- Exercise: <ex#>
 ```
 
 **Evidence is mandatory.** Paste the test result line from `validate.ps1`:
 ```
-Tests Passed: 266, Failed: 0, Skipped: 4
+Tests Passed: 307, Failed: 0, Skipped: 4
 ```
 
 ---
