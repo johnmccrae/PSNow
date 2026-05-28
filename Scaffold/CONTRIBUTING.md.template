@@ -1,0 +1,47 @@
+# Contributing to <%= $PLASTER_PARAM_ModuleName %>
+
+Thank you for your interest in contributing! This document explains how to get started.
+
+## Getting Started
+
+1. Fork the repository on GitHub: <https://github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>>
+2. Clone your fork and create a feature branch:
+   ```powershell
+   git checkout -b feature/my-improvement
+   ```
+3. Install dependencies:
+   ```powershell
+   .\Build\build.ps1 -ResolveDependency
+   ```
+
+## Development Workflow
+
+```powershell
+# Lint and test before every commit
+.\Build\build.ps1 -TaskList analyze,test
+
+# Stage the module
+.\Build\build.ps1 -TaskList stage
+```
+
+## Code Standards
+
+- One exported function per file; filename must match function name exactly
+- All exported functions require comment-based help (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`)
+- Use `[CmdletBinding()]` on every function
+- No new PSScriptAnalyzer warnings or errors
+- New public functions must have corresponding Pester unit tests in `Tests\Unit\`
+
+## Submitting a Pull Request
+
+1. Ensure all tests pass: `.\Build\build.ps1 -TaskList analyze,test`
+2. Update `CHANGELOG.md` under `[Unreleased]`
+3. Open a PR against `main` — fill in the PR template completely
+
+## Reporting Bugs
+
+Use the **Bug report** issue template. Include the PowerShell version (`$PSVersionTable`) and a minimal reproduction script.
+
+## Requesting Features
+
+Use the **Feature request** issue template. Describe the use case and expected behaviour.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plasterManifest xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1" schemaVersion="1.0">
+<plasterManifest xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1" schemaVersion="1.1">
   <metadata>
     <name>ModuleTemplate</name>
     <id>c8e32c92-c461-4200-89a0-79ac904e7520</id>
@@ -76,6 +76,16 @@ Setting up Your Project
 
         </message>
         <newModuleManifest destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1" moduleVersion="${PLASTER_PARAM_ModuleVersion}" rootModule="${PLASTER_PARAM_ModuleName}.psm1" author="${PLASTER_PARAM_ModuleAuthor}" companyName="${PLASTER_PARAM_CompanyName}" description="${PLASTER_PARAM_Description}" encoding='UTF8-NoBOM'/>
+        <modify path="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1">
+          <replace>
+            <original># LicenseUri = ''</original>
+            <substitute expand="true">LicenseUri = 'https://github.com/$PLASTER_PARAM_GitHubUserName/$PLASTER_PARAM_GitHubRepo/blob/main/LICENSE.md'</substitute>
+          </replace>
+          <replace>
+            <original># ProjectUri = ''</original>
+            <substitute expand="true">ProjectUri = 'https://github.com/$PLASTER_PARAM_GitHubUserName/$PLASTER_PARAM_GitHubRepo'</substitute>
+          </replace>
+        </modify>
         <templateFile source="Scaffold\template.psm1" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
         <templateFile source="Scaffold\nuspec.txt" destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.nuspec" />
 
@@ -106,6 +116,10 @@ Deploying Common Files
         </message>
         <templateFile source="Scaffold\LICENSE.md" destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
         <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\Readme.md" />
+        <templateFile source="Scaffold\CHANGELOG.md.template"    destination="${PLASTER_PARAM_ModuleName}\CHANGELOG.md" />
+        <templateFile source="Scaffold\CONTRIBUTING.md.template" destination="${PLASTER_PARAM_ModuleName}\CONTRIBUTING.md" />
+        <templateFile source="Scaffold\SECURITY.md.template"     destination="${PLASTER_PARAM_ModuleName}\SECURITY.md" />
+        <file         source="Scaffold\.editorconfig"            destination="${PLASTER_PARAM_ModuleName}\.editorconfig" />
 
         <message>
 
@@ -191,6 +205,8 @@ Your new PowerShell module -[ $PLASTER_PARAM_ModuleName ]- has been created.
 If you noted any 'Missing The required module 'abcde' (minimum version: 0.14.0) was not found' errors,
 you correct those by running .\build\build.ps1 -ResolveDependency.
 
+Next: add PS Gallery tags:  Update-ModuleManifest -Path '.\$PLASTER_PARAM_ModuleName.psd1' -Tags @('tag1', 'tag2')
+
         </message>
 
         <message condition="$PLASTER_PARAM_Options -in @('All','Standard')">
@@ -223,6 +239,12 @@ Setting up AI scaffolding
         <templateFile source="Scaffold\copilot-instructions.md.template"  destination="${PLASTER_PARAM_ModuleName}\.github\copilot-instructions.md" />
         <templateFile source="Scaffold\AGENTS.md.template"                destination="${PLASTER_PARAM_ModuleName}\AGENTS.md" />
         <templateFile source="Scaffold\CLAUDE.md.template"                destination="${PLASTER_PARAM_ModuleName}\CLAUDE.md" />
+        <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\ISSUE_TEMPLATE\" />
+        <file source="Scaffold\bug_report.md"          destination="${PLASTER_PARAM_ModuleName}\.github\ISSUE_TEMPLATE\bug_report.md" />
+        <file source="Scaffold\feature_request.md"     destination="${PLASTER_PARAM_ModuleName}\.github\ISSUE_TEMPLATE\feature_request.md" />
+        <file source="Scaffold\pull_request_template.md" destination="${PLASTER_PARAM_ModuleName}\.github\pull_request_template.md" />
+        <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\workflows\" />
+        <file source="Scaffold\github-actions-ci.yml.template"            destination="${PLASTER_PARAM_ModuleName}\.github\workflows\ci.yml" />
 
         <message>
 Fill in the TODOs in the AI scaffolding files to give your AI assistant context about this module:
