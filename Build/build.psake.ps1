@@ -17,15 +17,15 @@ Properties {
 
     # Pester — unit/common/acceptance tests plus template integration tests
     $TestScripts = @(
-        Get-ChildItem (Join-Path $ProjectRoot 'tests' '**' '*Tests.ps1') -ErrorAction SilentlyContinue
-        Get-ChildItem (Join-Path $ProjectRoot 'tests' 'Integration' '*Integration.Tests.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path -Path $ProjectRoot -ChildPath 'tests' -AdditionalChildPath '**', '*Tests.ps1') -ErrorAction SilentlyContinue
+        Get-ChildItem (Join-Path -Path $ProjectRoot -ChildPath 'tests' -AdditionalChildPath 'Integration', '*Integration.Tests.ps1') -ErrorAction SilentlyContinue
     )
     $TestFile = "Test-Unit_$($TimeStamp).xml"
 
     # Script Analyzer
     [ValidateSet('Error', 'Warning', 'Any', 'None')]
     $ScriptAnalysisFailBuildOnSeverityLevel = 'Error'
-    $ScriptAnalyzerSettingsPath = Join-Path $ProjectRoot 'Build' 'PSScriptAnalyzerSettings.psd1'
+    $ScriptAnalyzerSettingsPath = Join-Path -Path $ProjectRoot -ChildPath 'Build' -AdditionalChildPath 'PSScriptAnalyzerSettings.psd1'
 
     # Build
     $ArtifactFolder = Join-Path -Path $ProjectRoot -ChildPath 'BuildOutput'
