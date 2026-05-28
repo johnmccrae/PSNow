@@ -129,6 +129,26 @@ Describe 'Basic template — generated module structure' -Skip:(-not $plasterAva
         }
     }
 
+    Context 'Community health files' {
+        It 'Creates CHANGELOG.md'        { (Join-Path $modRoot 'CHANGELOG.md') | Should -Exist }
+        It 'Creates SECURITY.md'         { (Join-Path $modRoot 'SECURITY.md')  | Should -Exist }
+        It 'Creates .editorconfig'       { (Join-Path $modRoot '.editorconfig') | Should -Exist }
+        It 'Creates .github\ISSUE_TEMPLATE\bug_report.md'     { (Join-Path $modRoot '.github' 'ISSUE_TEMPLATE' 'bug_report.md')     | Should -Exist }
+        It 'Creates .github\ISSUE_TEMPLATE\feature_request.md'{ (Join-Path $modRoot '.github' 'ISSUE_TEMPLATE' 'feature_request.md') | Should -Exist }
+        It 'Creates .github\pull_request_template.md'          { (Join-Path $modRoot '.github' 'pull_request_template.md')           | Should -Exist }
+    }
+
+    Context 'Manifest PS Gallery metadata' {
+        It 'LicenseUri is set in the manifest' {
+            $psd1 = Get-Content (Join-Path $modRoot "$modName.psd1") -Raw
+            $psd1 | Should -Match "LicenseUri\s*=\s*'https://github.com/testuser/testrepo"
+        }
+        It 'ProjectUri is set in the manifest' {
+            $psd1 = Get-Content (Join-Path $modRoot "$modName.psd1") -Raw
+            $psd1 | Should -Match "ProjectUri\s*=\s*'https://github.com/testuser/testrepo"
+        }
+    }
+
     Context 'Template substitution' {
         It 'Starter function contains the module name' {
             Get-Content (Join-Path $modRoot 'Public' "$modName.ps1") -Raw | Should -Match $modName
@@ -254,6 +274,28 @@ Describe 'Extended template — generated module structure' -Skip:(-not $plaster
         }
         It 'AGENTS.md contains the module name' {
             Get-Content (Join-Path $modRoot 'AGENTS.md') -Raw | Should -Match $modName
+        }
+    }
+
+    Context 'Community health files' {
+        It 'Creates CHANGELOG.md'        { (Join-Path $modRoot 'CHANGELOG.md')   | Should -Exist }
+        It 'Creates CONTRIBUTING.md'     { (Join-Path $modRoot 'CONTRIBUTING.md') | Should -Exist }
+        It 'Creates SECURITY.md'         { (Join-Path $modRoot 'SECURITY.md')    | Should -Exist }
+        It 'Creates .editorconfig'       { (Join-Path $modRoot '.editorconfig')   | Should -Exist }
+        It 'Creates .github\ISSUE_TEMPLATE\bug_report.md'     { (Join-Path $modRoot '.github' 'ISSUE_TEMPLATE' 'bug_report.md')     | Should -Exist }
+        It 'Creates .github\ISSUE_TEMPLATE\feature_request.md'{ (Join-Path $modRoot '.github' 'ISSUE_TEMPLATE' 'feature_request.md') | Should -Exist }
+        It 'Creates .github\pull_request_template.md'          { (Join-Path $modRoot '.github' 'pull_request_template.md')           | Should -Exist }
+        It 'Creates .github\workflows\ci.yml'                  { (Join-Path $modRoot '.github' 'workflows' 'ci.yml')                 | Should -Exist }
+    }
+
+    Context 'Manifest PS Gallery metadata' {
+        It 'LicenseUri is set in the manifest' {
+            $psd1 = Get-Content (Join-Path $modRoot "$modName.psd1") -Raw
+            $psd1 | Should -Match "LicenseUri\s*=\s*'https://github.com/testuser/testrepo"
+        }
+        It 'ProjectUri is set in the manifest' {
+            $psd1 = Get-Content (Join-Path $modRoot "$modName.psd1") -Raw
+            $psd1 | Should -Match "ProjectUri\s*=\s*'https://github.com/testuser/testrepo"
         }
     }
 
@@ -405,6 +447,28 @@ Describe 'Advanced template — generated module structure' -Skip:(-not $plaster
         }
         It 'CLAUDE.md contains the module name' {
             Get-Content (Join-Path $modRoot 'CLAUDE.md') -Raw | Should -Match $modName
+        }
+    }
+
+    Context 'Community health files' {
+        It 'Creates CHANGELOG.md'        { (Join-Path $modRoot 'CHANGELOG.md')   | Should -Exist }
+        It 'Creates CONTRIBUTING.md'     { (Join-Path $modRoot 'CONTRIBUTING.md') | Should -Exist }
+        It 'Creates SECURITY.md'         { (Join-Path $modRoot 'SECURITY.md')    | Should -Exist }
+        It 'Creates .editorconfig'       { (Join-Path $modRoot '.editorconfig')   | Should -Exist }
+        It 'Creates .github\ISSUE_TEMPLATE\bug_report.md'     { (Join-Path $modRoot '.github' 'ISSUE_TEMPLATE' 'bug_report.md')     | Should -Exist }
+        It 'Creates .github\ISSUE_TEMPLATE\feature_request.md'{ (Join-Path $modRoot '.github' 'ISSUE_TEMPLATE' 'feature_request.md') | Should -Exist }
+        It 'Creates .github\pull_request_template.md'          { (Join-Path $modRoot '.github' 'pull_request_template.md')           | Should -Exist }
+        It 'Creates .github\workflows\ci.yml'                  { (Join-Path $modRoot '.github' 'workflows' 'ci.yml')                 | Should -Exist }
+    }
+
+    Context 'Manifest PS Gallery metadata' {
+        It 'LicenseUri is set in the manifest' {
+            $psd1 = Get-Content (Join-Path $modRoot "$modName.psd1") -Raw
+            $psd1 | Should -Match "LicenseUri\s*=\s*'https://github.com/testuser/testrepo"
+        }
+        It 'ProjectUri is set in the manifest' {
+            $psd1 = Get-Content (Join-Path $modRoot "$modName.psd1") -Raw
+            $psd1 | Should -Match "ProjectUri\s*=\s*'https://github.com/testuser/testrepo"
         }
     }
 

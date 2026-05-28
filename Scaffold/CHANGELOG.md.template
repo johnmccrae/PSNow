@@ -1,0 +1,21 @@
+# Changelog
+
+All notable changes to `<%= $PLASTER_PARAM_ModuleName %>` will be documented in this file.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- Initial module scaffold generated with [PSNow](https://github.com/johnmccrae/PSNow)
+
+## [<%= $PLASTER_PARAM_ModuleVersion %>] - <%= (Get-Date -Format 'yyyy-MM-dd') %>
+
+### Added
+
+- Initial release
+
+[Unreleased]: https://github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>/compare/v<%= $PLASTER_PARAM_ModuleVersion %>...HEAD
+[<%= $PLASTER_PARAM_ModuleVersion %>]: https://github.com/<%= $PLASTER_PARAM_GitHubUserName %>/<%= $PLASTER_PARAM_GitHubRepo %>/releases/tag/v<%= $PLASTER_PARAM_ModuleVersion %>

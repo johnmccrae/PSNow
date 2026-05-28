@@ -81,6 +81,17 @@ Setting up Your Module
       powerShellVersion="${PLASTER_PARAM_PowerShellVersion}"
       encoding="UTF8-NoBOM" />
 
+    <modify path="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1">
+      <replace>
+        <original># LicenseUri = ''</original>
+        <substitute expand="true">LicenseUri = 'https://github.com/$PLASTER_PARAM_GitHubUserName/$PLASTER_PARAM_GitHubRepo/blob/main/LICENSE.md'</substitute>
+      </replace>
+      <replace>
+        <original># ProjectUri = ''</original>
+        <substitute expand="true">ProjectUri = 'https://github.com/$PLASTER_PARAM_GitHubUserName/$PLASTER_PARAM_GitHubRepo'</substitute>
+      </replace>
+    </modify>
+
     <templateFile source="Scaffold\template.psm1"
                   destination="${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1" />
 
@@ -122,6 +133,10 @@ Deploying common files
     <templateFile source="Scaffold\LICENSE.md"    destination="${PLASTER_PARAM_ModuleName}\LICENSE.md" />
     <templateFile source="Scaffold\readme.md.txt" destination="${PLASTER_PARAM_ModuleName}\README.md" />
     <file         source=".gitignore"             destination="${PLASTER_PARAM_ModuleName}\.gitignore" />
+    <templateFile source="Scaffold\CHANGELOG.md.template"    destination="${PLASTER_PARAM_ModuleName}\CHANGELOG.md" />
+    <templateFile source="Scaffold\CONTRIBUTING.md.template" destination="${PLASTER_PARAM_ModuleName}\CONTRIBUTING.md" />
+    <templateFile source="Scaffold\SECURITY.md.template"     destination="${PLASTER_PARAM_ModuleName}\SECURITY.md" />
+    <file         source="Scaffold\.editorconfig"            destination="${PLASTER_PARAM_ModuleName}\.editorconfig" />
 
     <message>
 
@@ -177,6 +192,12 @@ Setting up AI scaffolding
     <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\" />
     <templateFile source="Scaffold\copilot-instructions.md.template"  destination="${PLASTER_PARAM_ModuleName}\.github\copilot-instructions.md" />
     <templateFile source="Scaffold\AGENTS.md.template"                destination="${PLASTER_PARAM_ModuleName}\AGENTS.md" />
+    <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\ISSUE_TEMPLATE\" />
+    <file source="Scaffold\bug_report.md"          destination="${PLASTER_PARAM_ModuleName}\.github\ISSUE_TEMPLATE\bug_report.md" />
+    <file source="Scaffold\feature_request.md"     destination="${PLASTER_PARAM_ModuleName}\.github\ISSUE_TEMPLATE\feature_request.md" />
+    <file source="Scaffold\pull_request_template.md" destination="${PLASTER_PARAM_ModuleName}\.github\pull_request_template.md" />
+    <file source=""                                                   destination="${PLASTER_PARAM_ModuleName}\.github\workflows\" />
+    <file source="Scaffold\github-actions-ci.yml.template"            destination="${PLASTER_PARAM_ModuleName}\.github\workflows\ci.yml" />
 
     <message>
 
@@ -190,6 +211,7 @@ Next steps:
   3. Run tests:            .\Build\build.ps1 -TaskList test
   4. Lint your code:       .\Build\build.ps1 -TaskList analyze,test
   5. Fill in the TODOs in: $PLASTER_PARAM_ModuleName\.github\copilot-instructions.md
+  6. Add PS Gallery tags:  Update-ModuleManifest -Path '.\$PLASTER_PARAM_ModuleName.psd1' -Tags @('tag1', 'tag2')
 
     </message>
 
