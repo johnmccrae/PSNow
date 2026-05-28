@@ -155,7 +155,9 @@ function New-PSNowModule {
             }
 
             $doc = Join-Path -Path $templateroot -ChildPath 'currentmodules.txt'
-            Add-Content -Path $doc -Value $Path
+            Invoke-PSNowWithRetry -OperationName 'tracker-append' -MaxAttempts 3 -InitialDelayMs 100 `
+                -ScriptBlock { param($filePath, $entry) Add-Content -Path $filePath -Value $entry } `
+                -ArgumentList @($doc, $Path)
         }
 
         }

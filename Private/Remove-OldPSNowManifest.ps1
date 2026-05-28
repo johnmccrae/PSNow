@@ -34,7 +34,9 @@ function Remove-OldPSNowManifest {
     # the directory is always PlasterTemplate/. This avoids a Get-ChildItem directory
     # scan on every New-PSNowModule call.
     $plasterdoc = Join-Path -Path $TemplateRoot -ChildPath 'PlasterTemplate' -AdditionalChildPath "$BaseManifest.xml"
-    Copy-Item -Path $plasterdoc -Destination $lowerManifest
+    Invoke-PSNowWithRetry -OperationName 'manifest-copy' -MaxAttempts 3 -InitialDelayMs 200 `
+        -ScriptBlock { param($src, $dst) Copy-Item -Path $src -Destination $dst } `
+        -ArgumentList @($plasterdoc, $lowerManifest)
 
     Write-PSNowStructuredLog -Operation 'manifest-setup' -Status 'completed' -Fields ([ordered]@{
         manifest    = $BaseManifest
