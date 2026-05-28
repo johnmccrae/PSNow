@@ -1,103 +1,103 @@
 trigger:
 - main
+- run-ex*
 
 pr:
 - main
 - run-ex*
 
-strategy:
-  matrix:
-    Windows:
-      vmImage: windows-latest
-      PSMODULE_CACHE_PATH: $(UserProfile)\Documents\PowerShell\Modules
-    Ubuntu:
-      vmImage: ubuntu-latest
-      PSMODULE_CACHE_PATH: $(HOME)/.local/share/powershell/Modules
+jobs:
+- job: Build
+  timeoutInMinutes: 20
+  strategy:
+    matrix:
+      Windows:
+        vmImage: windows-latest
+        PSMODULE_CACHE_PATH: $(UserProfile)\Documents\PowerShell\Modules
+      Ubuntu:
+        vmImage: ubuntu-latest
+        PSMODULE_CACHE_PATH: $(HOME)/.local/share/powershell/Modules
 
-pool:
-  vmImage: $(vmImage)
+  pool:
+    vmImage: $(vmImage)
 
-# Safety net: abort a stuck run before it consumes the full pipeline quota.
-# 20 minutes is generous for a run that normally completes in ~5-7 minutes.
-timeoutInMinutes: 20
+  steps:
+  - task: UseNode@1
+    displayName: Use Node.js 20.x (for Mermaid validation)
+    inputs:
+      version: '20.x'
 
-steps:
-- task: UseNode@1
-  displayName: Use Node.js 20.x (for Mermaid validation)
-  inputs:
-    version: '20.x'
+  - script: |
+      GITLEAKS_VERSION=8.30.1
+      curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+        -o /tmp/gitleaks.tar.gz
+      tar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
+      sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+      gitleaks version
+    displayName: Install gitleaks (Ubuntu)
+    condition: eq(variables['Agent.OS'], 'Linux')
 
-- script: |
-    GITLEAKS_VERSION=8.30.1
-    curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
-      -o /tmp/gitleaks.tar.gz
-    tar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
-    sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
-    gitleaks version
-  displayName: Install gitleaks (Ubuntu)
-  condition: eq(variables['Agent.OS'], 'Linux')
+  - pwsh: |
+      $version = "8.30.1"
+      $gitleaksDir = "C:\tools\gitleaks"
+      New-Item -ItemType Directory -Force -Path $gitleaksDir | Out-Null
+      Invoke-WebRequest -Uri "https://github.com/gitleaks/gitleaks/releases/download/v$version/gitleaks_${version}_windows_x64.zip" -OutFile "$env:TEMP\gitleaks.zip"
+      Expand-Archive -Path "$env:TEMP\gitleaks.zip" -DestinationPath $gitleaksDir -Force
+      Write-Host "##vso[task.prependpath]$gitleaksDir"
+      & "$gitleaksDir\gitleaks.exe" version
+    displayName: Install gitleaks (Windows)
+    condition: eq(variables['Agent.OS'], 'Windows_NT')
 
-- pwsh: |
-    $version = "8.30.1"
-    $gitleaksDir = "C:\tools\gitleaks"
-    New-Item -ItemType Directory -Force -Path $gitleaksDir | Out-Null
-    Invoke-WebRequest -Uri "https://github.com/gitleaks/gitleaks/releases/download/v$version/gitleaks_${version}_windows_x64.zip" -OutFile "$env:TEMP\gitleaks.zip"
-    Expand-Archive -Path "$env:TEMP\gitleaks.zip" -DestinationPath $gitleaksDir -Force
-    Write-Host "##vso[task.prependpath]$gitleaksDir"
-    & "$gitleaksDir\gitleaks.exe" version
-  displayName: Install gitleaks (Windows)
-  condition: eq(variables['Agent.OS'], 'Windows_NT')
+  - pwsh: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
+    displayName: Scan for secrets (gitleaks)
 
-- pwsh: gitleaks detect --source . --config .gitleaks.toml --no-banner --exit-code 1
-  displayName: Scan for secrets (gitleaks)
+  # Cache PowerShell modules keyed on the dependency manifest + OS.
+  # A cache hit skips all PSGallery downloads, saving ~2-3 min per matrix leg.
+  # The cache key uses "v2" so a manual bust is possible by incrementing the prefix.
+  - task: Cache@2
+    displayName: Cache PowerShell module dependencies
+    inputs:
+      key: '"psdeps-v2" | "$(Agent.OS)" | Build/build.depend.psd1'
+      restoreKeys: |
+        "psdeps-v2" | "$(Agent.OS)"
+      path: $(PSMODULE_CACHE_PATH)
 
-# Cache PowerShell modules keyed on the dependency manifest + OS.
-# A cache hit skips all PSGallery downloads, saving ~2-3 min per matrix leg.
-# The cache key uses "v2" so a manual bust is possible by incrementing the prefix.
-- task: Cache@2
-  displayName: Cache PowerShell module dependencies
-  inputs:
-    key: '"psdeps-v2" | "$(Agent.OS)" | Build/build.depend.psd1'
-    restoreKeys: |
-      "psdeps-v2" | "$(Agent.OS)"
-    path: $(PSMODULE_CACHE_PATH)
+  - task: PowerShell@2
+    displayName: Resolve dependencies and init
+    inputs:
+      targetType: 'filePath'
+      filePath: ./Build/build.ps1
+      arguments: '-ResolveDependency -TaskList Init'
+      errorActionPreference: 'stop'
+      failOnStderr: false
+      pwsh: true
 
-- task: PowerShell@2
-  displayName: Resolve dependencies and init
-  inputs:
-    targetType: 'filePath'
-    filePath: ./Build/build.ps1
-    arguments: '-ResolveDependency -TaskList Init'
-    errorActionPreference: 'stop'
-    failOnStderr: false
-    pwsh: true
+  - task: PowerShell@2
+    displayName: Stage module
+    inputs:
+      targetType: 'filePath'
+      filePath: ./Build/build.ps1
+      arguments: '-TaskList Stage'
+      errorActionPreference: 'stop'
+      failOnStderr: false
+      pwsh: true
 
-- task: PowerShell@2
-  displayName: Stage module
-  inputs:
-    targetType: 'filePath'
-    filePath: ./Build/build.ps1
-    arguments: '-TaskList Stage'
-    errorActionPreference: 'stop'
-    failOnStderr: false
-    pwsh: true
+  - task: PowerShell@2
+    displayName: Analyze
+    inputs:
+      targetType: 'filePath'
+      filePath: ./Build/build.ps1
+      arguments: '-TaskList Analyze'
+      errorActionPreference: 'stop'
+      failOnStderr: false
+      pwsh: true
 
-- task: PowerShell@2
-  displayName: Analyze
-  inputs:
-    targetType: 'filePath'
-    filePath: ./Build/build.ps1
-    arguments: '-TaskList Analyze'
-    errorActionPreference: 'stop'
-    failOnStderr: false
-    pwsh: true
-
-- task: PowerShell@2
-  displayName: Test
-  inputs:
-    targetType: 'filePath'
-    filePath: ./Build/build.ps1
-    arguments: '-TaskList Test'
-    errorActionPreference: 'stop'
-    failOnStderr: false
-    pwsh: true
+  - task: PowerShell@2
+    displayName: Test
+    inputs:
+      targetType: 'filePath'
+      filePath: ./Build/build.ps1
+      arguments: '-TaskList Test'
+      errorActionPreference: 'stop'
+      failOnStderr: false
+      pwsh: true
