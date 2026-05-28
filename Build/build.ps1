@@ -198,7 +198,7 @@ if(-not($env:BHBuildNumber))
 $stagingfolder = Join-Path $ENV:BHProjectPath 'Staging'
 Set-Item -Path env:\BHPSModulePath -Value $stagingfolder
 
-$publishfolder = Join-Path $ENV:BHProjectPath 'Staging' $ENV:BHProjectName
+$publishfolder = Join-Path -Path $ENV:BHProjectPath -ChildPath 'Staging' -AdditionalChildPath $ENV:BHProjectName
 Set-Item -Path env:\BHModulePath -Value $publishfolder
 #endregion
 
