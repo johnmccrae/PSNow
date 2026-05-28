@@ -57,7 +57,10 @@ function Find-PSNowModule {
 
         # Blank lines accumulate when entries are appended across runs.
         # Filter them on read to keep output clean without modifying the file.
-        $modules = Get-Content -Path $thefile | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        $rawLines = Invoke-PSNowWithRetry -OperationName 'tracker-read' -MaxAttempts 3 -InitialDelayMs 100 `
+            -ScriptBlock { param($filePath) Get-Content -Path $filePath } `
+            -ArgumentList $thefile
+        $modules = $rawLines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 
         Write-PSNowStructuredLog -Operation 'find-modules' -Status 'completed' -Fields ([ordered]@{
             count = $modules.Count
