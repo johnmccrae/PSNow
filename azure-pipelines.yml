@@ -1,10 +1,12 @@
 trigger:
 - main
 - run-ex*
+- fix-*
 
 pr:
 - main
 - run-ex*
+- fix-*
 
 jobs:
 - job: Build
